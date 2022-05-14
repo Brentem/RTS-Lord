@@ -2,9 +2,6 @@
 
 #include <stdlib.h>
 
-// const int backgroundWith = 3200;
-// const int backgroundHeight = 1216;
-
 MapInfo Map2D_Init(int mapWidth, int mapHeight)
 {
 	MapInfo mapInfo;
