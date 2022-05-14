@@ -9,6 +9,8 @@
 		"**/*.exe": true,
 	},
 	"files.associations": {
-		"2dmap.h": "c"
+		"2dmap.h": "c",
+		"raylib.h": "c",
+		"monitor.h": "c"
 	}
 }
