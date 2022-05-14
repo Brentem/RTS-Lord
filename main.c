@@ -21,35 +21,76 @@
 
 #include "raylib.h"
 
+#include "2DMap.h"
+
+#include <stdlib.h>
+
 int main() 
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+
+
+
+
+
+    const int screenWidth = 1920;
+    const int screenHeight = 1080;
 
     InitWindow(screenWidth, screenHeight, "raylib");
+    int currentMonitor = GetCurrentMonitor(); 
+    int monitorWidth = GetMonitorWidth(currentMonitor);
+    int monitorHeight = GetMonitorHeight(currentMonitor);
+    CloseWindow(); 
 
-    Camera camera = { 0 };
-    camera.position = (Vector3){ 10.0f, 10.0f, 8.0f };
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 60.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    InitWindow(monitorWidth, monitorHeight, "raylib");
+
+    float zoomX = monitorWidth/screenWidth;
+    float zoomY = monitorHeight/screenHeight;
+    float zoom = zoomX;
+    if(zoomY < zoomX) zoom = zoomY;
+
+    //ToggleFullscreen();
+
+	// setup a camera
+	Camera2D cam = { 0 };
+	cam.zoom = zoom;
+	// center the camera on the middle of the screen
+	cam.offset = (Vector2){ screenWidth / 2, screenHeight / 2 };
     
-    SetCameraMode(camera, CAMERA_ORBITAL);
-
-    Vector3 cubePosition = { 0 };
-
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
+
+    Texture2D background = Map2DGetBackground();
+    int posX = Map2dGetWidth();
+    int posY = Map2dGetHeight();
+    int mouseX;
+    int mouseY;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+
         // Update
         //----------------------------------------------------------------------------------
-        UpdateCamera(&camera);
+        if (IsKeyDown(KEY_RIGHT)) posX += 2.0f;
+        if (IsKeyDown(KEY_LEFT)) posX -= 2.0f;
+        if (IsKeyDown(KEY_UP)) posY -= 2.0f;
+        if (IsKeyDown(KEY_DOWN)) posY += 2.0f;
+
+        mouseX = GetMouseX();
+        if (mouseX < 20) posX += 2.0f;
+        if (mouseX < 5) posX += 2.0f;
+
+        if (mouseX > screenWidth-20) posX -= 2.0f;
+        if (mouseX > screenWidth-5) posX -= 2.0f;
+
+        mouseY = GetMouseY();
+        if (mouseY < 20) posY += 2.0f;
+        if (mouseY < 5) posY += 2.0f;
+
+        if (mouseY > screenHeight-20) posY -= 2.0f;
+        if (mouseY > screenHeight-5) posY -= 2.0f;
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -58,17 +99,16 @@ int main()
 
             ClearBackground(RAYWHITE);
 
-            BeginMode3D(camera);
+		    BeginMode2D(cam);
 
-                DrawCube(cubePosition, 2.0f, 2.0f, 2.0f, RED);
-                DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, MAROON);
-                DrawGrid(10, 1.0f);
+		        // draw the entire background image for the entire world. The camera will clip it to the screen
+		        DrawTexture(background, posX, posY, WHITE);
 
-            EndMode3D();
+		    EndMode2D();
 
-            DrawText("This is a raylib example", 10, 40, 20, DARKGRAY);
-
-            DrawFPS(10, 10);
+        char snum[5];
+        itoa(mouseX, snum, 10);
+        DrawText(snum, 190, 200, 20, LIGHTGRAY);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
