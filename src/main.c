@@ -21,58 +21,36 @@
 
 #include "raylib.h"
 
-#include "2DMap.h"
+#include "../include/2DMap.h"
+#include "../include/Monitor.h"
+#include "../include/Camera.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 1920
 #define VIEWPORT_HEIGHT 1080
 
-int main() 
+int main(void) 
 {
     // Initialization
     //--------------------------------------------------------------------------------------
 
     // Init for different monitor resolutions => zoom to VIEWPORT_WIDTH/VIEWPORT_HEIGHT
-    InitWindow(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, "raylib");
+    MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
-    int currentMonitor = GetCurrentMonitor(); 
-    int monitorWidth = GetMonitorWidth(currentMonitor);
-    int monitorHeight = GetMonitorHeight(currentMonitor);
-    CloseWindow(); 
-    InitWindow(monitorWidth, monitorHeight, "raylib");
+    InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
     ToggleFullscreen();
 
-    float zoomX = (float)monitorWidth/VIEWPORT_WIDTH;
-    float zoomY = (float)monitorHeight/VIEWPORT_HEIGHT;
-    float zoom = zoomX;
-    if(zoomY < zoomX) zoom = zoomY;
-
 	// setup a camera
-	Camera2D cam = { 0 };
-	cam.zoom = zoom;
-	// center the camera on the middle of the screen
-	cam.offset = (Vector2){ monitorWidth / 2, monitorHeight / 2 };
+	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
+                                VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-    Texture2D background = Map2DGetBackground();
-    int mapWidth = Map2dGetWidth();
-    int mapHeight = Map2dGetHeight();
-    int posX = (mapWidth/2) *-1;
-    int posY = (mapHeight/2) *-1;
-
-    int vertikalScrollSpace = mapHeight-VIEWPORT_HEIGHT;
-    int upperBoundary = posY + (vertikalScrollSpace/2);
-    int lowerBoundary = posY - (vertikalScrollSpace/2);
-
-    int horizontalScrollSpace = mapWidth-VIEWPORT_WIDTH;
-    int leftBoundary = posX + (horizontalScrollSpace/2);
-    int rightBoundary = posX - (horizontalScrollSpace/2);
-
-    int mouseX;
-    int mouseY;
+    MapInfo info = Map2D_Init(3200, 1216);
+    Texture2D background = Map2DGetBackground(info);
+    Boundaries boundaries = Map2D_GetBoundaries(info, setting);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -80,29 +58,9 @@ int main()
 
         // Update
         //----------------------------------------------------------------------------------
-        if (IsKeyDown(KEY_RIGHT)) posX += 5.0f;
-        if (IsKeyDown(KEY_LEFT)) posX -= 5.0f;
-        if (IsKeyDown(KEY_UP)) posY -= 5.0f;
-        if (IsKeyDown(KEY_DOWN)) posY += 5.0f;
-
-        mouseX = GetMouseX();
-        if (mouseX < 20) posX += 2.0f;
-        if (mouseX < 5) posX += 4.0f;
-        if (mouseX > monitorWidth-20) posX -= 2.0f;
-        if (mouseX > monitorWidth-5) posX -= 4.0f;
-
-        mouseY = GetMouseY();
-        if (mouseY < 20) posY += 2.0f;
-        if (mouseY < 5) posY += 2.0f;
-        if (mouseY > monitorHeight-40) posY -= 2.0f;
-        if (mouseY > monitorHeight-25) posY -= 2.0f;
-
-        if(posY > upperBoundary) posY = upperBoundary;
-        if(posY < lowerBoundary) posY = lowerBoundary;
-        if(posX > leftBoundary) posX = leftBoundary;
-        if(posX < rightBoundary) posX = rightBoundary;
-     
-
+        Map2D_HandleKeyboardInput(&info);
+        Map2D_HandleMouseInput(&info, setting);
+        Map2D_CheckBoundaries(&info, boundaries);
 
         //----------------------------------------------------------------------------------
 
@@ -115,13 +73,9 @@ int main()
 		    BeginMode2D(cam);
 
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
-		        DrawTexture(background, posX, posY, WHITE);
+		        DrawTexture(background, info.position.x, info.position.y, WHITE);
 
 		    EndMode2D();
-
-            // char snum[10];
-            // itoa(posY, snum, 10);
-            // DrawText(snum, 190, 200, 20, BLACK);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
