@@ -48,7 +48,7 @@ int main(void)
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-    MapInfo info = Map2D_Init(3200, 2016);
+    MapInfo info = Map2D_Init(64, 100, 32);
     Texture2D background = Map2DGetBackground(info);
     Boundaries boundaries = Map2D_GetBoundaries(info, setting);
 

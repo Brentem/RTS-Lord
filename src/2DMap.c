@@ -2,27 +2,59 @@
 
 #include <stdlib.h>
 
-MapInfo Map2D_Init(int mapWidth, int mapHeight)
+MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize)
 {
 	MapInfo mapInfo;
 
-	mapInfo.mapWidth = mapWidth;
-	mapInfo.mapHeight = mapHeight;
-	mapInfo.position = (Vector2){((mapWidth/2) *-1), ((mapHeight/2) *-1)};
+	mapInfo.rowCount = rowCount;
+	mapInfo.columnCount = columnCount;
+	mapInfo.cellSize = cellSize;
+	mapInfo.mapWidth = columnCount * cellSize;
+	mapInfo.mapHeight = rowCount * cellSize;
+	mapInfo.position = (Vector2){((mapInfo.mapWidth /2) *-1), ((mapInfo.mapHeight/2) *-1)};
 
 	return mapInfo;
 }
 
-
 Texture2D Map2DGetBackground(MapInfo info){
 
-    // make a huge image for the map, a checkerboard with a red outline
+	// Texture2D spriteSheet = LoadTexture("../assets/spritesheet.png"); 
+	Image spriteSheet = LoadImage("assets/spritesheet.png"); 
 
-	Image img = GenImageChecked(info.mapWidth, info.mapHeight, 32, 32, LIGHTGRAY, BEIGE);
-	ImageDrawRectangleLines(&img, (Rectangle) { 0, 0, info.mapWidth, info.mapHeight }, 10, RED);
-	ImageDrawCircle(&img, info.mapWidth/2, info.mapHeight/2, 50, GREEN);
-	Texture2D background = LoadTextureFromImage(img);
-	UnloadImage(img);
+	Rectangle sprite1Rec = { 0.0f, 0.0f, 32.0f, 32.0f};
+	Rectangle sprite2Rec = { 32.0f, 0.0f, 32.0f, 32.0f};
+	Rectangle sprite3Rec = { 0.0f, 32.0f, 32.0f, 32.0f};
+	Rectangle sprite4Rec = { 32.0f, 32.0f, 32.0f, 32.0f};
+
+	Image imageBackground = GenImageColor(info.mapWidth, info.mapHeight, WHITE);
+	// Random Grass
+	for (int i = 0; i < info.rowCount; i++){
+		for (int j = 0; j < info.columnCount; j++){
+			int randomGrassTile = GetRandomValue(2, 4); 
+			if(randomGrassTile == 2) ImageDraw(&imageBackground, spriteSheet, sprite2Rec,  (Rectangle) { j*32, i*32, 32, 32 }, WHITE);
+			else if(randomGrassTile == 3) ImageDraw(&imageBackground, spriteSheet, sprite3Rec,  (Rectangle) { j*32, i*32, 32, 32 }, WHITE);
+			else ImageDraw(&imageBackground, spriteSheet, sprite4Rec,  (Rectangle) { j*32, i*32, 32, 32 }, WHITE);
+		}
+	}
+
+	// Random Dirt; 10 patches
+	for (int i = 0; i < 10 ; i++){
+		int posX = GetRandomValue(0, info.mapWidth);
+		int posY = GetRandomValue(0, info.mapHeight);
+		int width = GetRandomValue(6, 15);
+		int height = GetRandomValue(6, 12);
+			
+		for (int y = 0; y < height ; y++){
+			for (int x = 0; x < width ; x++){
+				ImageDraw(&imageBackground, spriteSheet, sprite1Rec,  (Rectangle) {  posX + x*32, posY + y*32, 32, 32 }, WHITE);
+			}
+		}
+	}
+
+	ImageDrawRectangleLines(&imageBackground, (Rectangle) { 0, 0, info.mapWidth, info.mapHeight }, 4, RED);
+
+	Texture2D background = LoadTextureFromImage(imageBackground);
+	UnloadImage(imageBackground);
 
     return background;
 
