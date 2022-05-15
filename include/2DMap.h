@@ -7,6 +7,9 @@
 
 typedef struct 
 {
+    int columnCount;
+    int rowCount;
+    int cellSize;
     int mapWidth;
     int mapHeight;
     Vector2 position;
@@ -21,7 +24,7 @@ typedef struct
 } Boundaries;
 
 
-MapInfo Map2D_Init(int mapWidth, int mapHeight);
+MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize);
 
 Texture2D Map2DGetBackground(MapInfo info);
 
