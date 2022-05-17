@@ -28,7 +28,7 @@ MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize);
 
 Texture2D Map2DGetBackground(MapInfo info);
 
-Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting);
+Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor);
 
 void Map2D_HandleKeyboardInput(MapInfo* info);
 

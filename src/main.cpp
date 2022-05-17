@@ -21,14 +21,18 @@
 
 #include "raylib.h"
 
-#include "../include/2DMap.h"
-#include "../include/Monitor.h"
-#include "../include/Camera.h"
+// Our C code
+extern "C"
+{
+    #include "../include/2DMap.h"
+    #include "../include/Monitor.h"
+    #include "../include/Camera.h"
+};
 
 #include <stdlib.h>
 
-#define VIEWPORT_WIDTH 1920
-#define VIEWPORT_HEIGHT 1080
+#define VIEWPORT_WIDTH 800 //800 1920
+#define VIEWPORT_HEIGHT 600 //600 1080
 
 int main(void) 
 {
@@ -48,9 +52,12 @@ int main(void)
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-    MapInfo info = Map2D_Init(64, 100, 32);
+    MapInfo info = Map2D_Init(50, 80, 32);
     Texture2D background = Map2DGetBackground(info);
-    Boundaries boundaries = Map2D_GetBoundaries(info, setting);
+    Boundaries boundaries = Map2D_GetBoundaries(info, setting, cam.zoom);
+
+    Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
+    Vector2 characterPosition = {0.0f, 0.0f};
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -74,6 +81,10 @@ int main(void)
 
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, info.position.x, info.position.y, WHITE);
+
+                Vector2 position = { characterPosition.x + info.mapWidth/2 + info.position.x, characterPosition.y + info.mapHeight/2 + info.position.y };
+                Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f };
+                DrawTextureRec(characterTexture, frameRec, position, WHITE);
 
 		    EndMode2D();
 

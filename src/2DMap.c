@@ -60,15 +60,15 @@ Texture2D Map2DGetBackground(MapInfo info){
 
 }
 
-Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting)
+Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor)
 {
 	Boundaries boundaries = {0, 0, 0, 0};
 
-	int verticalScrollSpace = info.mapHeight - setting.monitorHeight;
+	int verticalScrollSpace = info.mapHeight - (int)setting.monitorHeight/zoomFactor;
 	boundaries.upperBoundary = info.position.y + (verticalScrollSpace/2);
 	boundaries.lowerBoundary = info.position.y - (verticalScrollSpace/2);
 
-	int horizontalScrollSpace = info.mapWidth - setting.monitorWidth;
+	int horizontalScrollSpace = info.mapWidth - (int)setting.monitorWidth/zoomFactor;
 	boundaries.leftBoundary = info.position.x + (horizontalScrollSpace/2);
 	boundaries.rightBoundary = info.position.x - (horizontalScrollSpace/2);
 
@@ -96,16 +96,16 @@ void Map2D_HandleMouseInput(MapInfo* info, MonitorSettings setting)
 	}
 	
 	int mouseX = GetMouseX();
-	if (mouseX < 20) info->position.x += 2.0f;
-    if (mouseX < 5) info->position.x += 4.0f;
-    if (mouseX > setting.monitorWidth-20) info->position.x -= 2.0f;
-    if (mouseX > setting.monitorWidth-5) info->position.x -= 4.0f;
+	if (mouseX < 20) info->position.x += 4.0f;
+    if (mouseX < 5) info->position.x += 12.0f;
+    if (mouseX > setting.monitorWidth-20) info->position.x -= 4.0f;
+    if (mouseX > setting.monitorWidth-5) info->position.x -= 12.0f;
 
 	int mouseY = GetMouseY();
-	if (mouseY < 20) info->position.y += 2.0f;
-    if (mouseY < 5) info->position.y += 2.0f;
-    if (mouseY > setting.monitorHeight-40) info->position.y -= 2.0f;
-    if (mouseY > setting.monitorHeight-25) info->position.y -= 2.0f;
+	if (mouseY < 20) info->position.y += 4.0f;
+    if (mouseY < 5) info->position.y += 12.0f;
+    if (mouseY > setting.monitorHeight-40) info->position.y -= 4.0f;
+    if (mouseY > setting.monitorHeight-25) info->position.y -= 12.0f;
 }
 
 void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries)
