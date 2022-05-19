@@ -21,18 +21,19 @@
 
 #include "raylib.h"
 
-// Our C code
-extern "C"
-{
-    #include "../include/2DMap.h"
-    #include "../include/Monitor.h"
-    #include "../include/Camera.h"
-};
+
+#include "../include/2DMap.h"
+#include "../include/Monitor.h"
+#include "../include/Camera.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
+
+#include <vector>
+
+std::vector<int> list;
 
 int main(void) 
 {
