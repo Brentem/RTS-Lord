@@ -25,6 +25,7 @@
 #include "../include/2DMap.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
+#include "../include/ECS.h"
 
 #include <stdlib.h>
 
@@ -44,7 +45,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    //ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -86,6 +87,8 @@ int main(void)
                 Vector2 position = { characterPosition.x + info.mapWidth/2 + info.position.x, characterPosition.y + info.mapHeight/2 + info.position.y };
                 Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f };
                 DrawTextureRec(characterTexture, frameRec, position, WHITE);
+
+                DrawEntities(characterTexture, info);
 
 		    EndMode2D();
 
