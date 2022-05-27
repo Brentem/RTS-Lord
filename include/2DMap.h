@@ -13,6 +13,7 @@ typedef struct
     int mapWidth;
     int mapHeight;
     Vector2 position;
+    Vector2 offSet;
 }MapInfo;
 
 typedef struct

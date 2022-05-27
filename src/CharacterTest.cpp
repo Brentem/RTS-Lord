@@ -22,7 +22,7 @@ Vector2 Character::getPosition(void){
 }
 
 void Character::setTargetPosition(Vector2 targetPosition){
-    _targetPosition = targetPosition;
+    _targetPosition = (Vector2) {targetPosition.x - _width/2, targetPosition.y - _height/2};
 }
 
 Vector2 Character::getTargetPosition(void){

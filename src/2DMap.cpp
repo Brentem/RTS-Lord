@@ -16,7 +16,7 @@ MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize)
 	return mapInfo;
 }
 
-Texture2D Map2DGetBackground(MapInfo info){
+Texture2D Map2DGetBackground(MapInfo mapInfo){
 
 	// Texture2D spriteSheet = LoadTexture("../assets/spritesheet.png"); 
 	Image spriteSheet = LoadImage("assets/spritesheet.png"); 
@@ -26,10 +26,10 @@ Texture2D Map2DGetBackground(MapInfo info){
 	Rectangle sprite3Rec = { 0.0f, 32.0f, 32.0f, 32.0f};
 	Rectangle sprite4Rec = { 32.0f, 32.0f, 32.0f, 32.0f};
 
-	Image imageBackground = GenImageColor(info.mapWidth, info.mapHeight, WHITE);
+	Image imageBackground = GenImageColor(mapInfo.mapWidth, mapInfo.mapHeight, WHITE);
 	// Random Grass
-	for (int i = 0; i < info.rowCount; i++){
-		for (int j = 0; j < info.columnCount; j++){
+	for (int i = 0; i < mapInfo.rowCount; i++){
+		for (int j = 0; j < mapInfo.columnCount; j++){
 			int randomGrassTile = GetRandomValue(2, 4); 
 			if(randomGrassTile == 2) ImageDraw(&imageBackground, spriteSheet, sprite2Rec,  (Rectangle) { (float)j*32, (float)i*32, 32.0f, 32.0f }, WHITE);
 			else if(randomGrassTile == 3) ImageDraw(&imageBackground, spriteSheet, sprite3Rec,  (Rectangle) { (float)j*32, (float)i*32, 32.0f, 32.0f }, WHITE);
@@ -39,8 +39,8 @@ Texture2D Map2DGetBackground(MapInfo info){
 
 	// Random Dirt; 10 patches
 	for (int i = 0; i < 10 ; i++){
-		int posX = GetRandomValue(0, info.mapWidth);
-		int posY = GetRandomValue(0, info.mapHeight);
+		int posX = GetRandomValue(0, mapInfo.mapWidth);
+		int posY = GetRandomValue(0, mapInfo.mapHeight);
 		int width = GetRandomValue(6, 15);
 		int height = GetRandomValue(6, 12);
 			
@@ -51,7 +51,7 @@ Texture2D Map2DGetBackground(MapInfo info){
 		}
 	}
 
-	ImageDrawRectangleLines(&imageBackground, (Rectangle) { 0, 0, (float)info.mapWidth, (float)info.mapHeight }, 4, RED);
+	ImageDrawRectangleLines(&imageBackground, (Rectangle) { 0, 0, (float)mapInfo.mapWidth, (float)mapInfo.mapHeight }, 4, RED);
 
 	Texture2D background = LoadTextureFromImage(imageBackground);
 	UnloadImage(imageBackground);
@@ -60,94 +60,105 @@ Texture2D Map2DGetBackground(MapInfo info){
 
 }
 
-Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor)
+Boundaries Map2D_GetBoundaries(MapInfo mapInfo, MonitorSettings monitorSettings, float zoomFactor)
 {
 	Boundaries boundaries = {0, 0, 0, 0};
 
-	int verticalScrollSpace = info.mapHeight - (int)setting.monitorHeight/zoomFactor;
-	boundaries.upperBoundary = info.position.y + (verticalScrollSpace/2);
-	boundaries.lowerBoundary = info.position.y - (verticalScrollSpace/2);
+	int verticalScrollSpace = mapInfo.mapHeight - (int)monitorSettings.monitorHeight/zoomFactor;
+	boundaries.upperBoundary = mapInfo.position.y + (verticalScrollSpace/2);
+	boundaries.lowerBoundary = mapInfo.position.y - (verticalScrollSpace/2);
 
-	int horizontalScrollSpace = info.mapWidth - (int)setting.monitorWidth/zoomFactor;
-	boundaries.leftBoundary = info.position.x + (horizontalScrollSpace/2);
-	boundaries.rightBoundary = info.position.x - (horizontalScrollSpace/2);
-
+	int horizontalScrollSpace = mapInfo.mapWidth - (int)monitorSettings.monitorWidth/zoomFactor;
+	boundaries.leftBoundary = mapInfo.position.x + (horizontalScrollSpace/2);
+	boundaries.rightBoundary = mapInfo.position.x - (horizontalScrollSpace/2);
 	return boundaries;
 }
 
-void Map2D_HandleKeyboardInput(MapInfo* info)
-{
-	if(info == NULL)
+static void SetOffset(MapInfo* mapInfo){
+	if(mapInfo == NULL)
 	{
 		return;
 	}
 
-	if (IsKeyDown(KEY_RIGHT)) info->position.x -= 5.0f;
-    if (IsKeyDown(KEY_LEFT)) info->position.x += 5.0f;
-    if (IsKeyDown(KEY_UP)) info->position.y += 5.0f;
-    if (IsKeyDown(KEY_DOWN)) info->position.y -= 5.0f;
+	mapInfo->offSet.x = mapInfo->mapWidth/2 + mapInfo->position.x;
+	mapInfo->offSet.y = mapInfo->mapHeight/2 + mapInfo->position.y;
 }
 
-void Map2D_HandleMouseInput(MapInfo* info, MouseInfo* mouseinfo, MonitorSettings setting)
+void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
 {
-	if(info == NULL || mouseinfo == NULL)
+	if(mapInfo == NULL)
+	{
+		return;
+	}
+
+	if (IsKeyDown(KEY_RIGHT)) mapInfo->position.x -= 5.0f;
+    if (IsKeyDown(KEY_LEFT)) mapInfo->position.x += 5.0f;
+    if (IsKeyDown(KEY_UP)) mapInfo->position.y += 5.0f;
+    if (IsKeyDown(KEY_DOWN)) mapInfo->position.y -= 5.0f;
+	SetOffset(mapInfo);
+}
+
+void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings)
+{
+	if(mapInfo == NULL || mouseInfo == NULL)
 	{
 		return;
 	}
 	
 	int mouseX = GetMouseX();
-	if (mouseX < 20) info->position.x += 4.0f;
-    if (mouseX < 5) info->position.x += 12.0f;
-    if (mouseX > setting.monitorWidth-20) info->position.x -= 4.0f;
-    if (mouseX > setting.monitorWidth-5) info->position.x -= 12.0f;
+	if (mouseX < 20) mapInfo->position.x += 4.0f;
+    if (mouseX < 5) mapInfo->position.x += 12.0f;
+    if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
+    if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
 
 	int mouseY = GetMouseY();
-	if (mouseY < 20) info->position.y += 4.0f;
-    if (mouseY < 5) info->position.y += 12.0f;
-    if (mouseY > setting.monitorHeight-40) info->position.y -= 4.0f;
-    if (mouseY > setting.monitorHeight-25) info->position.y -= 12.0f;
+	if (mouseY < 20) mapInfo->position.y += 4.0f;
+    if (mouseY < 5) mapInfo->position.y += 12.0f;
+    if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
+    if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
+	SetOffset(mapInfo);
 
-	mouseinfo->currentPosition.x = (float)mouseX;
-	mouseinfo->currentPosition.y = (float)mouseY;
+	mouseInfo->currentPosition.x = (float)mouseX;
+	mouseInfo->currentPosition.y = (float)mouseY;
 
 	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-		mouseinfo->isSelecting = false;
-		if(mouseinfo->isdragging){
+		mouseInfo->isSelecting = false;
+		if(mouseInfo->isdragging){
 
 		} else {
-			mouseinfo->isdragging = true;
-			mouseinfo->startPosition.x = (float)mouseX;
-			mouseinfo->startPosition.y = (float)mouseY;
+			mouseInfo->isdragging = true;
+			mouseInfo->startPosition.x = (float)mouseX;
+			mouseInfo->startPosition.y = (float)mouseY;
 		}
 	} else{
-		if(mouseinfo->isdragging){
+		if(mouseInfo->isdragging){
 			// Done dragging => select units
-			mouseinfo->isSelecting = true;
+			mouseInfo->isSelecting = true;
 		}
-		mouseinfo->isdragging = false;
+		mouseInfo->isdragging = false;
 	}
 
-	mouseinfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
+	mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
 }
 
-void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries)
+void Map2D_CheckBoundaries(MapInfo* mapInfo, Boundaries boundaries)
 {
-	if(info == NULL)
+	if(mapInfo == NULL)
 	{
 		return;
 	}
 
-	if(info->position.y > boundaries.upperBoundary) info->position.y = boundaries.upperBoundary;
-    if(info->position.y < boundaries.lowerBoundary) info->position.y = boundaries.lowerBoundary;
-    if(info->position.x > boundaries.leftBoundary) info->position.x = boundaries.leftBoundary;
-    if(info->position.x < boundaries.rightBoundary) info->position.x = boundaries.rightBoundary;
+	if(mapInfo->position.y > boundaries.upperBoundary) mapInfo->position.y = boundaries.upperBoundary;
+    if(mapInfo->position.y < boundaries.lowerBoundary) mapInfo->position.y = boundaries.lowerBoundary;
+    if(mapInfo->position.x > boundaries.leftBoundary) mapInfo->position.x = boundaries.leftBoundary;
+    if(mapInfo->position.x < boundaries.rightBoundary) mapInfo->position.x = boundaries.rightBoundary;
 }
 
-Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam){
-	float startX = mouseinfo->worldStartPosition.x;
-	float startY = mouseinfo->worldStartPosition.y;
-	float currentX = mouseinfo->worldCurrentPosition.x;
-	float currentY = mouseinfo->worldCurrentPosition.y;
+Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
+	float startX = mouseInfo->worldStartPosition.x;
+	float startY = mouseInfo->worldStartPosition.y;
+	float currentX = mouseInfo->worldCurrentPosition.x;
+	float currentY = mouseInfo->worldCurrentPosition.y;
 
 	float rectX;
 	float rectY;

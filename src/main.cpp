@@ -61,10 +61,7 @@ int main(void)
     Texture2D background = Map2DGetBackground(mapInfo);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
-
-
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
-
 
     Character character1(characterTexture, {0.0f, 0.0f}, 32.0f, 32.0f);
     Character character2(characterTexture, {60.0f, 30.0f}, 32.0f, 32.0f);
@@ -85,25 +82,23 @@ int main(void)
         mouseinfo.worldStartPosition = GetScreenToWorld2D(mouseinfo.startPosition, cam); 
         mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
-        
-        // Juiste positie op de map
-        //Rectangle collisionRectangle = {selectionRectangle.x - (mapInfo.position.x - (((float)mapInfo.mapWidth /2) *-1)), selectionRectangle.y - (mapInfo.position.y - (((float)mapInfo.mapHeight/2) *-1)), selectionRectangle.width, selectionRectangle.height};
-        
 
-
+        // Check if any character should be selected     
         if(mouseinfo.isSelecting){
-            character1.updateIsSelected(selectionRectangle);
-            character2.updateIsSelected(selectionRectangle);
+            Rectangle selectionRectangleOnMap = {selectionRectangle.x - mapInfo.offSet.x, selectionRectangle.y - mapInfo.offSet.y , selectionRectangle.width, selectionRectangle.height};
+            character1.updateIsSelected(selectionRectangleOnMap);
+            character2.updateIsSelected(selectionRectangleOnMap);
             mouseinfo.isSelecting = false;
         }
 
+        // Give characters a new target position, if needed
+        Vector2 currentMousePositionOnMap = (Vector2) {mouseinfo.worldCurrentPosition.x - mapInfo.offSet.x, mouseinfo.worldCurrentPosition.y - mapInfo.offSet.y};
         if(character1.getIsSelected() && mouseinfo.giveNewTarget){
-            character1.setTargetPosition(mouseinfo.worldCurrentPosition);
+            character1.setTargetPosition(currentMousePositionOnMap);
         }
         if(character2.getIsSelected() && mouseinfo.giveNewTarget){
-            character2.setTargetPosition(mouseinfo.worldCurrentPosition);
+            character2.setTargetPosition(currentMousePositionOnMap);
         }
-
         mouseinfo.giveNewTarget = false;
 
         //----------------------------------------------------------------------------------
@@ -119,29 +114,32 @@ int main(void)
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
+                // Render character1
                 Vector2 characterPosition = character1.getPosition();
-                Vector2 position = { characterPosition.x + mapInfo.mapWidth/2 + mapInfo.position.x, characterPosition.y + mapInfo.mapHeight/2 + mapInfo.position.y };
+                Vector2 characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
                 Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f };
-                DrawTextureRec(characterTexture, frameRec, position, WHITE);
+                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
 
                 if(character1.getIsSelected()){
-                    DrawRectangleLines(position.x, position.y, 32,32, RED);
+                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
                 }
 
+                // Render character2
                 characterPosition = character2.getPosition();
-                position = { characterPosition.x + mapInfo.mapWidth/2 + mapInfo.position.x, characterPosition.y + mapInfo.mapHeight/2 + mapInfo.position.y };
-                DrawTextureRec(characterTexture, frameRec, position, WHITE);
+                characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
+                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
 
                 if(character2.getIsSelected()){
-                    DrawRectangleLines(position.x, position.y, 32,32, RED);
+                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
                 }
 
+                // Render selection box
                 if(mouseinfo.isdragging){
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
-                   //DrawRectangleLines((int)(collisionRectangle.x) , (int)(collisionRectangle.y), (int)(collisionRectangle.width), (int)(collisionRectangle.height), BLACK);
                 }
 
-                Debug_DrawDebugInfo(mouseinfo, characterPosition, mouseinfo.worldStartPosition, mouseinfo.worldCurrentPosition, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+                // Render some Debug information
+                //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
 		    EndMode2D();
 
