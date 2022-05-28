@@ -13,3 +13,6 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 * Choose a license
 * Create Game Design Document
 * Early prototype
+
+## Credits
+[David Colson](https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html)

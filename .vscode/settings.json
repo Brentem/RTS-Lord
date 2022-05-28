@@ -11,6 +11,8 @@
 	"files.associations": {
 		"2dmap.h": "c",
 		"raylib.h": "c",
-		"monitor.h": "c"
+		"monitor.h": "c",
+		"new": "cpp",
+		"bitset": "cpp"
 	}
 }

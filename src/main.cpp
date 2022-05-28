@@ -27,16 +27,12 @@
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
 #include "../include/CharacterTest.h"
+#include "../include/SceneView.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
-
-
-#include <vector>
-
-std::vector<int> list;
 
 int main(void) 
 {
@@ -65,6 +61,9 @@ int main(void)
 
     Character character1(characterTexture, {0.0f, 0.0f}, 32.0f, 32.0f);
     Character character2(characterTexture, {60.0f, 30.0f}, 32.0f, 32.0f);
+
+    // ECS Test
+    Scene scene;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -141,7 +140,6 @@ int main(void)
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
-                //DrawEntities(characterTexture, info);
 
 		    EndMode2D();
 
