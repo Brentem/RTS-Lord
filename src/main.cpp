@@ -23,14 +23,16 @@
 
 
 #include "../include/2DMap.h"
+#include "../include/Debug.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
-#include "../include/ECS.h"
+#include "../include/CharacterTest.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
+
 
 #include <vector>
 
@@ -54,12 +56,15 @@ int main(void)
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-    MapInfo info = Map2D_Init(50, 80, 32);
-    Texture2D background = Map2DGetBackground(info);
-    Boundaries boundaries = Map2D_GetBoundaries(info, setting, cam.zoom);
+    MapInfo mapInfo = Map2D_Init(50, 80, 32);
+    MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
+    Texture2D background = Map2DGetBackground(mapInfo);
+    Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
-    Vector2 characterPosition = {0.0f, 0.0f};
+
+    Character character1(characterTexture, {0.0f, 0.0f}, 32.0f, 32.0f);
+    Character character2(characterTexture, {60.0f, 30.0f}, 32.0f, 32.0f);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -67,9 +72,34 @@ int main(void)
 
         // Update
         //----------------------------------------------------------------------------------
-        Map2D_HandleKeyboardInput(&info);
-        Map2D_HandleMouseInput(&info, setting);
-        Map2D_CheckBoundaries(&info, boundaries);
+        Map2D_HandleKeyboardInput(&mapInfo);
+        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting);
+        Map2D_CheckBoundaries(&mapInfo, boundaries);
+
+        character1.updatePosition();
+        character2.updatePosition();
+        
+        mouseinfo.worldStartPosition = GetScreenToWorld2D(mouseinfo.startPosition, cam); 
+        mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
+        Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
+
+        // Check if any character should be selected     
+        if(mouseinfo.isSelecting){
+            Rectangle selectionRectangleOnMap = {selectionRectangle.x - mapInfo.offSet.x, selectionRectangle.y - mapInfo.offSet.y , selectionRectangle.width, selectionRectangle.height};
+            character1.updateIsSelected(selectionRectangleOnMap);
+            character2.updateIsSelected(selectionRectangleOnMap);
+            mouseinfo.isSelecting = false;
+        }
+
+        // Give characters a new target position, if needed
+        Vector2 currentMousePositionOnMap = (Vector2) {mouseinfo.worldCurrentPosition.x - mapInfo.offSet.x, mouseinfo.worldCurrentPosition.y - mapInfo.offSet.y};
+        if(character1.getIsSelected() && mouseinfo.giveNewTarget){
+            character1.setTargetPosition(currentMousePositionOnMap);
+        }
+        if(character2.getIsSelected() && mouseinfo.giveNewTarget){
+            character2.setTargetPosition(currentMousePositionOnMap);
+        }
+        mouseinfo.giveNewTarget = false;
 
         //----------------------------------------------------------------------------------
 
@@ -82,13 +112,36 @@ int main(void)
 		    BeginMode2D(cam);
 
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
-		        DrawTexture(background, info.position.x, info.position.y, WHITE);
+		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
-                Vector2 position = { characterPosition.x + info.mapWidth/2 + info.position.x, characterPosition.y + info.mapHeight/2 + info.position.y };
+                // Render character1
+                Vector2 characterPosition = character1.getPosition();
+                Vector2 characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
                 Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f };
-                DrawTextureRec(characterTexture, frameRec, position, WHITE);
+                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
 
-                DrawEntities(characterTexture, info);
+                if(character1.getIsSelected()){
+                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
+                }
+
+                // Render character2
+                characterPosition = character2.getPosition();
+                characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
+                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
+
+                if(character2.getIsSelected()){
+                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
+                }
+
+                // Render selection box
+                if(mouseinfo.isdragging){
+                    DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
+                }
+
+                // Render some Debug information
+                //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
+
+                //DrawEntities(characterTexture, info);
 
 		    EndMode2D();
 
