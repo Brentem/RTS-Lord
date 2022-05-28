@@ -13,10 +13,26 @@ typedef unsigned int EntityIndex;
 typedef unsigned int EntityVersion;
 typedef unsigned long long EntityID;
 
-inline EntityID CreateEntityId(EntityIndex index, EntityVersion version);
-inline EntityIndex GetEntityIndex(EntityID id);
-inline EntityVersion GetEntityVersion(EntityID id);
-inline bool IsEntityValid(EntityID id);
+inline EntityID CreateEntityId(EntityIndex index, EntityVersion version)
+{
+  // Shift the index up 32, and put the version in the bottom
+  return ((EntityID)index << 32) | ((EntityID)version);
+}
+inline EntityIndex GetEntityIndex(EntityID id)
+{
+  // Shift down 32 so we lose the version and get our index
+  return id >> 32;
+}
+inline EntityVersion GetEntityVersion(EntityID id)
+{
+  // Cast to a 32 bit int to get our version number (loosing the top 32 bits)
+  return (EntityVersion)id;
+}
+inline bool IsEntityValid(EntityID id)
+{
+  // Check if the index is our invalid index
+  return (id >> 32) != EntityIndex(-1);
+}
 
 struct Scene
 {

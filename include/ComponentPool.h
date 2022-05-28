@@ -8,7 +8,10 @@ struct ComponentPool
 {
     ComponentPool(size_t elementSize);
     ~ComponentPool();
-    inline void* get(size_t index);
+    inline void* get(size_t index)
+    {
+        return pData + index * elementSize;
+    }
 
     char* pData {nullptr};
     size_t elementSize {0};

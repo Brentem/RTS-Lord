@@ -5,6 +5,10 @@
 template<typename... ComponentTypes>
 struct SceneView
 {
+  Scene* pScene{ nullptr };
+  ComponentMask componentMask;
+  bool all{ false };
+
   SceneView(Scene& scene) : pScene(&scene) 
   {
     if (sizeof...(ComponentTypes) == 0)
@@ -22,8 +26,13 @@ struct SceneView
 
   struct Iterator
   {
+      EntityIndex index;
+      Scene* pScene;
+      ComponentMask mask;
+      bool all{false};
+
       Iterator(Scene* pScene, EntityIndex index, ComponentMask mask, bool all) 
-        : pScene(pScene), index(index), mask(mask), all(all) {}
+        : index(index), pScene(pScene), mask(mask), all(all) {}
 
       EntityID operator*() const
       {
@@ -54,11 +63,6 @@ struct SceneView
         } while (index < pScene->entities.size() && !ValidIndex());
         return *this;
       }
-
-      EntityIndex index;
-      Scene* pScene;
-      ComponentMask mask;
-      bool all{false};
   };
   
   const Iterator begin() const
@@ -77,8 +81,4 @@ struct SceneView
   {
     return Iterator(pScene, EntityIndex(pScene->entities.size()), componentMask, all);
   }
-
-  Scene* pScene{ nullptr };
-  ComponentMask componentMask;
-  bool all{ false };
 };

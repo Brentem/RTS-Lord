@@ -10,8 +10,3 @@ ComponentPool::~ComponentPool()
 {
     delete[] pData;
 }
-
-inline void* ComponentPool::get(size_t index)
-{
-    return pData + index * elementSize;
-}

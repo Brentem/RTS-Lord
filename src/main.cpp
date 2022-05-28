@@ -27,12 +27,38 @@
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
 #include "../include/CharacterTest.h"
-#include "../include/SceneView.h"
+#include "../include/Scene.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
+
+// void MovementSystem(Scene& scene, Boundaries boundaries)
+// {
+//     for(EntityID ent: SceneView<Vector2>(scene))
+//     {
+//         Vector2* position = scene.Get<Vector2>(ent);
+        
+//         position->x += 5;
+
+//         if(position->x >= boundaries.rightBoundary)
+//         {
+//             position->x = 0;
+//         }
+//     }
+// }
+
+// void RenderSystem(Scene& scene)
+// {
+//     for(EntityID ent: SceneView<Vector2, Texture2D>(scene))
+//     {
+//         Vector2* position = scene.Get<Vector2>(ent);
+//         Texture2D* texture = scene.Get<Texture2D>(ent);
+
+//         DrawTexture(*texture, position->x, position->y, WHITE);
+//     }
+// }
 
 int main(void) 
 {
@@ -64,6 +90,28 @@ int main(void)
 
     // ECS Test
     Scene scene;
+
+    Texture2D ecsTexture = LoadTexture("assets/ECS_Test.png");
+
+    // Creating entity causes white screen.
+
+    //EntityID entity = scene.NewEntity();
+    // Vector2* position = scene.Assign<Vector2>(entity);
+    // Texture2D* texture = scene.Assign<Texture2D>(entity);
+    // *position = {500, 500};
+    // *texture = ecsTexture;
+
+    // entity = scene.NewEntity();
+    // position = scene.Assign<Vector2>(entity);
+    // texture = scene.Assign<Texture2D>(entity);
+    // *position = {1000, 1000};
+    // *texture = ecsTexture;
+
+    // entity = scene.NewEntity();
+    // position = scene.Assign<Vector2>(entity);
+    // texture = scene.Assign<Texture2D>(entity);
+    // *position = {1500, 1500};
+    // *texture = ecsTexture;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -99,6 +147,9 @@ int main(void)
             character2.setTargetPosition(currentMousePositionOnMap);
         }
         mouseinfo.giveNewTarget = false;
+
+        // ECS Test
+        //MovementSystem(scene, boundaries);
 
         //----------------------------------------------------------------------------------
 
@@ -140,6 +191,7 @@ int main(void)
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
+                //RenderSystem(scene);
 
 		    EndMode2D();
 
