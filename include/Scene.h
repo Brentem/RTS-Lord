@@ -13,6 +13,7 @@ typedef unsigned int EntityIndex;
 typedef unsigned int EntityVersion;
 typedef unsigned long long EntityID;
 
+
 inline EntityID CreateEntityId(EntityIndex index, EntityVersion version)
 {
   // Shift the index up 32, and put the version in the bottom
