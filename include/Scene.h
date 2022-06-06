@@ -67,7 +67,9 @@ struct Scene
             componentPools[componentId] = new ComponentPool(sizeof(T));
         }
 
-        T* pComponent = new (componentPools[componentId]->get(id)) T();
+
+        EntityIndex index = GetEntityIndex(id);
+        T* pComponent = new (componentPools[componentId]->get(index)) T();
 
         entities[id].mask.set(componentId);
 
@@ -77,7 +79,9 @@ struct Scene
     template <typename T>
     T* Get(EntityID id)
     {
-        if(entities[GetEntityIndex(id)].id != id)
+        EntityIndex index = GetEntityIndex(id);
+
+        if(entities[index].id != id)
             return nullptr;
 
         int componentId = GetId<T>();
@@ -85,7 +89,7 @@ struct Scene
         if(!entities[id].mask.test(componentId))
             return nullptr;
         
-        T* pComponent = static_cast<T*>(componentPools[componentId]->get(id));
+        T* pComponent = static_cast<T*>(componentPools[componentId]->get(index));
         return pComponent;
     }
 

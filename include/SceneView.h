@@ -57,10 +57,7 @@ struct SceneView
 
       Iterator& operator++()
       {
-        do
-        {
-          index++;
-        } while (index < pScene->entities.size() && !ValidIndex());
+        index++;
         return *this;
       }
   };
