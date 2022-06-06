@@ -34,18 +34,13 @@
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
-void MovementSystem(Scene& scene, Boundaries boundaries)
+void MovementSystem(Scene& scene, Boundaries boundaries, MapInfo info)
 {
     for(EntityID ent: SceneView<Vector2>(scene))
     {
         Vector2* position = scene.Get<Vector2>(ent);
-        
-        position->x += 5;
 
-        if(position->x >= boundaries.rightBoundary)
-        {
-            position->x = 0;
-        }
+        position->x += 5;
     }
 }
 
@@ -150,7 +145,7 @@ int main(void)
         mouseinfo.giveNewTarget = false;
 
         // ECS Test
-        //MovementSystem(scene, boundaries);
+        MovementSystem(scene, boundaries, mapInfo);
 
         //----------------------------------------------------------------------------------
 
