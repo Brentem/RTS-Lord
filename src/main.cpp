@@ -27,16 +27,48 @@
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
 #include "../include/CharacterTest.h"
+#include "../include/SceneView.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
+void MovementSystem(Scene& scene, Boundaries boundaries, MapInfo info)
+{
+    for(EntityID ent: SceneView<Vector2>(scene))
+    {
+        Vector2* position = scene.Get<Vector2>(ent);
 
-#include <vector>
+        position->x += 5;
+    }
+}
 
-std::vector<int> list;
+void RenderSystem(Scene& scene)
+{
+    for(EntityID ent: SceneView<Vector2, Texture2D>(scene))
+    {
+        Vector2* position = scene.Get<Vector2>(ent);
+        Texture2D* texture = scene.Get<Texture2D>(ent);
+
+        DrawTexture(*texture, position->x, position->y, WHITE);
+    }
+}
+
+Scene scene;
+
+EntityID entity1 = scene.NewEntity();
+Vector2* position1 = scene.Assign<Vector2>(entity1);
+Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
+
+EntityID entity2 = scene.NewEntity();
+Vector2* position2 = scene.Assign<Vector2>(entity2);
+Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
+
+EntityID entity3 = scene.NewEntity();
+Vector2* position3 = scene.Assign<Vector2>(entity3);
+Texture2D* texture3 = scene.Assign<Texture2D>(entity3);
+
 
 int main(void) 
 {
@@ -47,7 +79,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    //ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -65,6 +97,17 @@ int main(void)
 
     Character character1(characterTexture, {0.0f, 0.0f}, 32.0f, 32.0f);
     Character character2(characterTexture, {60.0f, 30.0f}, 32.0f, 32.0f);
+
+    // ECS Test
+    Texture2D ecsTexture = LoadTexture("assets/ECS_Test.png");
+    *position1 = {0, 0};
+    *texture1 = ecsTexture;
+
+    *position2 = {50, 50};
+    *texture2 = ecsTexture;
+
+    *position3 = {100, 100};
+    *texture3 = ecsTexture;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -100,6 +143,9 @@ int main(void)
             character2.setTargetPosition(currentMousePositionOnMap);
         }
         mouseinfo.giveNewTarget = false;
+
+        // ECS Test
+        MovementSystem(scene, boundaries, mapInfo);
 
         //----------------------------------------------------------------------------------
 
@@ -140,6 +186,8 @@ int main(void)
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
+
+                RenderSystem(scene);
 
 		    EndMode2D();
 
