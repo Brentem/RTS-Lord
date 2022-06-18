@@ -1,5 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
+#pragma once
 
 typedef struct
 {
@@ -7,4 +6,14 @@ typedef struct
     int monitorHeight;
 } MonitorSettings;
 
-#endif
+struct Position
+{
+    float x;
+    float y;
+};
+
+struct TargetPosition
+{
+    float x;
+    float y;
+};
