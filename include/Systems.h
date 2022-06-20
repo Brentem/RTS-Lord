@@ -1,5 +1,7 @@
 #pragma once
 
-#include "include/Scene.h"
-#include "include/Types.h"
+#include "SceneView.h"
+#include "Types.h"
 
+void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
+void RenderSystem(Scene& scene, MapInfo mapInfo);
