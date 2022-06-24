@@ -47,7 +47,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    //ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -56,9 +56,9 @@ int main(void)
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
-    MapInfo mapInfo = Map2D_Init(50, 80, 32);
+    MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
     MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
-    Texture2D background = Map2DGetBackground(mapInfo);
+    Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
