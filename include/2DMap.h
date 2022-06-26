@@ -4,6 +4,11 @@
 #include "raylib.h"
 
 #include "Types.h"
+#include <vector>
+
+typedef struct {
+    bool isWalkable;
+}Tile;
 
 typedef struct 
 {
@@ -14,6 +19,7 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
+    std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
 typedef struct
@@ -35,9 +41,9 @@ typedef struct
     bool giveNewTarget;
 }MouseInfo;
 
-MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize);
+MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize);
 
-Texture2D Map2DGetBackground(MapInfo info);
+Texture2D Map2DGetBackground(MapInfo info, const char *mapLayoutFileName, const char *tileSpritesheetFileName);
 
 Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor);
 

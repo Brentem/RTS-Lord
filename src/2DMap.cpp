@@ -2,52 +2,70 @@
 
 #include <stdlib.h>
 
-MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize)
+MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 {
-	MapInfo mapInfo;
+	Image mapSource = LoadImage(mapLayoutFileName); // "assets/map1.png"
 
-	mapInfo.rowCount = rowCount;
-	mapInfo.columnCount = columnCount;
+	MapInfo mapInfo;
+	mapInfo.rowCount = mapSource.height;
+	mapInfo.columnCount = mapSource.width;
 	mapInfo.cellSize = cellSize;
-	mapInfo.mapWidth = columnCount * cellSize;
-	mapInfo.mapHeight = rowCount * cellSize;
+	mapInfo.mapWidth = mapInfo.columnCount * cellSize;
+	mapInfo.mapHeight = mapInfo.rowCount * cellSize;
 	mapInfo.position = (Vector2){(((float)mapInfo.mapWidth /2) *-1), (((float)mapInfo.mapHeight/2) *-1)};
+
+	Tile tileDirt = {false};
+	Tile tileGrass = {true};
+	std::vector<std::vector<Tile>> tiles(mapInfo.columnCount, std::vector<Tile> (mapInfo.rowCount, tileDirt));
+	for (int x = 0; x < mapSource.width; x++)
+	{
+		for (int y = 0; y < mapSource.height; y++)
+		{
+			Color color = GetImageColor(mapSource, x, y); 
+
+			if(color.r == 122){
+				tiles[x][y] = tileDirt;
+			} else {
+				tiles[x][y] = tileGrass;
+			} 
+		}
+	}
+    mapInfo.tiles = tiles;
 
 	return mapInfo;
 }
 
-Texture2D Map2DGetBackground(MapInfo mapInfo){
+Texture2D Map2DGetBackground(MapInfo mapInfo,const char *mapLayoutFileName, const char *tileSpritesheetFileName){
 
 	// Texture2D spriteSheet = LoadTexture("../assets/spritesheet.png"); 
-	Image spriteSheet = LoadImage("assets/spritesheet.png"); 
+	Image spriteSheet = LoadImage(tileSpritesheetFileName); // "assets/spritesheet.png"
+	Image mapSource = LoadImage(mapLayoutFileName); // "assets/map1.png"
 
-	Rectangle sprite1Rec = { 0.0f, 0.0f, 32.0f, 32.0f};
-	Rectangle sprite2Rec = { 32.0f, 0.0f, 32.0f, 32.0f};
-	Rectangle sprite3Rec = { 0.0f, 32.0f, 32.0f, 32.0f};
-	Rectangle sprite4Rec = { 32.0f, 32.0f, 32.0f, 32.0f};
+	Rectangle tileDirt = { 0.0f, 0.0f, 32.0f, 32.0f};
+	Rectangle tileGrass1 = { 32.0f, 0.0f, 32.0f, 32.0f};
+	Rectangle tileGrass2 = { 0.0f, 32.0f, 32.0f, 32.0f};
+	Rectangle tileGrass3 = { 32.0f, 32.0f, 32.0f, 32.0f};
 
 	Image imageBackground = GenImageColor(mapInfo.mapWidth, mapInfo.mapHeight, WHITE);
-	// Random Grass
-	for (int i = 0; i < mapInfo.rowCount; i++){
-		for (int j = 0; j < mapInfo.columnCount; j++){
-			int randomGrassTile = GetRandomValue(2, 4); 
-			if(randomGrassTile == 2) ImageDraw(&imageBackground, spriteSheet, sprite2Rec,  (Rectangle) { (float)j*32, (float)i*32, 32.0f, 32.0f }, WHITE);
-			else if(randomGrassTile == 3) ImageDraw(&imageBackground, spriteSheet, sprite3Rec,  (Rectangle) { (float)j*32, (float)i*32, 32.0f, 32.0f }, WHITE);
-			else ImageDraw(&imageBackground, spriteSheet, sprite4Rec,  (Rectangle) { (float)j*32, (float)i*32, 32.0f, 32.0f }, WHITE);
-		}
-	}
-
-	// Random Dirt; 10 patches
-	for (int i = 0; i < 10 ; i++){
-		int posX = GetRandomValue(0, mapInfo.mapWidth);
-		int posY = GetRandomValue(0, mapInfo.mapHeight);
-		int width = GetRandomValue(6, 15);
-		int height = GetRandomValue(6, 12);
-			
-		for (int y = 0; y < height ; y++){
-			for (int x = 0; x < width ; x++){
-				ImageDraw(&imageBackground, spriteSheet, sprite1Rec,  (Rectangle) { (float)(posX + x*32), (float)(posY + y*32), 32.0f, 32.0f }, WHITE);
+	for (int x = 0; x < mapInfo.columnCount; x++){
+		for (int y = 0; y < mapInfo.rowCount; y++){
+			Color color = GetImageColor(mapSource, x, y); 
+			// r    g    b
+			// 122  74	 52
+			// 57	181	 74	Donkergroen
+			// 0	166	 81	Groen
+			// 141	198	 63	Lichtgroen
+			Rectangle spriteRectangle;
+			if(color.r == 122){
+				spriteRectangle = tileDirt;
+			} else if(color.r == 57){
+				spriteRectangle = tileGrass1;
+			} else if(color.r == 0){
+				spriteRectangle = tileGrass2;
+			} else if(color.r == 141){
+				spriteRectangle = tileGrass3;
 			}
+			ImageDraw(&imageBackground, spriteSheet, spriteRectangle,  (Rectangle) { (float)x*mapInfo.cellSize, (float)y*mapInfo.cellSize, (float)mapInfo.cellSize, (float)mapInfo.cellSize }, WHITE);
 		}
 	}
 
@@ -57,7 +75,6 @@ Texture2D Map2DGetBackground(MapInfo mapInfo){
 	UnloadImage(imageBackground);
 
     return background;
-
 }
 
 Boundaries Map2D_GetBoundaries(MapInfo mapInfo, MonitorSettings monitorSettings, float zoomFactor)
