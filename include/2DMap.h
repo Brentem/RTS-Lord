@@ -31,6 +31,9 @@ typedef struct
     int padding;
     Vector2 miniMapOffSet;
     Texture2D miniMapBackground;
+    int miniMapWidgetWidth;
+    int miniMapWidgetHeight;
+    float zoomFactor;
 }MiniMapInfo;
 
 typedef struct
@@ -66,8 +69,8 @@ void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries);
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam);
 
-MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera);
+MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings);
 
-void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo);
+void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo);
 
 #endif

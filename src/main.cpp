@@ -91,7 +91,7 @@ int main(void)
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
     MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
-    MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam);
+    MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
@@ -188,7 +188,7 @@ int main(void)
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
-                DrawMiniMap(setting, miniMapInfo);
+                DrawMiniMap(setting, miniMapInfo, mapInfo);
 
                 RenderSystem(scene);
 

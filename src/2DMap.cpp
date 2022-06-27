@@ -211,7 +211,7 @@ Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
 	return selectionRectangle;
 }
 
-MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera){
+MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings){
 	MiniMapInfo miniMapInfo;
 	miniMapInfo.width = width;
 	miniMapInfo.height = height;
@@ -245,14 +245,26 @@ MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int 
 	miniMapOffSet.y = height - (padding * 2) - maxHeight;
 	if(miniMapOffSet.x > 0) miniMapOffSet.x = miniMapOffSet.x/2;
 	if(miniMapOffSet.y > 0) miniMapOffSet.y = miniMapOffSet.y/2;
-
 	miniMapInfo.miniMapOffSet = miniMapOffSet;
+	miniMapInfo.zoomFactor = 1/zoom;
+	miniMapInfo.miniMapWidgetWidth = (int)monitorSettings.monitorWidth*miniMapInfo.zoomFactor/camera.zoom;
+	miniMapInfo.miniMapWidgetHeight = (int)monitorSettings.monitorHeight*miniMapInfo.zoomFactor/camera.zoom;
+
 	return miniMapInfo;
 }
 
-void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo){
+void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo){
 	DrawRectangle(miniMapInfo.screenPositionX , miniMapInfo.screenPositionY, miniMapInfo.width, miniMapInfo.height, BLACK );
 	int posX = miniMapInfo.screenPositionX + miniMapInfo.padding + miniMapInfo.miniMapOffSet.x;
 	int posY = miniMapInfo.screenPositionY + miniMapInfo.padding + miniMapInfo.miniMapOffSet.y;
 	DrawTexture(miniMapInfo.miniMapBackground, posX, posY, WHITE);
+
+	// Draw current mapposition => widget???
+	// Widget centered on minimap
+	int posXScreen = posX + (int)miniMapInfo.miniMapBackground.width/2 - (int)miniMapInfo.miniMapWidgetWidth/2;
+	int posYScreen = posY + (int)miniMapInfo.miniMapBackground.height/2 - (int)miniMapInfo.miniMapWidgetHeight/2;
+	// Process offset of background
+	posXScreen = posXScreen - (int)mapInfo.offSet.x*miniMapInfo.zoomFactor;
+	posYScreen = posYScreen - (int)mapInfo.offSet.y*miniMapInfo.zoomFactor;
+	DrawRectangleLines(posXScreen, posYScreen, miniMapInfo.miniMapWidgetWidth, (int)miniMapInfo.miniMapWidgetHeight, WHITE);
 }
