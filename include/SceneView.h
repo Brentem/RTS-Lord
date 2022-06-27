@@ -19,7 +19,7 @@ struct SceneView
     {
       // Unpack the template parameters into an initializer list
       int componentIds[] = { 0, GetId<ComponentTypes>() ... };
-      for (int i = 1; i < (sizeof...(ComponentTypes) + 1); i++)
+      for (size_t i = 1; i < (sizeof...(ComponentTypes) + 1); i++)
         componentMask.set(componentIds[i]);
     }
   }
@@ -64,7 +64,7 @@ struct SceneView
   
   const Iterator begin() const
   {
-    int firstIndex = 0;
+    size_t firstIndex = 0;
     while (firstIndex < pScene->entities.size() &&
     (componentMask != (componentMask & pScene->entities[firstIndex].mask) 
       || !IsEntityValid(pScene->entities[firstIndex].id))) 

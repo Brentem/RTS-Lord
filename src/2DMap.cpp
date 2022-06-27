@@ -30,7 +30,7 @@ MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 			} 
 		}
 	}
-    mapInfo.tiles = tiles;
+    //mapInfo.tiles = tiles;
 
 	UnloadImage(mapSource);
 

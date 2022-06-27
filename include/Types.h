@@ -22,7 +22,7 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
-    std::vector<std::vector<Tile>> tiles;
+    //std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
 typedef struct
@@ -48,4 +48,10 @@ struct EntityPosition
 {
     Vector2 currentPosition;
     Vector2 targetPosition;
+};
+
+struct EntitySize
+{
+    float width;
+    float height;
 };

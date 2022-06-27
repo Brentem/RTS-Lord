@@ -25,7 +25,6 @@
 #include "../include/Debug.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
-#include "../include/CharacterTest.h"
 #include "../include/SceneView.h"
 #include "../include/Types.h"
 #include "../include/Systems.h" 
@@ -40,11 +39,13 @@ Scene scene;
 EntityID entity1 = scene.NewEntity();
 EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
 Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
+EntitySize* size1 = scene.Assign<EntitySize>(entity1);
 bool* bool1 = scene.Assign<bool>(entity1);
 
 EntityID entity2 = scene.NewEntity();
 EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
 Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
+EntitySize* size2 = scene.Assign<EntitySize>(entity2);
 bool* bool2 = scene.Assign<bool>(entity2);
 
 int main(void) 
@@ -75,9 +76,11 @@ int main(void)
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
     *texture1 = characterTexture;
+    *size1 = {32.0f, 32.0f};
 
     *position2 = {{60, 30}, {60, 30}};
     *texture2 = characterTexture;
+    *size2 = {32.0f, 32.0f};
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key

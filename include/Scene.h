@@ -57,7 +57,7 @@ struct Scene
 
         int componentId = GetId<T>();
 
-        if(componentPools.size() <= componentId)
+        if(componentPools.size() <= (size_t)componentId) // Maybe make componentId a size_t variable
         {
             componentPools.resize(componentId + 1, nullptr);
         }

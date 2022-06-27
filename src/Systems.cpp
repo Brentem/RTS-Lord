@@ -20,20 +20,21 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
 void RenderSystem(Scene& scene, MapInfo mapInfo)
 {
-    for(EntityID ent: SceneView<EntityPosition, Texture2D, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
     {
         EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
         Texture2D* texture = scene.Get<Texture2D>(ent);
+        EntitySize* size = scene.Get<EntitySize>(ent);
         bool* isSelected = scene.Get<bool>(ent);
 
         Vector2 characterPosition = entityPosition->currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
-        Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f }; //TODO: Replace 32 with EntitySize
+        Rectangle frameRec = { 0.0f, 0.0f, size->width, size->height };
         DrawTextureRec(*texture, frameRec, characterPositionOnMap, WHITE);
 
         if(*isSelected)
         {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED); //TODO: Replace 32 with EntitySize
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size->width, size->height, RED);
         }
     }
 }
@@ -44,13 +45,14 @@ void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     {
         Rectangle selectionRectangleOnMap = {selection.x - mapInfo.offSet.x, selection.y - mapInfo.offSet.y , selection.width, selection.height};
 
-        for(EntityID ent: SceneView<EntityPosition, bool>(scene))
+        for(EntityID ent: SceneView<EntityPosition, EntitySize, bool>(scene))
         {
             bool* isSelected = scene.Get<bool>(ent);
             EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+            EntitySize* size = scene.Get<EntitySize>(ent);
             
             Rectangle entityBox = {entityPosition->currentPosition.x, entityPosition->currentPosition.y,
-                                    32, 32}; //TODO: Replace 32 with EntitySize
+                                    size->width, size->height}; //TODO: Replace 32 with EntitySize
             *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
         }
 
@@ -63,14 +65,15 @@ void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
     Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
                                                     (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
 
-    for(EntityID ent: SceneView<EntityPosition, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, EntitySize, bool>(scene))
     {
         bool* isSelected = scene.Get<bool>(ent);
         EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+        EntitySize* size = scene.Get<EntitySize>(ent);
 
         if(*isSelected && mouseInfo->giveNewTarget)
         {
-            entityPosition->targetPosition = {(currentMousePositionOnMap.x - 16), (currentMousePositionOnMap.y - 16)}; //TODO: Replace 16 with EntitySize
+            entityPosition->targetPosition = {(currentMousePositionOnMap.x - size->width/2), (currentMousePositionOnMap.y - size->height/2)}; //TODO: Replace 16 with EntitySize
         }
     }
     mouseInfo->giveNewTarget = false;
