@@ -93,7 +93,7 @@ int main(void)
         mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        //MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
+        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
         //----------------------------------------------------------------------------------
 
@@ -125,6 +125,8 @@ int main(void)
     }
 
     // De-Initialization
+    UnloadTexture(characterTexture);
+    UnloadTexture(background);
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

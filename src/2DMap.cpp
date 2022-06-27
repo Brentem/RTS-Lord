@@ -32,6 +32,8 @@ MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 	}
     mapInfo.tiles = tiles;
 
+	UnloadImage(mapSource);
+
 	return mapInfo;
 }
 
@@ -73,6 +75,8 @@ Texture2D Map2DGetBackground(MapInfo mapInfo,const char *mapLayoutFileName, cons
 
 	Texture2D background = LoadTextureFromImage(imageBackground);
 	UnloadImage(imageBackground);
+	UnloadImage(spriteSheet);
+	UnloadImage(mapSource);
 
     return background;
 }
