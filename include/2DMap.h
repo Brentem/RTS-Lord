@@ -22,6 +22,17 @@ typedef struct
     std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
+typedef struct 
+{
+    int screenPositionX;
+    int screenPositionY;
+    int width;
+    int height;
+    int padding;
+    Vector2 miniMapOffSet;
+    Texture2D miniMapBackground;
+}MiniMapInfo;
+
 typedef struct
 {
     int upperBoundary;
@@ -54,5 +65,9 @@ void Map2D_HandleMouseInput(MapInfo* info, MouseInfo* mouseinfo, MonitorSettings
 void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries);
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam);
+
+MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera);
+
+void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo);
 
 #endif
