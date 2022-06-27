@@ -21,54 +21,32 @@
 
 #include "raylib.h"
 
-
 #include "../include/2DMap.h"
 #include "../include/Debug.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
-#include "../include/CharacterTest.h"
 #include "../include/SceneView.h"
+#include "../include/Types.h"
+#include "../include/Systems.h" 
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
-void MovementSystem(Scene& scene, Boundaries boundaries, MapInfo info)
-{
-    for(EntityID ent: SceneView<Vector2>(scene))
-    {
-        Vector2* position = scene.Get<Vector2>(ent);
-
-        position->x += 5;
-    }
-}
-
-void RenderSystem(Scene& scene)
-{
-    for(EntityID ent: SceneView<Vector2, Texture2D>(scene))
-    {
-        Vector2* position = scene.Get<Vector2>(ent);
-        Texture2D* texture = scene.Get<Texture2D>(ent);
-
-        DrawTexture(*texture, position->x, position->y, WHITE);
-    }
-}
-
 Scene scene;
 
 EntityID entity1 = scene.NewEntity();
-Vector2* position1 = scene.Assign<Vector2>(entity1);
+EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
 Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
+EntitySize* size1 = scene.Assign<EntitySize>(entity1);
+bool* bool1 = scene.Assign<bool>(entity1);
 
 EntityID entity2 = scene.NewEntity();
-Vector2* position2 = scene.Assign<Vector2>(entity2);
+EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
 Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
-
-EntityID entity3 = scene.NewEntity();
-Vector2* position3 = scene.Assign<Vector2>(entity3);
-Texture2D* texture3 = scene.Assign<Texture2D>(entity3);
-
+EntitySize* size2 = scene.Assign<EntitySize>(entity2);
+bool* bool2 = scene.Assign<bool>(entity2);
 
 int main(void) 
 {
@@ -95,19 +73,14 @@ int main(void)
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
-    Character character1(characterTexture, {0.0f, 0.0f}, 32.0f, 32.0f);
-    Character character2(characterTexture, {60.0f, 30.0f}, 32.0f, 32.0f);
-
     // ECS Test
-    Texture2D ecsTexture = LoadTexture("assets/ECS_Test.png");
-    *position1 = {0, 0};
-    *texture1 = ecsTexture;
+    *position1 = {{0, 0}, {0, 0}};
+    *texture1 = characterTexture;
+    *size1 = {32.0f, 32.0f};
 
-    *position2 = {50, 50};
-    *texture2 = ecsTexture;
-
-    *position3 = {100, 100};
-    *texture3 = ecsTexture;
+    *position2 = {{60, 30}, {60, 30}};
+    *texture2 = characterTexture;
+    *size2 = {32.0f, 32.0f};
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -118,34 +91,12 @@ int main(void)
         Map2D_HandleKeyboardInput(&mapInfo);
         Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
-
-        character1.updatePosition();
-        character2.updatePosition();
         
         mouseinfo.worldStartPosition = GetScreenToWorld2D(mouseinfo.startPosition, cam); 
         mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        // Check if any character should be selected     
-        if(mouseinfo.isSelecting){
-            Rectangle selectionRectangleOnMap = {selectionRectangle.x - mapInfo.offSet.x, selectionRectangle.y - mapInfo.offSet.y , selectionRectangle.width, selectionRectangle.height};
-            character1.updateIsSelected(selectionRectangleOnMap);
-            character2.updateIsSelected(selectionRectangleOnMap);
-            mouseinfo.isSelecting = false;
-        }
-
-        // Give characters a new target position, if needed
-        Vector2 currentMousePositionOnMap = (Vector2) {mouseinfo.worldCurrentPosition.x - mapInfo.offSet.x, mouseinfo.worldCurrentPosition.y - mapInfo.offSet.y};
-        if(character1.getIsSelected() && mouseinfo.giveNewTarget){
-            character1.setTargetPosition(currentMousePositionOnMap);
-        }
-        if(character2.getIsSelected() && mouseinfo.giveNewTarget){
-            character2.setTargetPosition(currentMousePositionOnMap);
-        }
-        mouseinfo.giveNewTarget = false;
-
-        // ECS Test
-        MovementSystem(scene, boundaries, mapInfo);
+        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
         //----------------------------------------------------------------------------------
 
@@ -160,24 +111,7 @@ int main(void)
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
-                // Render character1
-                Vector2 characterPosition = character1.getPosition();
-                Vector2 characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
-                Rectangle frameRec = { 0.0f, 0.0f, 32.0f, 32.0f };
-                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
-
-                if(character1.getIsSelected()){
-                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
-                }
-
-                // Render character2
-                characterPosition = character2.getPosition();
-                characterPositionOnMap = { characterPosition.x + mapInfo.offSet.x, characterPosition.y + mapInfo.offSet.y };
-                DrawTextureRec(characterTexture, frameRec, characterPositionOnMap, WHITE);
-
-                if(character2.getIsSelected()){
-                    DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, 32,32, RED);
-                }
+                RenderSystem(scene, mapInfo);
 
                 // Render selection box
                 if(mouseinfo.isdragging){
@@ -187,8 +121,6 @@ int main(void)
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
-                RenderSystem(scene);
-
 		    EndMode2D();
 
         EndDrawing();
@@ -196,6 +128,8 @@ int main(void)
     }
 
     // De-Initialization
+    UnloadTexture(characterTexture);
+    UnloadTexture(background);
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
