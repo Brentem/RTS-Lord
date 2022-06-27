@@ -1,12 +1,17 @@
 #pragma once
 
 #include <raylib.h>
+#include <vector>
 
 typedef struct
 {
     int monitorWidth;
     int monitorHeight;
 } MonitorSettings;
+
+typedef struct {
+    bool isWalkable;
+}Tile;
 
 typedef struct 
 {
@@ -17,6 +22,7 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
+    std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
 typedef struct

@@ -13,6 +13,7 @@
 		"raylib.h": "c",
 		"monitor.h": "c",
 		"new": "cpp",
-		"bitset": "cpp"
+		"bitset": "cpp",
+		"vector": "cpp"
 	}
 }

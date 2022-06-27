@@ -28,7 +28,7 @@
 #include "../include/CharacterTest.h"
 #include "../include/SceneView.h"
 #include "../include/Types.h"
-#include "../include/Systems.h"
+#include "../include/Systems.h" 
 
 #include <stdlib.h>
 
@@ -93,7 +93,7 @@ int main(void)
         mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
+        //MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
         //----------------------------------------------------------------------------------
 
