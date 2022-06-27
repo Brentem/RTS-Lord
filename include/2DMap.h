@@ -5,9 +5,9 @@
 
 #include "Types.h"
 
-MapInfo Map2D_Init(int rowCount, int columnCount, int cellSize);
+MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize);
 
-Texture2D Map2DGetBackground(MapInfo info);
+Texture2D Map2DGetBackground(MapInfo info, const char *mapLayoutFileName, const char *tileSpritesheetFileName);
 
 Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor);
 
