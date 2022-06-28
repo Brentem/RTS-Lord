@@ -19,4 +19,8 @@ void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries);
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam);
 
+MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings);
+
+void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo);
+
 #endif

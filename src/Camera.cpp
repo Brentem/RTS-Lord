@@ -11,6 +11,7 @@ Camera2D Camera_Init(int monitorWidth, int monitorHeight, int viewportWidth, int
     cam.zoom = zoom;
     // center the camera on the middle of the screen
     cam.offset = (Vector2){(float)monitorWidth / 2, (float)monitorHeight / 2};
+    cam.target = (Vector2) {0.0f, 0.0f};
 
     return cam;
 }
