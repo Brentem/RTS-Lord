@@ -6,10 +6,13 @@ We plan to create a Retrograde RTS, because there are [Retrograde](https://itch.
 We decided to go for The One Year Game Jam, because it gives us a lot of time to do both.
 
 ## Built With
-* [C99](https://en.wikipedia.org/wiki/C99)
+* [C++14](https://en.wikipedia.org/wiki/C%2B%2B14)
 * [raylib](https://www.raylib.com/)
 
 ## Roadmap
 * Choose a license
 * Create Game Design Document
 * Early prototype
+
+## Credits
+[David Colson](https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html)
