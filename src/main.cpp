@@ -57,7 +57,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    // ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -90,11 +90,9 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         Map2D_HandleKeyboardInput(&mapInfo);
-        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting);
+        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting, &miniMapInfo, cam);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
         
-        mouseinfo.worldStartPosition = GetScreenToWorld2D(mouseinfo.startPosition, cam); 
-        mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
         MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
@@ -120,10 +118,10 @@ int main(void)
                 }
 
                 RenderSystem(scene, mapInfo);
-                DrawMiniMap(setting, miniMapInfo, mapInfo);
+                DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
 
                 // Render some Debug information
-                //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
+                Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);
 
 		    EndMode2D();
 
