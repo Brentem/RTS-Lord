@@ -11,7 +11,8 @@ void Debug_DrawDebugInfo(
     MapInfo mapinfo,
     Camera2D cam, 
     int viewportWidth, 
-    int viewportHeight
+    int viewportHeight,
+    MiniMapInfo miniMapInfo
     );
 
 #endif

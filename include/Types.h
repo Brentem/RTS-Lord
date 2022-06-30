@@ -25,10 +25,17 @@ typedef struct
     //std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
+typedef struct
+{
+    int upperBoundary;
+    int lowerBoundary;
+    int leftBoundary;
+    int rightBoundary;
+} Boundaries;
+
 typedef struct 
 {
-    int screenPositionX;
-    int screenPositionY;
+    Vector2 position;
     int width;
     int height;
     int padding;
@@ -37,15 +44,9 @@ typedef struct
     int miniMapWidgetWidth;
     int miniMapWidgetHeight;
     float zoomFactor;
+    bool isActive;
+    Boundaries widgetBoundaries;
 }MiniMapInfo;
-
-typedef struct
-{
-    int upperBoundary;
-    int lowerBoundary;
-    int leftBoundary;
-    int rightBoundary;
-} Boundaries;
 
 typedef struct
 {
