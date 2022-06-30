@@ -117,7 +117,6 @@ int main(void)
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
                 }
 
-                RenderSystem(scene, mapInfo);
                 DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
 
                 // Render some Debug information
