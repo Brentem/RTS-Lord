@@ -13,6 +13,7 @@ MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 	mapInfo.mapWidth = mapInfo.columnCount * cellSize;
 	mapInfo.mapHeight = mapInfo.rowCount * cellSize;
 	mapInfo.position = (Vector2){(((float)mapInfo.mapWidth /2) *-1), (((float)mapInfo.mapHeight/2) *-1)};
+	mapInfo.offSet = {0.0f, 0.0f};
 
 	Tile tileDirt = {false};
 	Tile tileGrass = {true};
