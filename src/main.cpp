@@ -121,7 +121,7 @@ int main(void)
                 DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
 
                 // Render some Debug information
-                Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);
+                //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);
 
 		    EndMode2D();
 
