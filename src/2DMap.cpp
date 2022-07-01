@@ -15,24 +15,6 @@ MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 	mapInfo.position = (Vector2){(((float)mapInfo.mapWidth /2) *-1), (((float)mapInfo.mapHeight/2) *-1)};
 	mapInfo.offSet = {0.0f, 0.0f};
 
-	Tile tileDirt = {false};
-	Tile tileGrass = {true};
-	std::vector<std::vector<Tile>> tiles(mapInfo.columnCount, std::vector<Tile> (mapInfo.rowCount, tileDirt));
-	for (int x = 0; x < mapSource.width; x++)
-	{
-		for (int y = 0; y < mapSource.height; y++)
-		{
-			Color color = GetImageColor(mapSource, x, y); 
-
-			if(color.r == 122){
-				tiles[x][y] = tileDirt;
-			} else {
-				tiles[x][y] = tileGrass;
-			} 
-		}
-	}
-    //mapInfo.tiles = tiles;
-
 	UnloadImage(mapSource);
 
 	return mapInfo;

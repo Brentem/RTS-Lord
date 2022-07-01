@@ -28,6 +28,7 @@
 #include "../include/SceneView.h"
 #include "../include/Types.h"
 #include "../include/Systems.h" 
+#include "../include/Grid.h"
 
 #include <stdlib.h>
 
@@ -67,6 +68,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
+    std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
     MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
