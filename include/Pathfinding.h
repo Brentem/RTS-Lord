@@ -9,7 +9,8 @@ typedef std::pair<int, int> Pair;
 
 struct Cell
 {
-    Pair parent;
+    Cell* parent;
+    Pair coordinates;
     double f, g, h;
 };
 
