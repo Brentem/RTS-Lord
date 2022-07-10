@@ -29,6 +29,7 @@
 #include "../include/Types.h"
 #include "../include/Systems.h" 
 #include "../include/Grid.h"
+#include "../include/Pathfinding.h"
 
 #include <stdlib.h>
 
@@ -73,6 +74,8 @@ int main(void)
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
+
+    std::vector<Pair> path = GetPath(grid, {5, 5}, {10, 10});
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
