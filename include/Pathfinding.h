@@ -14,4 +14,4 @@ struct Cell
     double f, g, h;
 };
 
-std::vector<Pair> GetPath(std::vector<std::vector<Tile>>& grid, Pair start, Pair end);
+std::vector<Pair> GetPath(Vector2 mapSize, Pair start, Pair end);

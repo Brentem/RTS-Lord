@@ -75,7 +75,13 @@ int main(void)
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
-    std::vector<Pair> path = GetPath(grid, {5, 5}, {10, 10});
+    std::vector<Pair> path = GetPath({ mapInfo.mapWidth, mapInfo.mapHeight}, {1, 1}, {(mapInfo.mapWidth - 1), (mapInfo.mapHeight - 1)});
+
+    // Debug
+    for(auto pair: path)
+    {
+       Pair bruh = pair;
+    }
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 

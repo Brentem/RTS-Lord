@@ -22,7 +22,6 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
-    //std::vector<std::vector<Tile>> tiles;
 }MapInfo;
 
 typedef struct

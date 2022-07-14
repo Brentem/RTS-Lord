@@ -6,49 +6,52 @@ using namespace std;
 
 static Pair childrenOffsets[8] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-static pair<Cell, int> findCurrentCellAndIndex(vector<Cell> openList);
-static bool isGoalFound(vector<Pair>& path, Cell currentCell, Cell endCell);
-static vector<Cell> generateChildren(Cell* currentCell);
+static pair<Cell*, int> findCurrentCellAndIndex(vector<Cell*> openList);
+static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell);
+static vector<Cell*> generateChildren(Vector2 mapSize, Cell* currentCell);
 
-vector<Pair> GetPath(vector<vector<Tile>>& grid, Pair start, Pair end)
+static void deleteLists(vector<Cell*>& openList, vector<Cell*>& closedList);
+
+vector<Pair> GetPath(Vector2 mapSize, Pair start, Pair end)
 {
-    Cell startCell = {nullptr, start, 0, 0, 0};
-    Cell endCell = {nullptr, end, 0, 0, 0};
+    Cell* startCell = new Cell{nullptr, start, 0, 0, 0};
+    Cell* endCell = new Cell{nullptr, end, 0, 0, 0};
 
-    vector<Cell> openList;
-    vector<Cell> closedList;
+    vector<Cell*> openList;
+    vector<Cell*> closedList;
+
+    vector<Pair> path;
 
     openList.push_back(startCell);
 
     while(openList.size() > 0)
     {
-        pair<Cell, int> currentCellAndIndex = findCurrentCellAndIndex(openList);
-        Cell currentCell = currentCellAndIndex.first;
+        pair<Cell*, int> currentCellAndIndex = findCurrentCellAndIndex(openList);
+        Cell* currentCell = currentCellAndIndex.first;
         int index = currentCellAndIndex.second;
 
         openList.erase(openList.begin() + index);
         closedList.push_back(currentCell);
 
-        vector<Pair> path;
-        bool found = isGoalFound(path, currentCell, endCell);
+        bool found = isGoalFound(path, currentCell, *endCell);
 
         if(found)
         {
-            // do something with path
+            deleteLists(openList, closedList);
             return path;
         }
 
-        vector<Cell> children = generateChildren(&currentCell);
+        vector<Cell*> children = generateChildren(mapSize, currentCell);
 
-        for(Cell child: children)
+        for(Cell* child: children)
         {
             int counter = 0;
 
             // Child is on the closed list
-            for(Cell closedChild: closedList)
+            for(Cell* closedChild: closedList)
             {
-                if((child.coordinates.first == closedChild.coordinates.first) &&
-                (child.coordinates.second == closedChild.coordinates.second))
+                if((child->coordinates.first == closedChild->coordinates.first) &&
+                (child->coordinates.second == closedChild->coordinates.second))
                 {
                     counter++;
                 }
@@ -56,19 +59,20 @@ vector<Pair> GetPath(vector<vector<Tile>>& grid, Pair start, Pair end)
 
             if(counter > 0)
             {
+                delete child;
                 continue;
             }
 
-            child.g = currentCell.g + 1;
-            child.h = (pow((child.coordinates.first - endCell.coordinates.first), 2)) + 
-                        (pow((child.coordinates.second - endCell.coordinates.second), 2));
-            child.f = child.g + child.h;
+            child->g = currentCell->g + 1;
+            child->h = (pow((child->coordinates.first - endCell->coordinates.first), 2)) + 
+                        (pow((child->coordinates.second - endCell->coordinates.second), 2));
+            child->f = child->g + child->h;
 
-            for(Cell openChild: openList)
+            for(Cell* openChild: openList)
             {
-                if((child.coordinates.first == openChild.coordinates.first) &&
-                (child.coordinates.second == openChild.coordinates.second) &&
-                child.g > openChild.g)
+                if((child->coordinates.first == openChild->coordinates.first) &&
+                (child->coordinates.second == openChild->coordinates.second) &&
+                child->g > openChild->g)
                 {
                     counter++;
                 }
@@ -76,41 +80,44 @@ vector<Pair> GetPath(vector<vector<Tile>>& grid, Pair start, Pair end)
 
             if(counter > 0)
             {
+                delete child;
                 continue;
             }
 
             openList.push_back(child);
         }
     }
+    // Return empty list
+    return path;
 }
 
-static pair<Cell, int> findCurrentCellAndIndex(vector<Cell> openList)
+static pair<Cell*, int> findCurrentCellAndIndex(vector<Cell*> openList)
 {
-    Cell currentCell = openList[0];
+    Cell* currentCell = openList[0];
     int currentIndex = 0;
 
     for(size_t i = 0; i < openList.size(); i++)
     {
-        if(openList[i].f < currentCell.f)
+        if(openList[i]->f < currentCell->f)
         {
             currentCell = openList[i];
             currentIndex = i;
         }
     }
 
-    return pair<Cell, int>(currentCell, currentIndex);
+    return pair<Cell*, int>(currentCell, currentIndex);
 }
 
-static bool isGoalFound(vector<Pair>& path, Cell currentCell, Cell endCell)
+static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell)
 {
     bool found = false;
 
-    if((currentCell.coordinates.first == endCell.coordinates.first) &&
-        (currentCell.coordinates.second == endCell.coordinates.second))
+    if((currentCell->coordinates.first == endCell.coordinates.first) &&
+        (currentCell->coordinates.second == endCell.coordinates.second))
     {
         found = true;
 
-        Cell* cellPointer = &currentCell;
+        Cell* cellPointer = currentCell;
         while(cellPointer != nullptr)
         {
             path.push_back(cellPointer->coordinates);
@@ -121,9 +128,9 @@ static bool isGoalFound(vector<Pair>& path, Cell currentCell, Cell endCell)
     return found;
 }
 
-static vector<Cell> generateChildren(Cell* currentCell)
+static vector<Cell*> generateChildren(Vector2 mapSize, Cell* currentCell)
 {
-    vector<Cell> children;
+    vector<Cell*> children;
     // Handle nullptr case
     for(Pair childOffset: childrenOffsets)
     {
@@ -131,12 +138,32 @@ static vector<Cell> generateChildren(Cell* currentCell)
                                  (currentCell->coordinates.second + childOffset.second)};
         
         // Handle case if coordinates aren't available in grid
+        if((cellCoordinates.first < 0) ||
+            (cellCoordinates.second < 0) ||
+            (cellCoordinates.first >= mapSize.x) ||
+            (cellCoordinates.second >= mapSize.y))
+        {
+            continue;
+        }
 
         // Handle case of not walkable terrain
 
-        Cell newCell = {currentCell, cellCoordinates, 0, 0, 0};
+        Cell* newCell = new Cell{currentCell, cellCoordinates, 0, 0, 0};
         children.push_back(newCell);
     }
 
     return children;
+}
+
+static void deleteLists(vector<Cell*>& openList, vector<Cell*>& closedList)
+{
+    for(Cell* item: openList)
+    {
+        delete item;
+    }
+
+    for(Cell* item: closedList)
+    {
+        delete item;
+    }
 }
