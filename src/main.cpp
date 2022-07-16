@@ -43,14 +43,14 @@ EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
 Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
 EntitySize* size1 = scene.Assign<EntitySize>(entity1);
 bool* bool1 = scene.Assign<bool>(entity1);
-Path* path1 = scene.Assign<Path>(entity1);
+Path* path1 = scene.Assign<Path>(entity1); // This causes an error!
 
 EntityID entity2 = scene.NewEntity();
 EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
 Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
 EntitySize* size2 = scene.Assign<EntitySize>(entity2);
 bool* bool2 = scene.Assign<bool>(entity2);
-Path* path2 = scene.Assign<Path>(entity2);
+Path* path2 = scene.Assign<Path>(entity2); //This causes an error!
 
 int main(void) 
 {

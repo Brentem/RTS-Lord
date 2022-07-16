@@ -52,7 +52,7 @@ struct Scene
     template <typename T>
     T* Assign(EntityID id)
     {
-        if(entities[GetEntityIndex(id)].id != id)
+         if(entities[GetEntityIndex(id)].id != id)
             return nullptr;
 
         int componentId = GetId<T>();

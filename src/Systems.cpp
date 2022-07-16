@@ -5,7 +5,7 @@
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
-void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
+void setTargetPosition(Scene& scene, MapInfo mapInfo);
 void updatePosition(Scene& scene);
 
 Pair getPair(Vector2 position);
@@ -19,6 +19,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
     setPath(scene, mouseInfo, mapInfo);
+    setTargetPosition(scene, mapInfo);
     updatePosition(scene);
 }
 
@@ -80,29 +81,30 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
                                                         (entityPosition->currentPosition.y - mapInfo.offSet.y)};
 
             *entityPath = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
-            int test = 0;
         }
     }
     mouseInfo->giveNewTarget = false;
 }
 
-void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
+void setTargetPosition(Scene& scene, MapInfo mapInfo)
 {
-    Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
-                                                    (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
-
-    for(EntityID ent: SceneView<EntityPosition, EntitySize, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, Path>(scene))
     {
-        bool* isSelected = scene.Get<bool>(ent);
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-        EntitySize* size = scene.Get<EntitySize>(ent);
-
-        if(*isSelected && mouseInfo->giveNewTarget)
+        Path* path = scene.Get<Path>(ent);
+        EntityPosition* position = scene.Get<EntityPosition>(ent);
+        
+        if(path->size() > 0)
         {
-            entityPosition->targetPosition = {(currentMousePositionOnMap.x - size->width/2), (currentMousePositionOnMap.y - size->height/2)};
+            Pair pair = path->front();
+            position->targetPosition = Vector2{float((pair.first * 32) + 16), float((pair.second * 32) + 16)};
+
+            if((position->currentPosition.x == position->targetPosition.x) &&
+                (position->currentPosition.y == position->targetPosition.y))
+            {
+                path->erase(path->begin());
+            }
         }
     }
-    mouseInfo->giveNewTarget = false;
 }
 
 void updatePosition(Scene& scene)
