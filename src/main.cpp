@@ -43,12 +43,14 @@ EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
 Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
 EntitySize* size1 = scene.Assign<EntitySize>(entity1);
 bool* bool1 = scene.Assign<bool>(entity1);
+Path* path1 = scene.Assign<Path>(entity1);
 
 EntityID entity2 = scene.NewEntity();
 EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
 Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
 EntitySize* size2 = scene.Assign<EntitySize>(entity2);
 bool* bool2 = scene.Assign<bool>(entity2);
+Path* path2 = scene.Assign<Path>(entity2);
 
 int main(void) 
 {
@@ -75,13 +77,7 @@ int main(void)
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
-    std::vector<Pair> path = GetPath({ mapInfo.mapWidth, mapInfo.mapHeight}, {1, 1}, {(mapInfo.mapWidth - 1), (mapInfo.mapHeight - 1)});
-
-    // Debug
-    for(auto pair: path)
-    {
-       Pair bruh = pair;
-    }
+    //std::vector<Pair> path = GetPath({ mapInfo.mapWidth, mapInfo.mapHeight}, {1, 1}, {(mapInfo.mapWidth - 1), (mapInfo.mapHeight - 1)});
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 

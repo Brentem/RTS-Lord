@@ -2,10 +2,7 @@
 
 #include "Types.h"
 
-#include <set>
 #include <vector>
-
-typedef std::pair<int, int> Pair;
 
 struct Cell
 {
@@ -14,4 +11,4 @@ struct Cell
     double f, g, h;
 };
 
-std::vector<Pair> GetPath(Vector2 mapSize, Pair start, Pair end);
+std::vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end);

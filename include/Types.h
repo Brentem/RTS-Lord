@@ -2,6 +2,10 @@
 
 #include <raylib.h>
 #include <vector>
+#include <set>
+
+typedef std::pair<int, int> Pair;
+typedef std::vector<Pair> Path;
 
 typedef struct
 {

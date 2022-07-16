@@ -1,10 +1,14 @@
 #include "../include/Systems.h"
 
-#include "../include/2DMap.h"
+#include "../include/Types.h"
+#include "../include/Pathfinding.h"
 
-void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
+void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
 void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
 void updatePosition(Scene& scene);
+
+Pair getPair(Vector2 position);
 
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
@@ -13,8 +17,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
         return;
     }
 
-    checkCollision(scene, mouseInfo, mapInfo, selection);
-    setTargetPosition(scene, mouseInfo, mapInfo);
+    checkIfSelected(scene, mouseInfo, mapInfo, selection);
+    setPath(scene, mouseInfo, mapInfo);
     updatePosition(scene);
 }
 
@@ -39,7 +43,7 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
     }
 }
 
-void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
+void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
     if(mouseInfo->isSelecting)
     {
@@ -52,12 +56,34 @@ void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
             EntitySize* size = scene.Get<EntitySize>(ent);
             
             Rectangle entityBox = {entityPosition->currentPosition.x, entityPosition->currentPosition.y,
-                                    size->width, size->height}; //TODO: Replace 32 with EntitySize
+                                    size->width, size->height};
             *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
         }
 
         mouseInfo->isSelecting = false;
     }
+}
+
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
+{
+    for(EntityID ent: SceneView<EntityPosition, Path, bool>(scene))
+    {
+        bool* isSelected = scene.Get<bool>(ent);
+        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+        Path* entityPath = scene.Get<Path>(ent);
+
+        if(*isSelected && mouseInfo->giveNewTarget)
+        {
+            Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
+                                                            (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
+            Vector2 currentPositionOnMap = (Vector2){(entityPosition->currentPosition.x - mapInfo.offSet.x),
+                                                        (entityPosition->currentPosition.y - mapInfo.offSet.y)};
+
+            *entityPath = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
+            int test = 0;
+        }
+    }
+    mouseInfo->giveNewTarget = false;
 }
 
 void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
@@ -73,7 +99,7 @@ void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
 
         if(*isSelected && mouseInfo->giveNewTarget)
         {
-            entityPosition->targetPosition = {(currentMousePositionOnMap.x - size->width/2), (currentMousePositionOnMap.y - size->height/2)}; //TODO: Replace 16 with EntitySize
+            entityPosition->targetPosition = {(currentMousePositionOnMap.x - size->width/2), (currentMousePositionOnMap.y - size->height/2)};
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -107,4 +133,11 @@ void updatePosition(Scene& scene)
             if(targetPosition->y > currentPosition->y) currentPosition->y = targetPosition->y;
         }
     }
+}
+
+Pair getPair(Vector2 position)
+{
+    int x = (int)((position.x / 16) / 2 + 0.5);
+    int y = (int)((position.y / 16) / 2 + 0.5);
+    return Pair(x, y);
 }

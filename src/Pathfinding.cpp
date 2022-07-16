@@ -8,11 +8,11 @@ static Pair childrenOffsets[8] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}, {-1, -1}, {-
 
 static pair<Cell*, int> findCurrentCellAndIndex(vector<Cell*> openList);
 static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell);
-static vector<Cell*> generateChildren(Vector2 mapSize, Cell* currentCell);
+static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell);
 
 static void deleteLists(vector<Cell*>& openList, vector<Cell*>& closedList);
 
-vector<Pair> GetPath(Vector2 mapSize, Pair start, Pair end)
+vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end)
 {
     Cell* startCell = new Cell{nullptr, start, 0, 0, 0};
     Cell* endCell = new Cell{nullptr, end, 0, 0, 0};
@@ -41,7 +41,7 @@ vector<Pair> GetPath(Vector2 mapSize, Pair start, Pair end)
             return path;
         }
 
-        vector<Cell*> children = generateChildren(mapSize, currentCell);
+        vector<Cell*> children = generateChildren(mapInfo, currentCell);
 
         for(Cell* child: children)
         {
@@ -128,7 +128,7 @@ static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell)
     return found;
 }
 
-static vector<Cell*> generateChildren(Vector2 mapSize, Cell* currentCell)
+static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell)
 {
     vector<Cell*> children;
     // Handle nullptr case
@@ -138,10 +138,10 @@ static vector<Cell*> generateChildren(Vector2 mapSize, Cell* currentCell)
                                  (currentCell->coordinates.second + childOffset.second)};
         
         // Handle case if coordinates aren't available in grid
-        if((cellCoordinates.first < 0) ||
-            (cellCoordinates.second < 0) ||
-            (cellCoordinates.first >= mapSize.x) ||
-            (cellCoordinates.second >= mapSize.y))
+        if(/*(cellCoordinates.first < 0) || */
+            /*(cellCoordinates.second < 0) || */
+            (cellCoordinates.first >= mapInfo.columnCount) ||
+            (cellCoordinates.second >= mapInfo.rowCount))
         {
             continue;
         }
