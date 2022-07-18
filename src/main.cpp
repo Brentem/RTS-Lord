@@ -1,24 +1,3 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - Basic 3d example
-*
-*   Welcome to raylib!
-*
-*   To compile example, just press F5.
-*   Note that compiled executable is placed in the same folder as .c file
-*
-*   You can find all basic examples on C:\raylib\raylib\examples folder or
-*   raylib official webpage: www.raylib.com
-*
-*   Enjoy using raylib. :)
-*
-*   This example has been created using raylib 1.0 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
-*
-*   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
 #include "raylib.h"
 
 #include "../include/2DMap.h"
@@ -43,14 +22,12 @@ EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
 Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
 EntitySize* size1 = scene.Assign<EntitySize>(entity1);
 bool* bool1 = scene.Assign<bool>(entity1);
-Path* path1 = scene.Assign<Path>(entity1); // This causes an error!
 
 EntityID entity2 = scene.NewEntity();
 EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
 Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
 EntitySize* size2 = scene.Assign<EntitySize>(entity2);
 bool* bool2 = scene.Assign<bool>(entity2);
-Path* path2 = scene.Assign<Path>(entity2); //This causes an error!
 
 int main(void) 
 {
@@ -76,8 +53,6 @@ int main(void)
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
-
-    //std::vector<Pair> path = GetPath({ mapInfo.mapWidth, mapInfo.mapHeight}, {1, 1}, {(mapInfo.mapWidth - 1), (mapInfo.mapHeight - 1)});
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 

@@ -3,18 +3,27 @@
 #include "../include/Types.h"
 #include "../include/Pathfinding.h"
 
+// Temporary solution!
+static std::vector<Path> EntityPaths;
+
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
 void setTargetPosition(Scene& scene, MapInfo mapInfo);
 void updatePosition(Scene& scene);
 
 Pair getPair(Vector2 position);
+float getPositionIndex(int pairIndex);
 
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
     if(mouseInfo == nullptr)
     {
         return;
+    }
+
+    if(EntityPaths.capacity() != MAX_ENTITIES)
+    {
+        EntityPaths.reserve(MAX_ENTITIES);
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
@@ -67,20 +76,19 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
 {
-    for(EntityID ent: SceneView<EntityPosition, Path, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, bool>(scene))
     {
         bool* isSelected = scene.Get<bool>(ent);
         EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-        Path* entityPath = scene.Get<Path>(ent);
 
         if(*isSelected && mouseInfo->giveNewTarget)
         {
             Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
                                                             (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
-            Vector2 currentPositionOnMap = (Vector2){(entityPosition->currentPosition.x - mapInfo.offSet.x),
-                                                        (entityPosition->currentPosition.y - mapInfo.offSet.y)};
+            Vector2 currentPositionOnMap = (Vector2){entityPosition->currentPosition.x, entityPosition->currentPosition.y};
 
-            *entityPath = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
+            int entityIndex = GetEntityIndex(ent);
+            EntityPaths[entityIndex] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -88,20 +96,21 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
 
 void setTargetPosition(Scene& scene, MapInfo mapInfo)
 {
-    for(EntityID ent: SceneView<EntityPosition, Path>(scene))
+    for(EntityID ent: SceneView<EntityPosition>(scene))
     {
-        Path* path = scene.Get<Path>(ent);
         EntityPosition* position = scene.Get<EntityPosition>(ent);
-        
-        if(path->size() > 0)
+
+        int entityIndex = GetEntityIndex(ent);
+
+        if(EntityPaths[entityIndex].size() > 0)
         {
-            Pair pair = path->front();
-            position->targetPosition = Vector2{float((pair.first * 32) + 16), float((pair.second * 32) + 16)};
+            Pair pair = EntityPaths[entityIndex].back();
+            position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
             if((position->currentPosition.x == position->targetPosition.x) &&
                 (position->currentPosition.y == position->targetPosition.y))
             {
-                path->erase(path->begin());
+                EntityPaths[entityIndex].pop_back();
             }
         }
     }
@@ -139,7 +148,42 @@ void updatePosition(Scene& scene)
 
 Pair getPair(Vector2 position)
 {
-    int x = (int)((position.x / 16) / 2 + 0.5);
-    int y = (int)((position.y / 16) / 2 + 0.5);
+    int x = 0;
+    int y = 0;
+
+    if(position.x < 0)
+    {
+        x = (int)((position.x / 16) / 2 - 0.5);
+    }
+    else
+    {
+        x = (int)((position.x / 16) / 2 + 0.5);
+    }
+
+    if(position.y < 0)
+    {
+        y = (int)((position.y / 16) / 2 - 0.5);
+    }
+    else
+    {
+        y = (int)((position.y / 16) / 2 + 0.5);
+    }
+
     return Pair(x, y);
+}
+
+float getPositionIndex(int pairIndex)
+{
+    float positionIndex = pairIndex * 32;
+
+    if(positionIndex < 0)
+    {
+        positionIndex -= 16;
+    }
+    else
+    {
+        positionIndex += 16;
+    }
+
+    return positionIndex;
 }
