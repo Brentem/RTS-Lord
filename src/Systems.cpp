@@ -1,10 +1,18 @@
 #include "../include/Systems.h"
 
-#include "../include/2DMap.h"
+#include "../include/Types.h"
+#include "../include/Pathfinding.h"
 
-void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
-void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
+// Temporary solution!
+static std::vector<Path> EntityPaths;
+
+void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
+void setTargetPosition(Scene& scene, MapInfo mapInfo);
 void updatePosition(Scene& scene);
+
+Pair getPair(Vector2 position);
+float getPositionIndex(int pairIndex);
 
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
@@ -13,8 +21,14 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
         return;
     }
 
-    checkCollision(scene, mouseInfo, mapInfo, selection);
-    setTargetPosition(scene, mouseInfo, mapInfo);
+    if(EntityPaths.capacity() != MAX_ENTITIES)
+    {
+        EntityPaths.reserve(MAX_ENTITIES);
+    }
+
+    checkIfSelected(scene, mouseInfo, mapInfo, selection);
+    setPath(scene, mouseInfo, mapInfo);
+    setTargetPosition(scene, mapInfo);
     updatePosition(scene);
 }
 
@@ -39,7 +53,7 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
     }
 }
 
-void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
+void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
     if(mouseInfo->isSelecting)
     {
@@ -52,7 +66,7 @@ void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
             EntitySize* size = scene.Get<EntitySize>(ent);
             
             Rectangle entityBox = {entityPosition->currentPosition.x, entityPosition->currentPosition.y,
-                                    size->width, size->height}; //TODO: Replace 32 with EntitySize
+                                    size->width, size->height};
             *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
         }
 
@@ -60,23 +74,46 @@ void checkCollision(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 }
 
-void setTargetPosition(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
 {
-    Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
-                                                    (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
-
-    for(EntityID ent: SceneView<EntityPosition, EntitySize, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, bool>(scene))
     {
         bool* isSelected = scene.Get<bool>(ent);
         EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-        EntitySize* size = scene.Get<EntitySize>(ent);
 
         if(*isSelected && mouseInfo->giveNewTarget)
         {
-            entityPosition->targetPosition = {(currentMousePositionOnMap.x - size->width/2), (currentMousePositionOnMap.y - size->height/2)}; //TODO: Replace 16 with EntitySize
+            Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
+                                                            (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
+            Vector2 currentPositionOnMap = (Vector2){entityPosition->currentPosition.x, entityPosition->currentPosition.y};
+
+            int entityIndex = GetEntityIndex(ent);
+            EntityPaths[entityIndex] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
         }
     }
     mouseInfo->giveNewTarget = false;
+}
+
+void setTargetPosition(Scene& scene, MapInfo mapInfo)
+{
+    for(EntityID ent: SceneView<EntityPosition>(scene))
+    {
+        EntityPosition* position = scene.Get<EntityPosition>(ent);
+
+        int entityIndex = GetEntityIndex(ent);
+
+        if(EntityPaths[entityIndex].size() > 0)
+        {
+            Pair pair = EntityPaths[entityIndex].back();
+            position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
+
+            if((position->currentPosition.x == position->targetPosition.x) &&
+                (position->currentPosition.y == position->targetPosition.y))
+            {
+                EntityPaths[entityIndex].pop_back();
+            }
+        }
+    }
 }
 
 void updatePosition(Scene& scene)
@@ -107,4 +144,46 @@ void updatePosition(Scene& scene)
             if(targetPosition->y > currentPosition->y) currentPosition->y = targetPosition->y;
         }
     }
+}
+
+Pair getPair(Vector2 position)
+{
+    int x = 0;
+    int y = 0;
+
+    if(position.x < 0)
+    {
+        x = (int)((position.x / 16) / 2 - 0.5);
+    }
+    else
+    {
+        x = (int)((position.x / 16) / 2 + 0.5);
+    }
+
+    if(position.y < 0)
+    {
+        y = (int)((position.y / 16) / 2 - 0.5);
+    }
+    else
+    {
+        y = (int)((position.y / 16) / 2 + 0.5);
+    }
+
+    return Pair(x, y);
+}
+
+float getPositionIndex(int pairIndex)
+{
+    float positionIndex = pairIndex * 32;
+
+    if(positionIndex < 0)
+    {
+        positionIndex -= 16;
+    }
+    else
+    {
+        positionIndex += 16;
+    }
+
+    return positionIndex;
 }

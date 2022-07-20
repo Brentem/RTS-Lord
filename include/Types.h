@@ -2,18 +2,22 @@
 
 #include <raylib.h>
 #include <vector>
+#include <set>
 
-typedef struct
+typedef std::pair<int, int> Pair;
+typedef std::vector<Pair> Path;
+
+struct MonitorSettings
 {
     int monitorWidth;
     int monitorHeight;
-} MonitorSettings;
+};
 
-typedef struct {
+struct Tile{
     bool isWalkable;
-}Tile;
+};
 
-typedef struct 
+struct MapInfo
 {
     int columnCount;
     int rowCount;
@@ -22,18 +26,17 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
-    //std::vector<std::vector<Tile>> tiles;
-}MapInfo;
+};
 
-typedef struct
+struct Boundaries
 {
     int upperBoundary;
     int lowerBoundary;
     int leftBoundary;
     int rightBoundary;
-} Boundaries;
+};
 
-typedef struct 
+struct MiniMapInfo
 {
     Vector2 position;
     int width;
@@ -46,9 +49,9 @@ typedef struct
     float zoomFactor;
     bool isActive;
     Boundaries widgetBoundaries;
-}MiniMapInfo;
+};
 
-typedef struct
+struct MouseInfo
 {
     Vector2 startPosition;
     Vector2 currentPosition;
@@ -57,7 +60,7 @@ typedef struct
     bool isdragging;
     bool isSelecting;
     bool giveNewTarget;
-}MouseInfo;
+};
 
 struct EntityPosition
 {

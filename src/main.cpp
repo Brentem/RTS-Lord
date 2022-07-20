@@ -1,24 +1,3 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - Basic 3d example
-*
-*   Welcome to raylib!
-*
-*   To compile example, just press F5.
-*   Note that compiled executable is placed in the same folder as .c file
-*
-*   You can find all basic examples on C:\raylib\raylib\examples folder or
-*   raylib official webpage: www.raylib.com
-*
-*   Enjoy using raylib. :)
-*
-*   This example has been created using raylib 1.0 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
-*
-*   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
 #include "raylib.h"
 
 #include "../include/2DMap.h"
@@ -28,6 +7,8 @@
 #include "../include/SceneView.h"
 #include "../include/Types.h"
 #include "../include/Systems.h" 
+#include "../include/Grid.h"
+#include "../include/Pathfinding.h"
 
 #include <stdlib.h>
 
@@ -67,6 +48,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
+    std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
     MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
