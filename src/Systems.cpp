@@ -27,8 +27,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
-    // //setPath(scene, mouseInfo, mapInfo);
-    //setTargetPosition(scene, mapInfo);
+    setPath(scene, mouseInfo, mapInfo);
+    setTargetPosition(scene, mapInfo);
     updatePosition(scene);
 }
 
@@ -105,7 +105,7 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo)
         if(EntityPaths[entityIndex].size() > 0)
         {
             Pair pair = EntityPaths[entityIndex].back();
-            position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
+            //position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
             if((position->currentPosition.x == position->targetPosition.x) &&
                 (position->currentPosition.y == position->targetPosition.y))

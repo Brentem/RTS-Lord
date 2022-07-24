@@ -112,6 +112,11 @@ static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell)
 {
     bool found = false;
 
+    if(currentCell == nullptr)
+    {
+        return found;
+    }
+
     if((currentCell->coordinates.first == endCell.coordinates.first) &&
         (currentCell->coordinates.second == endCell.coordinates.second))
     {
