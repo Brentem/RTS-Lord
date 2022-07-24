@@ -104,8 +104,8 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo)
 
         if(EntityPaths[entityIndex].size() > 0)
         {
-            Pair pair = EntityPaths[entityIndex].back();
-            //position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
+            Pair pair = EntityPaths[entityIndex].back(); // THis is probably the problem.
+            position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
             if((position->currentPosition.x == position->targetPosition.x) &&
                 (position->currentPosition.y == position->targetPosition.y))
