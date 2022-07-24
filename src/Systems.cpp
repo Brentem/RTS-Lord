@@ -27,8 +27,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
-    setPath(scene, mouseInfo, mapInfo);
-    setTargetPosition(scene, mapInfo);
+    // //setPath(scene, mouseInfo, mapInfo);
+    //setTargetPosition(scene, mapInfo);
     updatePosition(scene);
 }
 
