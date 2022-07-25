@@ -3,6 +3,8 @@
 #include "../include/Types.h"
 #include "../include/Pathfinding.h"
 
+#include <stdio.h>
+
 // Temporary solution!
 static std::vector<Path> EntityPaths;
 
@@ -23,7 +25,13 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
     if(EntityPaths.capacity() != MAX_ENTITIES)
     {
+        Path initPath;
         EntityPaths.reserve(MAX_ENTITIES);
+
+        for(int i = 0; i < MAX_ENTITIES; i++)
+        {
+            EntityPaths.push_back(initPath);
+        }
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
@@ -102,7 +110,7 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo)
 
         int entityIndex = GetEntityIndex(ent);
 
-        if(EntityPaths[entityIndex].size() > 0)
+        if((!(EntityPaths[entityIndex].empty())) && (!(EntityPaths.empty())))
         {
             Pair pair = EntityPaths[entityIndex].back();
             position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};

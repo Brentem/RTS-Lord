@@ -1,4 +1,6 @@
 {
+	"ProjectName": "RTS-Lord",
+
 	"files.exclude": {
 		"**/.git": true,
 		"**/.svn": true,
