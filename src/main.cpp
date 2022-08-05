@@ -56,6 +56,8 @@ int main(void)
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
+    Texture2D uiPlaceholder = LoadTexture("assets/ui/UI_placeholder.png");
+
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
     *texture1 = characterTexture;
@@ -91,6 +93,8 @@ int main(void)
 
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
+
+                DrawTexture(uiPlaceholder, -400, -800, WHITE);
 
                 RenderSystem(scene, mapInfo);
 
