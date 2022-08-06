@@ -9,6 +9,7 @@
 #include "../include/Systems.h" 
 #include "../include/Grid.h"
 #include "../include/Pathfinding.h"
+#include "../include/UI.h"
 
 #include <stdlib.h>
 
@@ -56,7 +57,7 @@ int main(void)
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
-    Texture2D uiPlaceholder = LoadTexture("assets/ui/UI_placeholder.png");
+    UI ui = UI_Init(1065, 800);
 
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
@@ -94,8 +95,6 @@ int main(void)
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
-                DrawTexture(uiPlaceholder, -400, -800, WHITE);
-
                 RenderSystem(scene, mapInfo);
 
                 // Render selection box
@@ -104,6 +103,8 @@ int main(void)
                 }
 
                 DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
+
+		        DrawTexture(ui.texture, -535, -525, WHITE);
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);

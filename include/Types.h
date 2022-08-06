@@ -73,3 +73,11 @@ struct EntitySize
     float width;
     float height;
 };
+
+struct UI
+{
+    Vector2 position;
+    int width;
+    int height;
+    Texture2D texture;
+};
