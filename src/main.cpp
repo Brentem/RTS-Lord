@@ -39,6 +39,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     // ToggleFullscreen();
 
 	// setup a camera
@@ -57,7 +58,9 @@ int main(void)
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
-    UI ui = UI_Init(UI_WIDTH, UI_LENGTH);
+    Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
+
+    UI ui(uiTexture, 1.0f, 1.0f);
 
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
@@ -82,6 +85,8 @@ int main(void)
 
         MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
+        ui.Update(cam);
+
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -105,7 +110,7 @@ int main(void)
                 DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
 
 		        //DrawTexture(ui.texture, -535, -525, WHITE);
-                UI_Draw(ui, cam);
+                ui.Draw(cam);
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);

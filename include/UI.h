@@ -2,10 +2,15 @@
 
 #include "Types.h"
 
-#define UI_WIDTH 1070
-#define UI_LENGTH 800
+#define UI_POSY_MARGIN -20.0f
 
-#define UI_POSY_MARGIN -218.0f
+struct UI
+{
+    Texture2D Texture;
+    float WidthFactor;
+    float HeightFactor;
 
-UI UI_Init(int width, int height);
-void UI_Draw(UI ui, Camera2D camera);
+    UI(Texture2D texture, float widthFactor, float heightFactor);
+    void Update(Camera2D camera);
+    void Draw(Camera2D camera);
+};

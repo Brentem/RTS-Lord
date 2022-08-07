@@ -9,8 +9,8 @@ MonitorSettings Monitor_GetSettings(int viewportWidth, int viewportHeight)
     InitWindow(viewportWidth, viewportHeight, "RTS-Lord");
 
     int currentMonitor = GetCurrentMonitor();
-    settings.monitorHeight = GetMonitorHeight(currentMonitor);
-    settings.monitorWidth = GetMonitorWidth(currentMonitor);
+    settings.monitorHeight = GetMonitorHeight(currentMonitor) - 100;
+    settings.monitorWidth = GetMonitorWidth(currentMonitor) - 10;
 
     CloseWindow();
 
