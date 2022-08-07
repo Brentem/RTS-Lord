@@ -11,3 +11,11 @@ UI UI_Init(int width, int height)
 
     return ui;
 }
+
+void UI_Draw(UI ui, Camera2D camera)
+{
+    float posX = (camera.offset.x / camera.zoom) * -1;
+    float posY = UI_POSY_MARGIN - (camera.offset.y / camera.zoom);
+
+    DrawTexture(ui.texture, posX, posY, WHITE);
+}

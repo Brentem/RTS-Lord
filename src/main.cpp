@@ -57,7 +57,7 @@ int main(void)
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
-    UI ui = UI_Init(1065, 800);
+    UI ui = UI_Init(UI_WIDTH, UI_LENGTH);
 
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
@@ -104,7 +104,8 @@ int main(void)
 
                 DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
 
-		        DrawTexture(ui.texture, -535, -525, WHITE);
+		        //DrawTexture(ui.texture, -535, -525, WHITE);
+                UI_Draw(ui, cam);
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);
