@@ -30,4 +30,11 @@ void Debug_DrawDebugInfo(
     // DrawText(TextFormat("mouseinfo.worldStartPositionY: %05f", mouseinfo.worldStartPosition.y), 10-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     DrawText(TextFormat("mapinfo pos.x: %01f pos.y %01f", mapinfo.position.x, mapinfo.position.y), 600-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     DrawText(TextFormat("mapinfo off.x: %01f off.y %01f", mapinfo.offSet.x, mapinfo.offSet.y), 600-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+
+    DrawText(TextFormat("camera.offset.x: %01f offset.y %01f", cam.offset.x, cam.offset.y), 600-viewportWidth/2, 80-viewportHeight/2, DEBUG_FONT_SIZE, WHITE);
+
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    DrawText(TextFormat("expected camera.offset.x: %d expected offset.y %d", screenWidth/2, screenHeight/2), 600-viewportWidth/2, 90-viewportHeight/2, DEBUG_FONT_SIZE, WHITE);
 }

@@ -2,8 +2,6 @@
 
 #include "Types.h"
 
-#define UI_POSY_MARGIN -20.0f
-
 struct UI
 {
     Texture2D Texture;

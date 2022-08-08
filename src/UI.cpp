@@ -20,7 +20,10 @@ void UI::Update(Camera2D camera)
 void UI::Draw(Camera2D camera)
 {
     float posX = (camera.offset.x / camera.zoom) * -1;
-    float posY = UI_POSY_MARGIN - (camera.offset.y / camera.zoom);
+
+    const float percentage = -0.06f;
+    float offsetY = camera.offset.y / camera.zoom;
+    float posY = (percentage * offsetY) - offsetY;
 
     DrawTexture(Texture, posX, posY, WHITE);
 }
