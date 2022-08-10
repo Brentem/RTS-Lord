@@ -36,20 +36,20 @@ struct Boundaries
     int rightBoundary;
 };
 
-struct MiniMapInfo
-{
-    Vector2 position;
-    int width;
-    int height;
-    int padding;
-    Vector2 miniMapOffSet;
-    Texture2D miniMapBackground;
-    int miniMapWidgetWidth;
-    int miniMapWidgetHeight;
-    float zoomFactor;
-    bool isActive;
-    Boundaries widgetBoundaries;
-};
+// struct MiniMapInfo
+// {
+//     Vector2 position;
+//     int width;
+//     int height;
+//     int padding;
+//     Vector2 miniMapOffSet;
+//     Texture2D miniMapBackground;
+//     int miniMapWidgetWidth;
+//     int miniMapWidgetHeight;
+//     float zoomFactor;
+//     bool isActive;
+//     Boundaries widgetBoundaries;
+// };
 
 struct MouseInfo
 {

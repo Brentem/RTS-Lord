@@ -102,9 +102,9 @@ void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
 	SetOffset(mapInfo);
 }
 
-void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings, MiniMapInfo* miniMapInfo, Camera2D camera)
+void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings, MiniMap* miniMap, Camera2D camera)
 {
-	if(mapInfo == NULL || mouseInfo == NULL)
+	if(mapInfo == NULL || mouseInfo == NULL || miniMap == NULL)
 	{
 		return;
 	}
@@ -120,25 +120,25 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 	Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
 	mouseInfo->worldCurrentPosition = worldCurrentPosition;
 
-	if(!(miniMapInfo->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
-		miniMapInfo->isActive = Map2D_IsMouseOverMiniMap(worldCurrentPosition, miniMapInfo, camera);
+	if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
+		miniMap->isActive = Map2D_IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
 	}
 
-	if(miniMapInfo->isActive){
+	if(miniMap->isActive){
 		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
 
 			// Position on minimap
-			int posXOnMinimap = miniMapInfo->position.x + miniMapInfo->miniMapOffSet.x - worldCurrentPosition.x;
-			int posYOnMinimap = miniMapInfo->position.y + miniMapInfo->miniMapOffSet.y- worldCurrentPosition.y;
+			int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
+			int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
 
 			// Don't navigate out the minimap
-			if(posXOnMinimap > miniMapInfo->widgetBoundaries.leftBoundary) posXOnMinimap = miniMapInfo->widgetBoundaries.leftBoundary;
-			if(posXOnMinimap < miniMapInfo->widgetBoundaries.rightBoundary) posXOnMinimap = miniMapInfo->widgetBoundaries.rightBoundary;
-			if(posYOnMinimap > miniMapInfo->widgetBoundaries.upperBoundary) posYOnMinimap = miniMapInfo->widgetBoundaries.upperBoundary;
-			if(posYOnMinimap < miniMapInfo->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMapInfo->widgetBoundaries.lowerBoundary;
+			if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
+			if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
+			if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
+			if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
 
-			float posXOnMap = posXOnMinimap/miniMapInfo->zoomFactor;
-			float posYOnMap = posYOnMinimap/miniMapInfo->zoomFactor;
+			float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
+			float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
 
 			mapInfo->position.x = posXOnMap;
 			mapInfo->position.y = posYOnMap;
@@ -185,13 +185,13 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 
 }
 
-bool Map2D_IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMapInfo* miniMapInfo, Camera2D camera)
+bool Map2D_IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap, Camera2D camera)
 {
 
-	if(worldCurrentPosition.x > miniMapInfo->position.x && 
-		worldCurrentPosition.x < miniMapInfo->position.x + miniMapInfo->width &&
-		worldCurrentPosition.y > miniMapInfo->position.y &&
-		worldCurrentPosition.y < miniMapInfo->position.y + miniMapInfo->height
+	if(worldCurrentPosition.x > miniMap->position.x && 
+		worldCurrentPosition.x < miniMap->position.x + miniMap->width &&
+		worldCurrentPosition.y > miniMap->position.y &&
+		worldCurrentPosition.y < miniMap->position.y + miniMap->height
 	)
 	{
 		return true;
@@ -253,82 +253,82 @@ Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
 	return selectionRectangle;
 }
 
-MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings){
-	MiniMapInfo miniMapInfo;
-	miniMapInfo.width = width;
-	miniMapInfo.height = height;
-	miniMapInfo.padding = padding;
+// MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings){
+// 	MiniMapInfo miniMapInfo;
+// 	miniMapInfo.width = width;
+// 	miniMapInfo.height = height;
+// 	miniMapInfo.padding = padding;
 
-	// Calculate position on screen, remember camera is centered
-	miniMapInfo.position.x = 10.0f - ((camera.offset.x/camera.zoom) + 0.05f);
-	miniMapInfo.position.y = 10.0f - ((camera.offset.y/camera.zoom) + 0.05f);
+// 	// Calculate position on screen, remember camera is centered
+// 	miniMapInfo.position.x = 10.0f - ((camera.offset.x/camera.zoom) + 0.05f);
+// 	miniMapInfo.position.y = 10.0f - ((camera.offset.y/camera.zoom) + 0.05f);
 
-	// Create minimap background
-	int maxWidth = width - (padding * 2);
-	if(maxWidth<0) maxWidth = 1;
-	int maxHeight = height - (padding * 2);
-	if(maxHeight<0) maxHeight = 1;
+// 	// Create minimap background
+// 	int maxWidth = width - (padding * 2);
+// 	if(maxWidth<0) maxWidth = 1;
+// 	int maxHeight = height - (padding * 2);
+// 	if(maxHeight<0) maxHeight = 1;
 	
-	Image backgroundImage = LoadImageFromTexture(background);
-    float zoomX = (float)backgroundImage.width/maxWidth;
-    float zoomY =  (float)backgroundImage.height/maxHeight;
-    float zoom = (zoomY > zoomX) ? zoomY : zoomX;
+// 	Image backgroundImage = LoadImageFromTexture(background);
+//     float zoomX = (float)backgroundImage.width/maxWidth;
+//     float zoomY =  (float)backgroundImage.height/maxHeight;
+//     float zoom = (zoomY > zoomX) ? zoomY : zoomX;
 
-	maxWidth = backgroundImage.width/zoom;
-	maxHeight = backgroundImage.height/zoom;
+// 	maxWidth = backgroundImage.width/zoom;
+// 	maxHeight = backgroundImage.height/zoom;
 
-	ImageResize(&backgroundImage, maxWidth, maxHeight);
-	miniMapInfo.miniMapBackground  = LoadTextureFromImage(backgroundImage);
-	UnloadImage(backgroundImage);
+// 	ImageResize(&backgroundImage, maxWidth, maxHeight);
+// 	miniMapInfo.miniMapBackground  = LoadTextureFromImage(backgroundImage);
+// 	UnloadImage(backgroundImage);
 
-	// Calculate miniMapOffSet
-	Vector2 miniMapOffSet;
-	miniMapOffSet.x = (float)width - ((float)padding * 2) - (float)maxWidth;
-	miniMapOffSet.y = (float)height - ((float)padding * 2) - (float)maxHeight;
-	if(miniMapOffSet.x > 0) miniMapOffSet.x = miniMapOffSet.x/2;
-	if(miniMapOffSet.y > 0) miniMapOffSet.y = miniMapOffSet.y/2;
-	miniMapInfo.miniMapOffSet = miniMapOffSet;
-	miniMapInfo.zoomFactor = 1/zoom;
-	miniMapInfo.miniMapWidgetWidth = (int)monitorSettings.monitorWidth*miniMapInfo.zoomFactor/camera.zoom + 1.0f;
-	miniMapInfo.miniMapWidgetHeight = (int)monitorSettings.monitorHeight*miniMapInfo.zoomFactor/camera.zoom + 1.0f;
+// 	// Calculate miniMapOffSet
+// 	Vector2 miniMapOffSet;
+// 	miniMapOffSet.x = (float)width - ((float)padding * 2) - (float)maxWidth;
+// 	miniMapOffSet.y = (float)height - ((float)padding * 2) - (float)maxHeight;
+// 	if(miniMapOffSet.x > 0) miniMapOffSet.x = miniMapOffSet.x/2;
+// 	if(miniMapOffSet.y > 0) miniMapOffSet.y = miniMapOffSet.y/2;
+// 	miniMapInfo.miniMapOffSet = miniMapOffSet;
+// 	miniMapInfo.zoomFactor = 1/zoom;
+// 	miniMapInfo.miniMapWidgetWidth = (int)monitorSettings.monitorWidth*miniMapInfo.zoomFactor/camera.zoom + 1.0f;
+// 	miniMapInfo.miniMapWidgetHeight = (int)monitorSettings.monitorHeight*miniMapInfo.zoomFactor/camera.zoom + 1.0f;
 
-	Boundaries widgetBoundaries;
-	widgetBoundaries.leftBoundary = (int)(-miniMapInfo.miniMapWidgetWidth/2);
-	widgetBoundaries.rightBoundary = (int)(miniMapInfo.miniMapWidgetWidth/2 - miniMapInfo.width + (miniMapInfo.miniMapOffSet.x *2))+4;
-	widgetBoundaries.upperBoundary = (int)(-miniMapInfo.miniMapWidgetHeight/2);
-	widgetBoundaries.lowerBoundary = (int)(miniMapInfo.miniMapWidgetHeight/2 - miniMapInfo.height + (miniMapInfo.miniMapOffSet.y *2))+4;
-	miniMapInfo.widgetBoundaries = widgetBoundaries;
+// 	Boundaries widgetBoundaries;
+// 	widgetBoundaries.leftBoundary = (int)(-miniMapInfo.miniMapWidgetWidth/2);
+// 	widgetBoundaries.rightBoundary = (int)(miniMapInfo.miniMapWidgetWidth/2 - miniMapInfo.width + (miniMapInfo.miniMapOffSet.x *2))+4;
+// 	widgetBoundaries.upperBoundary = (int)(-miniMapInfo.miniMapWidgetHeight/2);
+// 	widgetBoundaries.lowerBoundary = (int)(miniMapInfo.miniMapWidgetHeight/2 - miniMapInfo.height + (miniMapInfo.miniMapOffSet.y *2))+4;
+// 	miniMapInfo.widgetBoundaries = widgetBoundaries;
 
-	return miniMapInfo;
-}
+// 	return miniMapInfo;
+// }
 
-void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo, Scene& scene){
-	DrawRectangle(miniMapInfo.position.x , miniMapInfo.position.y, miniMapInfo.width, miniMapInfo.height, BLACK );
-	int posX = miniMapInfo.position.x + miniMapInfo.padding + miniMapInfo.miniMapOffSet.x;
-	int posY = miniMapInfo.position.y + miniMapInfo.padding + miniMapInfo.miniMapOffSet.y;
-	DrawTexture(miniMapInfo.miniMapBackground, posX, posY, WHITE);
+// void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo, Scene& scene){
+// 	DrawRectangle(miniMapInfo.position.x , miniMapInfo.position.y, miniMapInfo.width, miniMapInfo.height, BLACK );
+// 	int posX = miniMapInfo.position.x + miniMapInfo.padding + miniMapInfo.miniMapOffSet.x;
+// 	int posY = miniMapInfo.position.y + miniMapInfo.padding + miniMapInfo.miniMapOffSet.y;
+// 	DrawTexture(miniMapInfo.miniMapBackground, posX, posY, WHITE);
 
-	for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
-    {
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+// 	for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
+//     {
+//         EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
 
-        Vector2 characterPosition = entityPosition->currentPosition;
-		Vector2 characterPositionOnMinimap;
-		characterPositionOnMinimap.x = miniMapInfo.position.x + miniMapInfo.padding + miniMapInfo.width/2 + characterPosition.x*miniMapInfo.zoomFactor;
-		characterPositionOnMinimap.y = miniMapInfo.position.y + miniMapInfo.padding + miniMapInfo.height/2 + characterPosition.y*miniMapInfo.zoomFactor;
-		DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*miniMapInfo.zoomFactor, BLUE);
-    }
+//         Vector2 characterPosition = entityPosition->currentPosition;
+// 		Vector2 characterPositionOnMinimap;
+// 		characterPositionOnMinimap.x = miniMapInfo.position.x + miniMapInfo.padding + miniMapInfo.width/2 + characterPosition.x*miniMapInfo.zoomFactor;
+// 		characterPositionOnMinimap.y = miniMapInfo.position.y + miniMapInfo.padding + miniMapInfo.height/2 + characterPosition.y*miniMapInfo.zoomFactor;
+// 		DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*miniMapInfo.zoomFactor, BLUE);
+//     }
 
-	// Draw current mapposition => widget???
-	// Widget centered on minimap
-	int posXScreen = posX + (int)miniMapInfo.miniMapBackground.width/2 - (int)miniMapInfo.miniMapWidgetWidth/2;
-	int posYScreen = posY + (int)miniMapInfo.miniMapBackground.height/2 - (int)miniMapInfo.miniMapWidgetHeight/2;
-	// Process offset of background
-	posXScreen = posXScreen - (int)mapInfo.offSet.x*miniMapInfo.zoomFactor;
-	posYScreen = posYScreen - (int)mapInfo.offSet.y*miniMapInfo.zoomFactor;
-	DrawRectangleLines(posXScreen, posYScreen, miniMapInfo.miniMapWidgetWidth, (int)miniMapInfo.miniMapWidgetHeight, WHITE);
+// 	// Draw current mapposition => widget???
+// 	// Widget centered on minimap
+// 	int posXScreen = posX + (int)miniMapInfo.miniMapBackground.width/2 - (int)miniMapInfo.miniMapWidgetWidth/2;
+// 	int posYScreen = posY + (int)miniMapInfo.miniMapBackground.height/2 - (int)miniMapInfo.miniMapWidgetHeight/2;
+// 	// Process offset of background
+// 	posXScreen = posXScreen - (int)mapInfo.offSet.x*miniMapInfo.zoomFactor;
+// 	posYScreen = posYScreen - (int)mapInfo.offSet.y*miniMapInfo.zoomFactor;
+// 	DrawRectangleLines(posXScreen, posYScreen, miniMapInfo.miniMapWidgetWidth, (int)miniMapInfo.miniMapWidgetHeight, WHITE);
 
-	if( miniMapInfo.isActive){
-		DrawRectangleLines(miniMapInfo.position.x , miniMapInfo.position.y, miniMapInfo.width, miniMapInfo.height, WHITE );
-	}
-}
+// 	if( miniMapInfo.isActive){
+// 		DrawRectangleLines(miniMapInfo.position.x , miniMapInfo.position.y, miniMapInfo.width, miniMapInfo.height, WHITE );
+// 	}
+// }
