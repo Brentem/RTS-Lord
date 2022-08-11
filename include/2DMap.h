@@ -7,7 +7,6 @@ extern "C"
 }
 
 #include "Types.h"
-#include "SceneView.h"
 #include "MiniMap.h"
 
 MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize);

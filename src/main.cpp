@@ -40,19 +40,6 @@ void DrawHudElements(std::vector<HudElement*> hud)
     }
 }
 
-void DrawCharactersOnMiniMap(std::vector<HudElement*> hud, Scene& scene)
-{
-    for(HudElement* element: hud)
-    {
-        MiniMap* miniMap = dynamic_cast<MiniMap*>(element);
-
-        if(miniMap != nullptr)
-        {
-            miniMap->DrawCharacters(scene);
-        }
-    }
-}
-
 Scene scene;
 
 EntityID entity1 = scene.NewEntity();
@@ -144,7 +131,7 @@ int main(void)
                 }
 
                 DrawHudElements(hud);
-                DrawCharactersOnMiniMap(hud, scene);
+                MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);

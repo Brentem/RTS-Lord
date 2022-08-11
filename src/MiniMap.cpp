@@ -70,19 +70,3 @@ void MiniMap::Draw()
 		DrawRectangleLines(position.x , position.y, width, height, WHITE);
 	}
 }
-
-void MiniMap::DrawCharacters(Scene& scene)
-{
-    for(EntityID ent: SceneView<EntityPosition>(scene))
-    {
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-
-        Vector2 characterPosition = entityPosition->currentPosition;
-		Vector2 characterPositionOnMinimap;
-		characterPositionOnMinimap.x = position.x + padding + width/2 + characterPosition.x*zoomFactor;
-		characterPositionOnMinimap.y = position.y + padding + height/2 + characterPosition.y*zoomFactor;
-		DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*zoomFactor, BLUE);
-    }
-
-    DrawRectangleLines(posXScreen, posYScreen, miniMapWidgetWidth, miniMapWidgetHeight, WHITE);
-}

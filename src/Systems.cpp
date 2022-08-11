@@ -61,6 +61,27 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
     }
 }
 
+void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)
+{
+    if(miniMap == nullptr)
+    {
+        return;
+    }
+
+    for(EntityID ent: SceneView<EntityPosition>(scene))
+    {
+        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+
+        Vector2 characterPosition = entityPosition->currentPosition;
+		Vector2 characterPositionOnMinimap;
+		characterPositionOnMinimap.x = miniMap->position.x + miniMap->padding + miniMap->width/2 + characterPosition.x*miniMap->zoomFactor;
+		characterPositionOnMinimap.y = miniMap->position.y + miniMap->padding + miniMap->height/2 + characterPosition.y*miniMap->zoomFactor;
+		DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*miniMap->zoomFactor, BLUE);
+    }
+
+    DrawRectangleLines(miniMap->posXScreen, miniMap->posYScreen, miniMap->miniMapWidgetWidth, miniMap->miniMapWidgetHeight, WHITE);
+}
+
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
 {
     if(mouseInfo->isSelecting)

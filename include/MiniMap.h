@@ -2,20 +2,14 @@
 
 #include "HudElement.h"
 
-#include "SceneView.h"
 #include "Types.h"
 
 class MiniMap : public HudElement
 {
     private:
-        int padding;
-        int miniMapWidgetWidth;
-        int miniMapWidgetHeight;
-
         int offsetPosX;
         int offsetPosY;
-        int posXScreen;
-        int posYScreen;
+
 
     public:
         Vector2 miniMapOffSet;
@@ -23,6 +17,11 @@ class MiniMap : public HudElement
         float zoomFactor;
         int width;
         int height;
+        int padding;
+        int posXScreen;
+        int posYScreen;
+        int miniMapWidgetWidth;
+        int miniMapWidgetHeight;
         bool isActive;
 
         MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSettings,
@@ -30,5 +29,4 @@ class MiniMap : public HudElement
 
         void Update(MapInfo info);
         virtual void Draw() override;
-        void DrawCharacters(Scene& scene);
 };
