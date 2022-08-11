@@ -3,7 +3,10 @@
 
 #include "Types.h"
 
-#include "raylib.h"
+extern "C"
+{
+    #include "raylib.h"
+}
 
 
 void Debug_DrawDebugInfo(
@@ -11,8 +14,8 @@ void Debug_DrawDebugInfo(
     MapInfo mapinfo,
     Camera2D cam, 
     int viewportWidth, 
-    int viewportHeight,
-    MiniMapInfo miniMapInfo
+    int viewportHeight
+    //MiniMapInfo miniMapInfo
     );
 
 #endif

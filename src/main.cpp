@@ -1,4 +1,7 @@
-#include "raylib.h"
+extern "C"
+{
+    #include "raylib.h"
+}
 
 #include "../include/2DMap.h"
 #include "../include/Debug.h"
@@ -9,11 +12,33 @@
 #include "../include/Systems.h" 
 #include "../include/Grid.h"
 #include "../include/Pathfinding.h"
+#include "../include/MiniMap.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
+
+void UpdateHudElements(std::vector<HudElement*> hud, MapInfo mapInfo)
+{
+    for(HudElement* element: hud)
+    {
+        MiniMap* miniMap = dynamic_cast<MiniMap*>(element);
+
+        if(miniMap != nullptr)
+        {
+            miniMap->Update(mapInfo);
+        }
+    }
+}
+
+void DrawHudElements(std::vector<HudElement*> hud)
+{
+    for(HudElement* element: hud)
+    {
+        element->Draw();
+    }
+}
 
 Scene scene;
 
@@ -51,10 +76,15 @@ int main(void)
     std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
     MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
-    MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
     Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
+
+    Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
+
+    std::vector<HudElement*> hud;
+    hud.push_back(new MiniMap(background, cam, setting, 150, 150, 2, 10, 10));
+    hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
 
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
@@ -72,13 +102,14 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         Map2D_HandleKeyboardInput(&mapInfo);
-        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting, &miniMapInfo, cam);
+        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting, dynamic_cast<MiniMap*>(hud[0]), cam);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
         
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
         MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
+        UpdateHudElements(hud, mapInfo);
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -99,7 +130,8 @@ int main(void)
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
                 }
 
-                DrawMiniMap(setting, miniMapInfo, mapInfo, scene);
+                DrawHudElements(hud);
+                MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
                 //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, miniMapInfo);
@@ -113,6 +145,8 @@ int main(void)
     // De-Initialization
     UnloadTexture(characterTexture);
     UnloadTexture(background);
+    UnloadTexture(uiTexture);
+
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

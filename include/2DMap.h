@@ -1,11 +1,13 @@
 #ifndef TWODMAP_H
 #define TWODMAP_H
 
-#include "raylib.h"
+extern "C"
+{
+    #include "raylib.h"
+}
 
 #include "Types.h"
-#include "../include/Scene.h" 
-#include "../include/SceneView.h"
+#include "MiniMap.h"
 
 MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize);
 
@@ -15,16 +17,10 @@ Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoom
 
 void Map2D_HandleKeyboardInput(MapInfo* info);
 
-void Map2D_HandleMouseInput(MapInfo* info, MouseInfo* mouseinfo, MonitorSettings setting, MiniMapInfo* miniMapInfo, Camera2D camera);
-
-bool Map2D_IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMapInfo* miniMapInfo,  Camera2D camera);
+void Map2D_HandleMouseInput(MapInfo* info, MouseInfo* mouseinfo, MonitorSettings setting, MiniMap* miniMap, Camera2D camera);
 
 void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries);
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam);
-
-MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings);
-
-void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo, Scene& scene);
 
 #endif
