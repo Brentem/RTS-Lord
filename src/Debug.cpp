@@ -1,6 +1,10 @@
 #include "../include/Debug.h"
 #include "../include/2DMap.h"
-#include "raylib.h"
+
+extern "C"
+{
+    #include "raylib.h"
+}
 
 #define DEBUG_FONT_SIZE 12
 

@@ -3,7 +3,10 @@
 
 #include "Types.h"
 
-#include "raylib.h"
+extern "C"
+{
+    #include "raylib.h"
+}
 
 
 void Debug_DrawDebugInfo(

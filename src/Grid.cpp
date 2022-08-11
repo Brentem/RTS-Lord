@@ -1,6 +1,9 @@
 #include "../include/Grid.h"
 
-#include <raylib.h>
+extern "C"
+{
+    #include "raylib.h"
+}
 
 std::vector<std::vector<Tile>> Grid_Init(const char *mapLayoutFileName, MapInfo mapInfo)
 {
