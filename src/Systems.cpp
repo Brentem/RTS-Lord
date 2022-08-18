@@ -205,14 +205,14 @@ float getPositionIndex(int pairIndex)
 {
     float positionIndex = pairIndex * 32;
 
-    if(positionIndex < 0)
-    {
-        positionIndex -= 16;
-    }
-    else
-    {
-        positionIndex += 16;
-    }
+    // if(positionIndex < 0)
+    // {
+    //     positionIndex -= 16;
+    // }
+    // else
+    // {
+    //     positionIndex += 16;
+    // }
 
     return positionIndex;
 }

@@ -54,6 +54,7 @@ Texture2D Map2DGetBackground(MapInfo mapInfo,const char *mapLayoutFileName, cons
 				spriteRectangle = tileGrass3;
 			}
 			ImageDraw(&imageBackground, spriteSheet, spriteRectangle,  (Rectangle) { (float)x*mapInfo.cellSize, (float)y*mapInfo.cellSize, (float)mapInfo.cellSize, (float)mapInfo.cellSize }, WHITE);
+			ImageDrawRectangleLines(&imageBackground, (Rectangle){x*mapInfo.cellSize, y*mapInfo.cellSize, mapInfo.cellSize, mapInfo.cellSize}, 1, WHITE);
 		}
 	}
 
