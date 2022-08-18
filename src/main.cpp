@@ -13,6 +13,7 @@ extern "C"
 #include "../include/Grid.h"
 #include "../include/Pathfinding.h"
 #include "../include/MiniMap.h"
+#include "../include/UnitSelection.h"
 
 #include <stdlib.h>
 
@@ -78,13 +79,15 @@ int main(void)
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
-    Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
+    Texture2D characterTexture = LoadTexture("assets/Character_Down2.png");
+    Texture2D characterIcon = LoadTexture("assets/ui/Character_Icon.png");
 
     Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
 
     std::vector<HudElement*> hud;
     hud.push_back(new MiniMap(background, cam, setting, 150, 150, 2, 10, 10));
     hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
+    hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 230, 530));
 
     // ECS Test
     *position1 = {{0, 0}, {0, 0}};
@@ -146,6 +149,7 @@ int main(void)
     UnloadTexture(characterTexture);
     UnloadTexture(background);
     UnloadTexture(uiTexture);
+    UnloadTexture(characterIcon);
 
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
