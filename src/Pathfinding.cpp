@@ -8,11 +8,11 @@ static Pair childrenOffsets[8] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}, {-1, -1}, {-
 
 static pair<Cell*, int> findCurrentCellAndIndex(vector<Cell*> openList);
 static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell);
-static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell);
+static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell, vector<vector<Tile>> grid);
 
 static void deleteLists(vector<Cell*>& openList, vector<Cell*>& closedList);
 
-vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end)
+vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end, vector<vector<Tile>> grid)
 {
     Cell* startCell = new Cell{nullptr, start, 0, 0, 0};
     Cell* endCell = new Cell{nullptr, end, 0, 0, 0};
@@ -41,7 +41,13 @@ vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end)
             return path;
         }
 
-        vector<Cell*> children = generateChildren(mapInfo, currentCell);
+        vector<Cell*> children = generateChildren(mapInfo, currentCell, grid);
+
+        if(children.size() == 0)
+        {
+            deleteLists(openList, closedList);
+            return path;
+        }
 
         for(Cell* child: children)
         {
@@ -133,25 +139,31 @@ static bool isGoalFound(vector<Pair>& path, Cell* currentCell, Cell endCell)
     return found;
 }
 
-static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell)
+static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell, vector<vector<Tile>> grid)
 {
     vector<Cell*> children;
-    // Handle nullptr case
+    if(currentCell == nullptr)
+    {
+        return children;
+    }
+
     for(Pair childOffset: childrenOffsets)
     {
         Pair cellCoordinates = {(currentCell->coordinates.first + childOffset.first),
                                  (currentCell->coordinates.second + childOffset.second)};
         
         // Handle case if coordinates aren't available in grid
-        if(/*(cellCoordinates.first < 0) || */
-            /*(cellCoordinates.second < 0) || */
-            (cellCoordinates.first >= mapInfo.columnCount) ||
+        if((cellCoordinates.first >= mapInfo.columnCount) ||
             (cellCoordinates.second >= mapInfo.rowCount))
         {
             continue;
         }
 
         // Handle case of not walkable terrain
+        // if(grid[cellCoordinates.first][cellCoordinates.second].isWalkable == false)
+        // {
+        //     continue;
+        // }
 
         Cell* newCell = new Cell{currentCell, cellCoordinates, 0, 0, 0};
         children.push_back(newCell);

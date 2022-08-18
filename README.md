@@ -14,7 +14,7 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 * Create Game Design Document
 * Early prototype
 
-## Credits
+## Information Used
 * [David Colson](https://www.david-colson.com/2020/02/09/making-a-simple-ecs.html)
 * A* Algorithm
   * [Nicholas Swift](https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2)
