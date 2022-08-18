@@ -107,7 +107,7 @@ int main(void)
         
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
+        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle, grid);
 
         UpdateHudElements(hud, mapInfo);
         //----------------------------------------------------------------------------------

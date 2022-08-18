@@ -5,18 +5,20 @@
 
 #include <stdio.h>
 
+using namespace std;
+
 // Temporary solution!
-static std::vector<Path> EntityPaths;
+static vector<Path> EntityPaths;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo);
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>> grid);
 void setTargetPosition(Scene& scene, MapInfo mapInfo);
 void updatePosition(Scene& scene);
 
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
 
-void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection)
+void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>> grid)
 {
     if(mouseInfo == nullptr)
     {
@@ -35,7 +37,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
-    setPath(scene, mouseInfo, mapInfo);
+    setPath(scene, mouseInfo, mapInfo, grid);
     setTargetPosition(scene, mapInfo);
     updatePosition(scene);
 }
@@ -103,7 +105,7 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     }
 }
 
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>> grid)
 {
     for(EntityID ent: SceneView<EntityPosition, bool>(scene))
     {
@@ -117,7 +119,7 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo)
             Vector2 currentPositionOnMap = (Vector2){entityPosition->currentPosition.x, entityPosition->currentPosition.y};
 
             int entityIndex = GetEntityIndex(ent);
-            EntityPaths[entityIndex] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap));
+            EntityPaths[entityIndex] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap), grid);
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -203,16 +205,5 @@ Pair getPair(Vector2 position)
 
 float getPositionIndex(int pairIndex)
 {
-    float positionIndex = pairIndex * 32;
-
-    // if(positionIndex < 0)
-    // {
-    //     positionIndex -= 16;
-    // }
-    // else
-    // {
-    //     positionIndex += 16;
-    // }
-
-    return positionIndex;
+    return pairIndex * 32;
 }
