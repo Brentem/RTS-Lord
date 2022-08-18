@@ -11,14 +11,14 @@ using namespace std;
 static vector<Path> EntityPaths;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>> grid);
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid);
 void setTargetPosition(Scene& scene, MapInfo mapInfo);
 void updatePosition(Scene& scene);
 
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
 
-void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>> grid)
+void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid)
 {
     if(mouseInfo == nullptr)
     {
@@ -105,7 +105,7 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     }
 }
 
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>> grid)
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid)
 {
     for(EntityID ent: SceneView<EntityPosition, bool>(scene))
     {

@@ -12,7 +12,7 @@ static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell, vector
 
 static void deleteLists(vector<Cell*>& openList, vector<Cell*>& closedList);
 
-vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end, vector<vector<Tile>> grid)
+vector<Pair> GetPath(MapInfo mapInfo, Pair start, Pair end, vector<vector<Tile>>& grid)
 {
     Cell* startCell = new Cell{nullptr, start, 0, 0, 0};
     Cell* endCell = new Cell{nullptr, end, 0, 0, 0};
