@@ -98,7 +98,20 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
             
             Rectangle entityBox = {entityPosition->currentPosition.x, entityPosition->currentPosition.y,
                                     size->width, size->height};
-            *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
+
+            if(mouseInfo->selectedUnits < MAX_UNITS_SELECTED)
+            {
+                *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
+            }
+            else
+            {
+                *isSelected = false;
+            }
+
+            if(*isSelected)
+            {
+                mouseInfo->selectedUnits++;
+            }
         }
 
         mouseInfo->isSelecting = false;

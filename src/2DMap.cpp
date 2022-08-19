@@ -165,6 +165,7 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 		mouseInfo->currentPosition.y = (float)mouseY;
 
 		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+			mouseInfo->selectedUnits = 0;
 			mouseInfo->isSelecting = false;
 			if(mouseInfo->isdragging){
 

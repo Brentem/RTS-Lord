@@ -8,6 +8,8 @@ extern "C"
 #include <vector>
 #include <set>
 
+#define MAX_UNITS_SELECTED 30
+
 typedef std::pair<int, int> Pair;
 typedef std::vector<Pair> Path;
 
@@ -46,6 +48,7 @@ struct MouseInfo
     Vector2 currentPosition;
     Vector2 worldStartPosition;
     Vector2 worldCurrentPosition;
+    int selectedUnits;
     bool isdragging;
     bool isSelecting;
     bool giveNewTarget;

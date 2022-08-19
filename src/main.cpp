@@ -75,7 +75,7 @@ int main(void)
 
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
     std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
-    MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
+    MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, 0, false, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
@@ -113,6 +113,9 @@ int main(void)
         MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle, grid);
 
         UpdateHudElements(hud, mapInfo);
+
+        UnitSelection* unitSelection = dynamic_cast<UnitSelection*>(hud[2]);
+        unitSelection->selectedUnits = mouseinfo.selectedUnits;
         //----------------------------------------------------------------------------------
 
         // Draw
