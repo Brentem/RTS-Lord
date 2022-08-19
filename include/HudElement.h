@@ -9,6 +9,8 @@ class HudElement
 {
     protected:
         Texture2D texture;
+        int width;
+        int height;
 
     public:
         Vector2 position;
