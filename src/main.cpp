@@ -20,6 +20,8 @@ extern "C"
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
+Scene scene;
+
 void UpdateHudElements(std::vector<HudElement*> hud, MapInfo mapInfo)
 {
     for(HudElement* element: hud)
@@ -41,19 +43,50 @@ void DrawHudElements(std::vector<HudElement*> hud)
     }
 }
 
-Scene scene;
+// You can't initialize the fields here
+// because it will cause errors in rendering
+// why this is I don't know. -Brent
+void CreateUnits()
+{
+    for(int i = 0; i < 40; i++)
+    {
+        EntityID entity = scene.NewEntity();
+        scene.Assign<EntityPosition>(entity);
+        scene.Assign<Texture2D>(entity);
+        scene.Assign<EntitySize>(entity);
+        scene.Assign<bool>(entity);
+    }
+}
 
-EntityID entity1 = scene.NewEntity();
-EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
-Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
-EntitySize* size1 = scene.Assign<EntitySize>(entity1);
-bool* bool1 = scene.Assign<bool>(entity1);
+void InitializeUnits(Texture2D characterTexture)
+{
+    float posX = 0.0f;
+    float posY = 0.0f;
 
-EntityID entity2 = scene.NewEntity();
-EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
-Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
-EntitySize* size2 = scene.Assign<EntitySize>(entity2);
-bool* bool2 = scene.Assign<bool>(entity2);
+    int counter = 0;
+
+    for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
+    {
+        if(counter % 10 == 0)
+        {
+            posX = 0.0f;
+            posY += 64.0f;
+        }
+
+        EntityPosition* position = scene.Get<EntityPosition>(ent);
+        Texture2D* texture = scene.Get<Texture2D>(ent);
+        EntitySize* size = scene.Get<EntitySize>(ent);
+        bool* isSelected = scene.Get<bool>(ent);
+
+        *position = {{posX, posY}, {posX, posY}};
+        *texture = characterTexture;
+        *size = {32.0f, 32.0f};
+        *isSelected = false;
+
+        posX += 64.0f;
+        counter++;
+    }
+}
 
 int main(void) 
 {
@@ -89,14 +122,8 @@ int main(void)
     hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
     hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 230, 530));
 
-    // ECS Test
-    *position1 = {{0, 0}, {0, 0}};
-    *texture1 = characterTexture;
-    *size1 = {32.0f, 32.0f};
-
-    *position2 = {{60, 30}, {60, 30}};
-    *texture2 = characterTexture;
-    *size2 = {32.0f, 32.0f};
+    CreateUnits();
+    InitializeUnits(characterTexture);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
