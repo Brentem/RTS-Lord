@@ -35,7 +35,7 @@ void Debug_DrawDebugInfo(
     DrawText(TextFormat("mapinfo pos.x: %01f pos.y %01f", mapinfo.position.x, mapinfo.position.y), 600-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     DrawText(TextFormat("mapinfo off.x: %01f off.y %01f", mapinfo.offSet.x, mapinfo.offSet.y), 600-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
 
-    DrawText(TextFormat("camera.offset.x: %01f offset.y %01f", cam.offset.x, cam.offset.y), 600-viewportWidth/2, 80-viewportHeight/2, DEBUG_FONT_SIZE, WHITE);
+    DrawText(TextFormat("camera.rotation: %01f offset.y %01f", cam.rotation, cam.offset.y), 600-viewportWidth/2, 80-viewportHeight/2, DEBUG_FONT_SIZE, WHITE);
 
     int screenWidth = GetScreenWidth();
     int screenHeight = GetScreenHeight();
