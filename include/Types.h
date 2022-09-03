@@ -65,3 +65,11 @@ struct EntitySize
     float width;
     float height;
 };
+
+enum TaskState
+{
+    IDLE,
+    TO_RESOURCE,
+    GATHERING,
+    TO_BASE
+};

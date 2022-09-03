@@ -20,3 +20,4 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
   * [Nicholas Swift](https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2)
   * [Nicholas Swift's Source Code](https://gist.github.com/Nicholas-Swift/003e1932ef2804bebef2710527008f44)
   * [Ryan Collingwood's Source Code](https://gist.github.com/ryancollingwood/32446307e976a11a1185a5394d6657bc)
+* [Using Timers in Raylib](https://www.youtube.com/watch?v=vGlvTWUctTQ)
