@@ -55,6 +55,8 @@ void CreateUnits()
         scene.Assign<Texture2D>(entity);
         scene.Assign<EntitySize>(entity);
         scene.Assign<bool>(entity);
+        scene.Assign<TaskState>(entity);
+        scene.Assign<TaskPositions>(entity);
     }
 }
 
@@ -65,7 +67,7 @@ void InitializeUnits(Texture2D characterTexture)
 
     int counter = 0;
 
-    for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
+    for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool, TaskState>(scene))
     {
         if(counter % 10 == 0)
         {
@@ -77,11 +79,15 @@ void InitializeUnits(Texture2D characterTexture)
         Texture2D* texture = scene.Get<Texture2D>(ent);
         EntitySize* size = scene.Get<EntitySize>(ent);
         bool* isSelected = scene.Get<bool>(ent);
+        TaskState* taskState = scene.Get<TaskState>(ent);
+        TaskPositions* taskPositions = scene.Get<TaskPositions>(ent);
 
         *position = {{posX, posY}, {posX, posY}};
         *texture = characterTexture;
         *size = {32.0f, 32.0f};
         *isSelected = false;
+        *taskState = IDLE;
+        *taskPositions = {{0, 0}, {0, 0}};
 
         posX += 64.0f;
         counter++;

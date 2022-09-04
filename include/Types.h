@@ -66,6 +66,12 @@ struct EntitySize
     float height;
 };
 
+struct TaskPositions
+{
+    Vector2 basePosition;
+    Vector2 resourcePosition;
+};
+
 enum TaskState
 {
     IDLE,
