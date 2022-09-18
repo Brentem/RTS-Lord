@@ -30,6 +30,14 @@
                     "BUILD_MODE=DEBUG"
                 ]
             },
+            "linux": {
+                "args": [
+                    "RAYLIB_PATH=${userHome}/raylib",
+                    "PROJECT_NAME=${config:ProjectName}",
+                    "OBJS=src/*.cpp",
+                    "BUILD_MODE=DEBUG"
+                ]
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -60,6 +68,13 @@
                     "RAYLIB_PATH=<path_to_raylib>/raylib",
                     "PROJECT_NAME=${fileBasenameNoExtension}",
                     "OBJS=${fileBasenameNoExtension}.c"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "RAYLIB_PATH=${userHome}/raylib",
+                    "PROJECT_NAME=${config:ProjectName}",
+                    "OBJS=src/*.cpp"
                 ]
             },
             "group": "build",
