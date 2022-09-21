@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SceneView.h"
 #include "Types.h"
 #include "MiniMap.h"
+#include "Scene.h"
 
 #include <vector>
 

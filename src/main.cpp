@@ -7,8 +7,7 @@ extern "C"
 #include "../include/Debug.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
-#include "../include/SceneView.h"
-#include "../include/Types.h"
+#include "../include/Scene.h"
 #include "../include/Systems.h" 
 #include "../include/Grid.h"
 #include "../include/Pathfinding.h"
@@ -20,7 +19,6 @@ extern "C"
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
-Scene scene;
 
 void UpdateHudElements(std::vector<HudElement*> hud, MapInfo mapInfo)
 {
@@ -42,57 +40,6 @@ void DrawHudElements(std::vector<HudElement*> hud)
         element->Draw();
     }
 }
-
-// You can't initialize the fields here
-// because it will cause errors in rendering
-// why this is I don't know. -Brent
-// void CreateUnits()
-// {
-//     for(int i = 0; i < 40; i++)
-//     {
-//         EntityID entity = scene.NewEntity();
-//         scene.Assign<EntityPosition>(entity);
-//         scene.Assign<Texture2D>(entity);
-//         scene.Assign<EntitySize>(entity);
-//         scene.Assign<bool>(entity);
-//         scene.Assign<TaskState>(entity);
-//         scene.Assign<TaskPositions>(entity);
-//     }
-// }
-
-// void InitializeUnits(Texture2D characterTexture)
-// {
-//     float posX = 0.0f;
-//     float posY = 0.0f;
-
-//     int counter = 0;
-
-//     for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool, TaskState>(scene))
-//     {
-//         if(counter % 10 == 0)
-//         {
-//             posX = 0.0f;
-//             posY += 64.0f;
-//         }
-
-//         EntityPosition* position = scene.Get<EntityPosition>(ent);
-//         Texture2D* texture = scene.Get<Texture2D>(ent);
-//         EntitySize* size = scene.Get<EntitySize>(ent);
-//         bool* isSelected = scene.Get<bool>(ent);
-//         TaskState* taskState = scene.Get<TaskState>(ent);
-//         TaskPositions* taskPositions = scene.Get<TaskPositions>(ent);
-
-//         *position = {{posX, posY}, {posX, posY}};
-//         *texture = characterTexture;
-//         *size = {32.0f, 32.0f};
-//         *isSelected = false;
-//         *taskState = IDLE;
-//         *taskPositions = {{0, 0}, {0, 0}};
-
-//         posX += 64.0f;
-//         counter++;
-//     }
-// }
 
 int main(void) 
 {
@@ -123,13 +70,12 @@ int main(void)
 
     Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
 
+    Scene scene(characterTexture);
+
     std::vector<HudElement*> hud;
     hud.push_back(new MiniMap(background, cam, setting, 150, 150, 2, 10, 10));
     hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
     hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 230, 530));
-
-    //CreateUnits();
-    //InitializeUnits(characterTexture);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -143,7 +89,7 @@ int main(void)
         
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        //MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle, grid);
+        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle, grid);
 
         UpdateHudElements(hud, mapInfo);
 
@@ -162,7 +108,7 @@ int main(void)
 		        // draw the entire background image for the entire world. The camera will clip it to the screen
 		        DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
-                //RenderSystem(scene, mapInfo);
+                RenderSystem(scene, mapInfo);
 
                 // Render selection box
                 if(mouseinfo.isdragging){
@@ -170,7 +116,7 @@ int main(void)
                 }
 
                 DrawHudElements(hud);
-                //MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
+                MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
                 // Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
