@@ -1,6 +1,6 @@
 #pragma once
 
-#include <entt/entt.hpp>
+#include "../vendor/entt/entt.hpp"
 #include <raylib.h>
 
 class Scene
