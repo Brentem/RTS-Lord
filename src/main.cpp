@@ -50,7 +50,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    // ToggleFullscreen();
+    ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -61,7 +61,7 @@ int main(void)
 
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
     std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
-    MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, 0, false, false, false};
+    MouseInfo mouseInfo = {0.0f, 0.0f, 0.0f, 0.0f, 0, false, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
@@ -84,17 +84,18 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         Map2D_HandleKeyboardInput(&mapInfo);
-        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting, dynamic_cast<MiniMap*>(hud[0]), cam);
+        Map2D_HandleMouseInput(&mapInfo, &mouseInfo, setting, dynamic_cast<MiniMap*>(hud[0]), cam);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
+        Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
         
-        Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
+        Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, cam);
 
-        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle, grid);
+        MovementSystem(scene, &mouseInfo, mapInfo, selectionRectangle, grid);
 
         UpdateHudElements(hud, mapInfo);
 
         UnitSelection* unitSelection = dynamic_cast<UnitSelection*>(hud[2]);
-        unitSelection->selectedUnits = mouseinfo.selectedUnits;
+        unitSelection->selectedUnits = mouseInfo.selectedUnits;
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -111,15 +112,18 @@ int main(void)
                 RenderSystem(scene, mapInfo);
 
                 // Render selection box
-                if(mouseinfo.isdragging){
+                if(mouseInfo.isdragging){
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
                 }
+
+                DrawMouseGrid(5, 3, mouseInfo, mapInfo, grid);
 
                 DrawHudElements(hud);
                 MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
-                // Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+                Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+
 
 		    EndMode2D();
 
