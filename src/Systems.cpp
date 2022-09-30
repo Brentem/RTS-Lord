@@ -8,6 +8,7 @@
 using namespace std;
 
 // Temporary solution!
+const int MAX_ENTITIES = 400;
 static vector<Path> EntityPaths;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
@@ -44,21 +45,22 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
 void RenderSystem(Scene& scene, MapInfo mapInfo)
 {
-    for(EntityID ent: SceneView<EntityPosition, Texture2D, EntitySize, bool>(scene))
+    auto view = scene.registry.view<EntityPosition, Texture2D, EntitySize, bool>();
+    for(auto entity : view)
     {
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-        Texture2D* texture = scene.Get<Texture2D>(ent);
-        EntitySize* size = scene.Get<EntitySize>(ent);
-        bool* isSelected = scene.Get<bool>(ent);
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Texture2D& texture = view.get<Texture2D>(entity);
+        EntitySize& size = view.get<EntitySize>(entity);
+        bool& isSelected = view.get<bool>(entity);
 
-        Vector2 characterPosition = entityPosition->currentPosition;
+        Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
-        Rectangle frameRec = { 0.0f, 0.0f, size->width, size->height };
-        DrawTextureRec(*texture, frameRec, characterPositionOnMap, WHITE);
+        Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
+        DrawTextureRec(texture, frameRec, characterPositionOnMap, WHITE);
 
-        if(*isSelected)
+        if(isSelected)
         {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size->width, size->height, RED);
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
         }
     }
 }
@@ -70,11 +72,12 @@ void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)
         return;
     }
 
-    for(EntityID ent: SceneView<EntityPosition>(scene))
+    auto view = scene.registry.view<EntityPosition>();
+    for(auto entity : view)
     {
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
 
-        Vector2 characterPosition = entityPosition->currentPosition;
+        Vector2 characterPosition = entityPosition.currentPosition;
 		Vector2 characterPositionOnMinimap;
 		characterPositionOnMinimap.x = miniMap->position.x + miniMap->padding + miniMap->width/2 + characterPosition.x*miniMap->zoomFactor;
 		characterPositionOnMinimap.y = miniMap->position.y + miniMap->padding + miniMap->height/2 + characterPosition.y*miniMap->zoomFactor;
@@ -90,25 +93,26 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     {
         Rectangle selectionRectangleOnMap = {selection.x - mapInfo.offSet.x, selection.y - mapInfo.offSet.y , selection.width, selection.height};
 
-        for(EntityID ent: SceneView<EntityPosition, EntitySize, bool>(scene))
+        auto view = scene.registry.view<EntityPosition, EntitySize, bool>();
+        for(auto entity : view)
         {
-            bool* isSelected = scene.Get<bool>(ent);
-            EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-            EntitySize* size = scene.Get<EntitySize>(ent);
+            bool& isSelected = view.get<bool>(entity);
+            EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+            EntitySize& size = view.get<EntitySize>(entity);
             
-            Rectangle entityBox = {entityPosition->currentPosition.x, entityPosition->currentPosition.y,
-                                    size->width, size->height};
+            Rectangle entityBox = {entityPosition.currentPosition.x, entityPosition.currentPosition.y,
+                                    size.width, size.height};
 
             if(mouseInfo->selectedUnits < MAX_UNITS_SELECTED)
             {
-                *isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
+                isSelected = CheckCollisionRecs(selectionRectangleOnMap, entityBox);
             }
             else
             {
-                *isSelected = false;
+                isSelected = false;
             }
 
-            if(*isSelected)
+            if(isSelected)
             {
                 mouseInfo->selectedUnits++;
             }
@@ -120,19 +124,20 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid)
 {
-    for(EntityID ent: SceneView<EntityPosition, bool>(scene))
+    auto view = scene.registry.view<EntityPosition, bool>();
+    for(auto entity : view)
     {
-        bool* isSelected = scene.Get<bool>(ent);
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
+        bool& isSelected = view.get<bool>(entity);
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
 
-        if(*isSelected && mouseInfo->giveNewTarget)
+        if(isSelected && mouseInfo->giveNewTarget)
         {
             Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
                                                             (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
-            Vector2 currentPositionOnMap = (Vector2){entityPosition->currentPosition.x, entityPosition->currentPosition.y};
+            Vector2 currentPositionOnMap = (Vector2){entityPosition.currentPosition.x, entityPosition.currentPosition.y};
 
-            int entityIndex = GetEntityIndex(ent);
-            EntityPaths[entityIndex] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap), grid);
+            //int entityIndex = GetEntityIndex(ent);
+            EntityPaths[(uint32_t)entity] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap), grid);
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -140,19 +145,21 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
 
 void setTargetPosition(Scene& scene, MapInfo mapInfo)
 {
-    for(EntityID ent: SceneView<EntityPosition>(scene))
+    auto view = scene.registry.view<EntityPosition>();
+    for(auto entity : view)
     {
-        EntityPosition* position = scene.Get<EntityPosition>(ent);
+        EntityPosition& position = view.get<EntityPosition>(entity);
 
-        int entityIndex = GetEntityIndex(ent);
+        //int entityIndex = GetEntityIndex(ent);
+        int entityIndex = (uint32_t)entity;
 
         if((!(EntityPaths[entityIndex].empty())) && (!(EntityPaths.empty())))
         {
             Pair pair = EntityPaths[entityIndex].back();
-            position->targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
+            position.targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
-            if((position->currentPosition.x == position->targetPosition.x) &&
-                (position->currentPosition.y == position->targetPosition.y))
+            if((position.currentPosition.x == position.targetPosition.x) &&
+                (position.currentPosition.y == position.targetPosition.y))
             {
                 EntityPaths[entityIndex].pop_back();
             }
@@ -162,11 +169,12 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo)
 
 void updatePosition(Scene& scene)
 {
-    for(EntityID ent: SceneView<EntityPosition>(scene))
+    auto view = scene.registry.view<EntityPosition>();
+    for(auto entity : view)
     {
-        EntityPosition* entityPosition = scene.Get<EntityPosition>(ent);
-        Vector2* currentPosition = &entityPosition->currentPosition;
-        Vector2* targetPosition = &entityPosition->targetPosition;
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Vector2* currentPosition = &entityPosition.currentPosition;
+        Vector2* targetPosition = &entityPosition.targetPosition;
 
         if(targetPosition->x > currentPosition->x){
             currentPosition->x += 1.0f;
