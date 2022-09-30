@@ -1,48 +1,28 @@
 #include "../include/Scene.h"
 
-#include "../include/Types.h"
+#include "../include/ComponentId.h"
 
-Scene::Scene(Texture2D characterTexture)
+#define INVALID_ENTITY CreateEntityId(EntityIndex(-1), 0)
+
+EntityID Scene::NewEntity()
 {
-    for(int i = 0; i < 40; i++)
+    if(!freeEntities.empty())
     {
-        entt::entity entity = registry.create();
-        registry.emplace<EntityPosition>(entity);
-        registry.emplace<Texture2D>(entity);
-        registry.emplace<EntitySize>(entity);
-        registry.emplace<bool>(entity, false);
+        EntityIndex newIndex = freeEntities.back();
+        freeEntities.pop_back();
+        EntityID newID = CreateEntityId(newIndex, GetEntityVersion(entities[newIndex].id));
+        entities[newIndex].id = newID;
+        return entities[newIndex].id;
     }
 
-    float posX = 0.0f;
-    float posY = 0.0f;
-
-    int counter = 0;
-
-    auto view = registry.view<EntityPosition, Texture2D, EntitySize, bool>();
-    for(auto entity : view)
-    {
-        if(counter % 10 == 0)
-        {
-            posX = 0.0f;
-            posY += 64.0f;
-        }
-
-        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
-        Texture2D& texture = view.get<Texture2D>(entity);
-        EntitySize& size = view.get<EntitySize>(entity);
-
-        entityPosition = {{posX, posY}, {posX, posY}};
-
-        texture = characterTexture;
-
-        size = {32.0f, 32.0f};
-
-        posX += 64.0f;
-        counter++;
-    }
+    entities.push_back({ CreateEntityId(EntityIndex(entities.size()), 0), ComponentMask() });
+    return entities.back().id;
 }
 
-Scene::~Scene()
+void Scene::DestroyEntity(EntityID id)
 {
-    registry.clear();
+    EntityID newID = CreateEntityId(EntityIndex(-1), GetEntityVersion(id) + 1);
+    entities[GetEntityIndex(id)].id = newID;
+    entities[GetEntityIndex(id)].mask.reset();
+    freeEntities.push_back(GetEntityIndex(id));
 }

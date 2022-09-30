@@ -1,6 +1,4 @@
 {
-	"ProjectName": "RTS-Lord",
-
 	"files.exclude": {
 		"**/.git": true,
 		"**/.svn": true,
@@ -57,7 +55,6 @@
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
 		"cinttypes": "cpp",
-		"typeinfo": "cpp",
-		"set": "cpp"
+		"typeinfo": "cpp"
 	}
 }

@@ -42,7 +42,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${userHome}/raylib/src/**",
+                "<path_to_raylib>/src/**",
                 "${workspaceFolder}/**"
             ],
             "defines": [
@@ -54,7 +54,7 @@
             ],
             "compilerPath": "usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++14",
             "intelliSenseMode": "clang-x64"
 
         }

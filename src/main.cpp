@@ -1,45 +1,52 @@
-extern "C"
-{
-    #include "raylib.h"
-}
+/*******************************************************************************************
+*
+*   raylib [core] example - Basic 3d example
+*
+*   Welcome to raylib!
+*
+*   To compile example, just press F5.
+*   Note that compiled executable is placed in the same folder as .c file
+*
+*   You can find all basic examples on C:\raylib\raylib\examples folder or
+*   raylib official webpage: www.raylib.com
+*
+*   Enjoy using raylib. :)
+*
+*   This example has been created using raylib 1.0 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
+*
+********************************************************************************************/
+
+#include "raylib.h"
 
 #include "../include/2DMap.h"
 #include "../include/Debug.h"
 #include "../include/Monitor.h"
 #include "../include/Camera.h"
-#include "../include/Scene.h"
+#include "../include/SceneView.h"
+#include "../include/Types.h"
 #include "../include/Systems.h" 
-#include "../include/Grid.h"
-#include "../include/Pathfinding.h"
-#include "../include/MiniMap.h"
-#include "../include/UnitSelection.h"
 
 #include <stdlib.h>
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
 
+Scene scene;
 
-void UpdateHudElements(std::vector<HudElement*> hud, MapInfo mapInfo)
-{
-    for(HudElement* element: hud)
-    {
-        MiniMap* miniMap = dynamic_cast<MiniMap*>(element);
+EntityID entity1 = scene.NewEntity();
+EntityPosition* position1 = scene.Assign<EntityPosition>(entity1);
+Texture2D* texture1 = scene.Assign<Texture2D>(entity1);
+EntitySize* size1 = scene.Assign<EntitySize>(entity1);
+bool* bool1 = scene.Assign<bool>(entity1);
 
-        if(miniMap != nullptr)
-        {
-            miniMap->Update(mapInfo);
-        }
-    }
-}
-
-void DrawHudElements(std::vector<HudElement*> hud)
-{
-    for(HudElement* element: hud)
-    {
-        element->Draw();
-    }
-}
+EntityID entity2 = scene.NewEntity();
+EntityPosition* position2 = scene.Assign<EntityPosition>(entity2);
+Texture2D* texture2 = scene.Assign<Texture2D>(entity2);
+EntitySize* size2 = scene.Assign<EntitySize>(entity2);
+bool* bool2 = scene.Assign<bool>(entity2);
 
 int main(void) 
 {
@@ -60,22 +67,21 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     MapInfo mapInfo = Map2D_Init("assets/map1.png", 32);
-    std::vector<std::vector<Tile>> grid = Grid_Init("assets/map1.png", mapInfo);
-    MouseInfo mouseInfo = {0.0f, 0.0f, 0.0f, 0.0f, 0, false, false, false};
+    MouseInfo mouseinfo = {0.0f, 0.0f, 0.0f, 0.0f, false, false};
     Texture2D background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
+    MiniMapInfo miniMapInfo = Map2D_MiniMap_Init(background, 150, 150, 2, cam, setting);
     Boundaries boundaries = Map2D_GetBoundaries(mapInfo, setting, cam.zoom);
 
-    Texture2D characterTexture = LoadTexture("assets/Character_Down2.png");
-    Texture2D characterIcon = LoadTexture("assets/ui/Character_Icon.png");
+    Texture2D characterTexture = LoadTexture("assets/Character_Down2.png"); 
 
-    Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
+    // ECS Test
+    *position1 = {{0, 0}, {0, 0}};
+    *texture1 = characterTexture;
+    *size1 = {32.0f, 32.0f};
 
-    Scene scene(characterTexture);
-
-    std::vector<HudElement*> hud;
-    hud.push_back(new MiniMap(background, cam, setting, 150, 150, 2, 10, 10));
-    hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
-    hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 230, 530));
+    *position2 = {{60, 30}, {60, 30}};
+    *texture2 = characterTexture;
+    *size2 = {32.0f, 32.0f};
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -84,18 +90,15 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         Map2D_HandleKeyboardInput(&mapInfo);
-        Map2D_HandleMouseInput(&mapInfo, &mouseInfo, setting, dynamic_cast<MiniMap*>(hud[0]), cam);
+        Map2D_HandleMouseInput(&mapInfo, &mouseinfo, setting);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
-        Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
         
-        Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, cam);
+        mouseinfo.worldStartPosition = GetScreenToWorld2D(mouseinfo.startPosition, cam); 
+        mouseinfo.worldCurrentPosition = GetScreenToWorld2D(mouseinfo.currentPosition, cam);
+        Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseinfo, cam);
 
-        MovementSystem(scene, &mouseInfo, mapInfo, selectionRectangle, grid);
+        MovementSystem(scene, &mouseinfo, mapInfo, selectionRectangle);
 
-        UpdateHudElements(hud, mapInfo);
-
-        UnitSelection* unitSelection = dynamic_cast<UnitSelection*>(hud[2]);
-        unitSelection->selectedUnits = mouseInfo.selectedUnits;
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -112,18 +115,15 @@ int main(void)
                 RenderSystem(scene, mapInfo);
 
                 // Render selection box
-                if(mouseInfo.isdragging){
+                if(mouseinfo.isdragging){
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
                 }
 
-                DrawMouseGrid(5, 3, mouseInfo, mapInfo, grid);
-
-                DrawHudElements(hud);
-                MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
+                RenderSystem(scene, mapInfo);
+                DrawMiniMap(setting, miniMapInfo, mapInfo);
 
                 // Render some Debug information
-                Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
-
+                //Debug_DrawDebugInfo(mouseinfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, &character1);
 
 		    EndMode2D();
 
@@ -134,9 +134,6 @@ int main(void)
     // De-Initialization
     UnloadTexture(characterTexture);
     UnloadTexture(background);
-    UnloadTexture(uiTexture);
-    UnloadTexture(characterIcon);
-
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

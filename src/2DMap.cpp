@@ -2,9 +2,6 @@
 
 #include <stdlib.h>
 
-static bool IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMapInfo,  Camera2D camera);
-
-
 MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 {
 	Image mapSource = LoadImage(mapLayoutFileName); // "assets/map1.png"
@@ -16,7 +13,24 @@ MapInfo Map2D_Init(const char *mapLayoutFileName, int cellSize)
 	mapInfo.mapWidth = mapInfo.columnCount * cellSize;
 	mapInfo.mapHeight = mapInfo.rowCount * cellSize;
 	mapInfo.position = (Vector2){(((float)mapInfo.mapWidth /2) *-1), (((float)mapInfo.mapHeight/2) *-1)};
-	mapInfo.offSet = {0.0f, 0.0f};
+
+	Tile tileDirt = {false};
+	Tile tileGrass = {true};
+	std::vector<std::vector<Tile>> tiles(mapInfo.columnCount, std::vector<Tile> (mapInfo.rowCount, tileDirt));
+	for (int x = 0; x < mapSource.width; x++)
+	{
+		for (int y = 0; y < mapSource.height; y++)
+		{
+			Color color = GetImageColor(mapSource, x, y); 
+
+			if(color.r == 122){
+				tiles[x][y] = tileDirt;
+			} else {
+				tiles[x][y] = tileGrass;
+			} 
+		}
+	}
+    //mapInfo.tiles = tiles;
 
 	UnloadImage(mapSource);
 
@@ -87,8 +101,8 @@ static void SetOffset(MapInfo* mapInfo){
 		return;
 	}
 
-	mapInfo->offSet.x = (float)mapInfo->mapWidth/2 + mapInfo->position.x;
-	mapInfo->offSet.y = (float)mapInfo->mapHeight/2 + mapInfo->position.y;
+	mapInfo->offSet.x = mapInfo->mapWidth/2 + mapInfo->position.x;
+	mapInfo->offSet.y = mapInfo->mapHeight/2 + mapInfo->position.y;
 }
 
 void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
@@ -105,87 +119,47 @@ void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
 	SetOffset(mapInfo);
 }
 
-void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings, MiniMap* miniMap, Camera2D camera)
+void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings)
 {
-	if(mapInfo == nullptr || mouseInfo == nullptr || miniMap == nullptr)
+	if(mapInfo == NULL || mouseInfo == NULL)
 	{
 		return;
 	}
-
+	
 	int mouseX = GetMouseX();
+	if (mouseX < 20) mapInfo->position.x += 4.0f;
+    if (mouseX < 5) mapInfo->position.x += 12.0f;
+    if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
+    if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
+
 	int mouseY = GetMouseY();
+	if (mouseY < 20) mapInfo->position.y += 4.0f;
+    if (mouseY < 5) mapInfo->position.y += 12.0f;
+    if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
+    if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
+	SetOffset(mapInfo);
 
-	Vector2 currentPosition;
-	currentPosition.x = (float)mouseX;
-	currentPosition.y = (float)mouseY;
-	mouseInfo->currentPosition = currentPosition;
+	mouseInfo->currentPosition.x = (float)mouseX;
+	mouseInfo->currentPosition.y = (float)mouseY;
 
-	Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
-	mouseInfo->worldCurrentPosition = worldCurrentPosition;
+	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+		mouseInfo->isSelecting = false;
+		if(mouseInfo->isdragging){
 
-	if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
-		miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
-	}
-
-	if(miniMap->isActive){
-		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-
-			// Position on minimap
-			int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
-			int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
-
-			// Don't navigate out the minimap
-			if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
-			if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
-			if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
-			if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
-
-			float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
-			float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
-
-			mapInfo->position.x = posXOnMap;
-			mapInfo->position.y = posYOnMap;
-			SetOffset(mapInfo);
+		} else {
+			mouseInfo->isdragging = true;
+			mouseInfo->startPosition.x = (float)mouseX;
+			mouseInfo->startPosition.y = (float)mouseY;
 		}
-
-		return;
 	} else{
-		if (mouseX < 20) mapInfo->position.x += 4.0f;
-    	if (mouseX < 5) mapInfo->position.x += 12.0f;
-    	if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
-    	if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
-
-		if (mouseY < 20) mapInfo->position.y += 4.0f;
-    	if (mouseY < 5) mapInfo->position.y += 12.0f;
-    	if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
-    	if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
-
-		mouseInfo->currentPosition.x = (float)mouseX;
-		mouseInfo->currentPosition.y = (float)mouseY;
-
-		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-			mouseInfo->selectedUnits = 0;
-			mouseInfo->isSelecting = false;
-			if(mouseInfo->isdragging){
-
-			} else {
-				mouseInfo->isdragging = true;
-				mouseInfo->startPosition.x = (float)mouseX;
-				mouseInfo->startPosition.y = (float)mouseY;
-			}
-		} else{
-			if(mouseInfo->isdragging){
-				// Done dragging => select units
-				mouseInfo->isSelecting = true;
+		if(mouseInfo->isdragging){
+			// Done dragging => select units
+			mouseInfo->isSelecting = true;
 		}
 		mouseInfo->isdragging = false;
-		}
-			
-		mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
 	}
-	
-	mouseInfo->worldStartPosition = GetScreenToWorld2D(mouseInfo->startPosition, camera); 
 
+	mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
 }
 
 void Map2D_CheckBoundaries(MapInfo* mapInfo, Boundaries boundaries)
@@ -199,19 +173,6 @@ void Map2D_CheckBoundaries(MapInfo* mapInfo, Boundaries boundaries)
     if(mapInfo->position.y < boundaries.lowerBoundary) mapInfo->position.y = boundaries.lowerBoundary;
     if(mapInfo->position.x > boundaries.leftBoundary) mapInfo->position.x = boundaries.leftBoundary;
     if(mapInfo->position.x < boundaries.rightBoundary) mapInfo->position.x = boundaries.rightBoundary;
-}
-
-void Map2D_UpdateMouseInfo(MouseInfo* mouseInfo, MapInfo* mapInfo){
-	
-	SetOffset(mapInfo);
-	
-	mouseInfo->currentPositionOnMap = (Vector2) {
-		(mouseInfo->worldCurrentPosition.x - mapInfo->offSet.x + (float)mapInfo->mapWidth/2), 
-		(mouseInfo->worldCurrentPosition.y - mapInfo->offSet.y + (float)mapInfo->mapHeight/2)
-		};
-
-	mouseInfo->gridCellX = mouseInfo->currentPositionOnMap.x/mapInfo->cellSize;
-	mouseInfo->gridCellY = mouseInfo->currentPositionOnMap.y/mapInfo->cellSize;
 }
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
@@ -254,65 +215,60 @@ Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
 	return selectionRectangle;
 }
 
-static bool IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap,  Camera2D camera)
-{
-	if(miniMap == nullptr)
-	{
-		return false;
-	}
+MiniMapInfo Map2D_MiniMap_Init(Texture2D background, int width, int height, int padding, Camera2D camera, MonitorSettings monitorSettings){
+	MiniMapInfo miniMapInfo;
+	miniMapInfo.width = width;
+	miniMapInfo.height = height;
+	miniMapInfo.padding = padding;
 
-	if(worldCurrentPosition.x > miniMap->position.x && 
-		worldCurrentPosition.x < miniMap->position.x + miniMap->width &&
-		worldCurrentPosition.y > miniMap->position.y &&
-		worldCurrentPosition.y < miniMap->position.y + miniMap->height
-		)
-	{
-		return true;
-	} 
-	else
-	{
-		return false;
-	}
+	// Calculate position on screen, remember camera is centered
+	miniMapInfo.screenPositionX = 0 - (int)((camera.offset.x/camera.zoom) + 0.05f) + 10;
+	miniMapInfo.screenPositionY = 0 - (int)((camera.offset.y/camera.zoom) + 0.05f) + 10;
+
+	// Create minimap background
+	int maxWidth = width - (padding * 2);
+	if(maxWidth<0) maxWidth = 1;
+	int maxHeight = height - (padding * 2);
+	if(maxHeight<0) maxHeight = 1;
+	
+	Image backgroundImage = LoadImageFromTexture(background);
+    float zoomX = (float)backgroundImage.width/maxWidth;
+    float zoomY =  (float)backgroundImage.height/maxHeight;
+    float zoom = (zoomY > zoomX) ? zoomY : zoomX;
+
+	maxWidth = backgroundImage.width/zoom;
+	maxHeight = backgroundImage.height/zoom;
+
+	ImageResize(&backgroundImage, maxWidth, maxHeight);
+	miniMapInfo.miniMapBackground  = LoadTextureFromImage(backgroundImage);
+	UnloadImage(backgroundImage);
+
+	// Calculate miniMapOffSet
+	Vector2 miniMapOffSet;
+	miniMapOffSet.x = width - (padding * 2) - maxWidth;
+	miniMapOffSet.y = height - (padding * 2) - maxHeight;
+	if(miniMapOffSet.x > 0) miniMapOffSet.x = miniMapOffSet.x/2;
+	if(miniMapOffSet.y > 0) miniMapOffSet.y = miniMapOffSet.y/2;
+	miniMapInfo.miniMapOffSet = miniMapOffSet;
+	miniMapInfo.zoomFactor = 1/zoom;
+	miniMapInfo.miniMapWidgetWidth = (int)monitorSettings.monitorWidth*miniMapInfo.zoomFactor/camera.zoom;
+	miniMapInfo.miniMapWidgetHeight = (int)monitorSettings.monitorHeight*miniMapInfo.zoomFactor/camera.zoom;
+
+	return miniMapInfo;
 }
 
-void DrawMouseGrid(int mouseGridSizeX, int mouseGridSizeY, MouseInfo mouseInfo, MapInfo mapInfo, std::vector<std::vector<Tile>> grid)
-{
-	
-	Vector2 virtualPositionOnMap;
-	virtualPositionOnMap.x = mouseInfo.currentPositionOnMap.x - (mapInfo.cellSize/2*(mouseGridSizeX-1));
-	virtualPositionOnMap.y = mouseInfo.currentPositionOnMap.y - (mapInfo.cellSize/2*(mouseGridSizeY-1));
+void DrawMiniMap(MonitorSettings monitorSettings, MiniMapInfo miniMapInfo, MapInfo mapInfo){
+	DrawRectangle(miniMapInfo.screenPositionX , miniMapInfo.screenPositionY, miniMapInfo.width, miniMapInfo.height, BLACK );
+	int posX = miniMapInfo.screenPositionX + miniMapInfo.padding + miniMapInfo.miniMapOffSet.x;
+	int posY = miniMapInfo.screenPositionY + miniMapInfo.padding + miniMapInfo.miniMapOffSet.y;
+	DrawTexture(miniMapInfo.miniMapBackground, posX, posY, WHITE);
 
-	int gridCellX = virtualPositionOnMap.x/mapInfo.cellSize;
-	int gridCellY = virtualPositionOnMap.y/mapInfo.cellSize;
-
-	for (int x = 0; x < mouseGridSizeX; x++)
-	{
-		for (int y = 0; y < mouseGridSizeY; y++)
-		{
-			int virtualGridCellX = gridCellX + x;
-			int virtualGridCellY = gridCellY + y;
-			if(virtualGridCellX < 0 || virtualGridCellX >= mapInfo.columnCount || virtualGridCellY < 0 || virtualGridCellY >= mapInfo.rowCount){
-				continue;
-			}
-
-			Color color = WHITE;
-			Tile tile = grid[virtualGridCellX][virtualGridCellY];
-			if(!tile.isWalkable){
-				color = RED;
-			}
-			
-			DrawRectangle(
-				virtualGridCellX*mapInfo.cellSize - mapInfo.mapWidth/2 + mapInfo.offSet.x, 
-            	virtualGridCellY*mapInfo.cellSize - mapInfo.mapHeight/2 + mapInfo.offSet.y, 
-            	mapInfo.cellSize,
-            	mapInfo.cellSize, 
-            	Fade(color, 0.2f));
-			DrawRectangleLines(
-				virtualGridCellX*mapInfo.cellSize - mapInfo.mapWidth/2 + mapInfo.offSet.x, 
-            	virtualGridCellY*mapInfo.cellSize - mapInfo.mapHeight/2 + mapInfo.offSet.y, 
-            	mapInfo.cellSize,
-            	mapInfo.cellSize, 
-            	color);		
-		}
-	}	
+	// Draw current mapposition => widget???
+	// Widget centered on minimap
+	int posXScreen = posX + (int)miniMapInfo.miniMapBackground.width/2 - (int)miniMapInfo.miniMapWidgetWidth/2;
+	int posYScreen = posY + (int)miniMapInfo.miniMapBackground.height/2 - (int)miniMapInfo.miniMapWidgetHeight/2;
+	// Process offset of background
+	posXScreen = posXScreen - (int)mapInfo.offSet.x*miniMapInfo.zoomFactor;
+	posYScreen = posYScreen - (int)mapInfo.offSet.y*miniMapInfo.zoomFactor;
+	DrawRectangleLines(posXScreen, posYScreen, miniMapInfo.miniMapWidgetWidth, (int)miniMapInfo.miniMapWidgetHeight, WHITE);
 }
