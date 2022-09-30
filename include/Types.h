@@ -66,16 +66,29 @@ struct EntitySize
     float height;
 };
 
+struct EntityType
+{
+    enum Value
+    {
+        Worker,
+        Building,
+        Resource
+    } Value;
+};
+
 struct TaskPositions
 {
     Vector2 basePosition;
     Vector2 resourcePosition;
 };
 
-enum TaskState
+struct TaskState
 {
-    IDLE,
-    TO_RESOURCE,
-    GATHERING,
-    TO_BASE
+    enum Value
+    {
+        IDLE,
+        TO_RESOURCE,
+        GATHERING,
+        TO_BASE
+    } Value;
 };

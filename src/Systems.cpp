@@ -45,13 +45,29 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
 void RenderSystem(Scene& scene, MapInfo mapInfo)
 {
-    auto view = scene.registry.view<EntityPosition, Texture2D, EntitySize, bool>();
+    auto view = scene.registry.view<EntityPosition, Texture2D, EntityType>();
     for(auto entity : view)
     {
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Texture2D& texture = view.get<Texture2D>(entity);
-        EntitySize& size = view.get<EntitySize>(entity);
-        bool& isSelected = view.get<bool>(entity);
+        EntityType& type = view.get<EntityType>(entity);
+
+        Vector2 currentPosition = entityPosition.currentPosition;
+        Vector2 positionOnMap = {currentPosition.x + mapInfo.offSet.x, currentPosition.y + mapInfo.offSet.y};
+
+        if(type.Value != EntityType::Worker)
+        {
+            DrawTextureV(texture, positionOnMap, WHITE);
+        }
+    }
+
+    auto secondView = scene.registry.view<EntityPosition, Texture2D, EntitySize, bool>();
+    for(auto entity : secondView)
+    {
+        EntityPosition& entityPosition = secondView.get<EntityPosition>(entity);
+        Texture2D& texture = secondView.get<Texture2D>(entity);
+        EntitySize& size = secondView.get<EntitySize>(entity);
+        bool& isSelected = secondView.get<bool>(entity);
 
         Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
@@ -72,16 +88,20 @@ void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)
         return;
     }
 
-    auto view = scene.registry.view<EntityPosition>();
+    auto view = scene.registry.view<EntityPosition, EntityType>();
     for(auto entity : view)
     {
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        EntityType& entityType = view.get<EntityType>(entity);
 
-        Vector2 characterPosition = entityPosition.currentPosition;
-		Vector2 characterPositionOnMinimap;
-		characterPositionOnMinimap.x = miniMap->position.x + miniMap->padding + miniMap->width/2 + characterPosition.x*miniMap->zoomFactor;
-		characterPositionOnMinimap.y = miniMap->position.y + miniMap->padding + miniMap->height/2 + characterPosition.y*miniMap->zoomFactor;
-		DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*miniMap->zoomFactor, BLUE);
+        if(entityType.Value == EntityType::Worker)
+        {
+            Vector2 characterPosition = entityPosition.currentPosition;
+		    Vector2 characterPositionOnMinimap;
+		    characterPositionOnMinimap.x = miniMap->position.x + miniMap->padding + miniMap->width/2 + characterPosition.x*miniMap->zoomFactor;
+		    characterPositionOnMinimap.y = miniMap->position.y + miniMap->padding + miniMap->height/2 + characterPosition.y*miniMap->zoomFactor;
+		    DrawCircle((int)characterPositionOnMinimap.x, (int)characterPositionOnMinimap.y, 32*miniMap->zoomFactor, BLUE);
+        }
     }
 
     DrawRectangleLines(miniMap->posXScreen, miniMap->posYScreen, miniMap->miniMapWidgetWidth, miniMap->miniMapWidgetHeight, WHITE);
@@ -136,7 +156,6 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
                                                             (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
             Vector2 currentPositionOnMap = (Vector2){entityPosition.currentPosition.x, entityPosition.currentPosition.y};
 
-            //int entityIndex = GetEntityIndex(ent);
             EntityPaths[(uint32_t)entity] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap), grid);
         }
     }
@@ -150,7 +169,6 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo)
     {
         EntityPosition& position = view.get<EntityPosition>(entity);
 
-        //int entityIndex = GetEntityIndex(ent);
         int entityIndex = (uint32_t)entity;
 
         if((!(EntityPaths[entityIndex].empty())) && (!(EntityPaths.empty())))
