@@ -9,6 +9,7 @@ Camera2D Camera_Init(int monitorWidth, int monitorHeight, int viewportWidth, int
     float zoom = (zoomY < zoomX) ? zoomY : zoomX;
 
     cam.zoom = zoom;
+    cam.rotation = 0.0f;
     // center the camera on the middle of the screen
     cam.offset = (Vector2){(float)monitorWidth / 2, (float)monitorHeight / 2};
     cam.target = (Vector2) {0.0f, 0.0f};

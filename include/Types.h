@@ -1,19 +1,29 @@
 #pragma once
 
-#include <raylib.h>
-#include <vector>
+extern "C"
+{
+    #include "raylib.h"
+}
 
-typedef struct
+#include <vector>
+#include <set>
+
+#define MAX_UNITS_SELECTED 30
+
+typedef std::pair<int, int> Pair;
+typedef std::vector<Pair> Path;
+
+struct MonitorSettings
 {
     int monitorWidth;
     int monitorHeight;
-} MonitorSettings;
+};
 
-typedef struct {
+struct Tile{
     bool isWalkable;
-}Tile;
+};
 
-typedef struct 
+struct MapInfo
 {
     int columnCount;
     int rowCount;
@@ -22,41 +32,30 @@ typedef struct
     int mapHeight;
     Vector2 position;
     Vector2 offSet;
-    //std::vector<std::vector<Tile>> tiles;
-}MapInfo;
+};
 
-typedef struct 
-{
-    int screenPositionX;
-    int screenPositionY;
-    int width;
-    int height;
-    int padding;
-    Vector2 miniMapOffSet;
-    Texture2D miniMapBackground;
-    int miniMapWidgetWidth;
-    int miniMapWidgetHeight;
-    float zoomFactor;
-}MiniMapInfo;
-
-typedef struct
+struct Boundaries
 {
     int upperBoundary;
     int lowerBoundary;
     int leftBoundary;
     int rightBoundary;
-} Boundaries;
+};
 
-typedef struct
+struct MouseInfo
 {
     Vector2 startPosition;
     Vector2 currentPosition;
     Vector2 worldStartPosition;
     Vector2 worldCurrentPosition;
+    Vector2 currentPositionOnMap;
+    int gridCellX;
+    int gridCellY;
+    int selectedUnits;
     bool isdragging;
     bool isSelecting;
     bool giveNewTarget;
-}MouseInfo;
+};
 
 struct EntityPosition
 {
@@ -68,4 +67,18 @@ struct EntitySize
 {
     float width;
     float height;
+};
+
+struct TaskPositions
+{
+    Vector2 basePosition;
+    Vector2 resourcePosition;
+};
+
+enum TaskState
+{
+    IDLE,
+    TO_RESOURCE,
+    GATHERING,
+    TO_BASE
 };
