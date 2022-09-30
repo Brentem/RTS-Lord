@@ -1,9 +1,6 @@
 #include "../include/Monitor.h"
 
-extern "C"
-{
-    #include "raylib.h"
-}
+#include <raylib.h>
 
 MonitorSettings Monitor_GetSettings(int viewportWidth, int viewportHeight)
 {
