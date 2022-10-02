@@ -49,8 +49,7 @@ struct MouseInfo
     Vector2 worldStartPosition;
     Vector2 worldCurrentPosition;
     Vector2 currentPositionOnMap;
-    int gridCellX;
-    int gridCellY;
+    Pair gridCell;
     int selectedUnits;
     bool isdragging;
     bool isSelecting;

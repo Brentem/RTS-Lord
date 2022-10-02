@@ -50,7 +50,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    //ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -90,7 +90,7 @@ int main(void)
         
         Rectangle selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, cam);
 
-        MovementSystem(scene, &mouseInfo, mapInfo, selectionRectangle, grid);
+        MovementSystem(scene, &mouseInfo, mapInfo, selectionRectangle, grid, cam);
 
         UpdateHudElements(hud, mapInfo);
 
@@ -116,7 +116,7 @@ int main(void)
                     DrawRectangleLines((int)(selectionRectangle.x) , (int)(selectionRectangle.y), (int)(selectionRectangle.width), (int)(selectionRectangle.height), WHITE);
                 }
 
-                DrawMouseGrid(5, 3, mouseInfo, mapInfo, grid);
+                //DrawMouseGrid(5, 3, mouseInfo, mapInfo, grid);
 
                 DrawHudElements(hud);
                 MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));

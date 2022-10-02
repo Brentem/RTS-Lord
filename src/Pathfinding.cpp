@@ -160,10 +160,10 @@ static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell, vector
         }
 
         // Handle case of not walkable terrain
-        // if(grid[cellCoordinates.first][cellCoordinates.second].isWalkable == false)
-        // {
-        //     continue;
-        // }
+        if(grid[cellCoordinates.first][cellCoordinates.second].isWalkable == false)
+        {
+            continue;
+        }
 
         Cell* newCell = new Cell{currentCell, cellCoordinates, 0, 0, 0};
         children.push_back(newCell);
