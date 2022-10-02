@@ -87,8 +87,8 @@ static void SetOffset(MapInfo* mapInfo){
 		return;
 	}
 
-	mapInfo->offSet.x = mapInfo->mapWidth/2 + mapInfo->position.x;
-	mapInfo->offSet.y = mapInfo->mapHeight/2 + mapInfo->position.y;
+	mapInfo->offSet.x = (float)mapInfo->mapWidth/2 + mapInfo->position.x;
+	mapInfo->offSet.y = (float)mapInfo->mapHeight/2 + mapInfo->position.y;
 }
 
 void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
@@ -159,7 +159,6 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
     	if (mouseY < 5) mapInfo->position.y += 12.0f;
     	if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
     	if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
-		SetOffset(mapInfo);
 
 		mouseInfo->currentPosition.x = (float)mouseX;
 		mouseInfo->currentPosition.y = (float)mouseY;
@@ -200,6 +199,32 @@ void Map2D_CheckBoundaries(MapInfo* mapInfo, Boundaries boundaries)
     if(mapInfo->position.y < boundaries.lowerBoundary) mapInfo->position.y = boundaries.lowerBoundary;
     if(mapInfo->position.x > boundaries.leftBoundary) mapInfo->position.x = boundaries.leftBoundary;
     if(mapInfo->position.x < boundaries.rightBoundary) mapInfo->position.x = boundaries.rightBoundary;
+}
+
+void Map2D_UpdateMouseInfo(MouseInfo* mouseInfo, MapInfo* mapInfo){
+	
+	SetOffset(mapInfo);
+	
+	mouseInfo->currentPositionOnMap = GetPositionOnMap(mouseInfo->worldCurrentPosition, mapInfo->offSet, mapInfo->mapWidth, mapInfo->mapHeight);
+	mouseInfo->gridCell = GetGridPosition( mouseInfo->currentPositionOnMap, mapInfo->cellSize);
+}
+
+Vector2 GetPositionOnMap(Vector2 worldPosition, Vector2 mapOffset, int mapWidth, int mapHeight){
+	Vector2 positionOnMap;
+	positionOnMap.x = worldPosition.x - mapOffset.x + (float)mapWidth/2;
+	positionOnMap.y = worldPosition.y - mapOffset.y + (float)mapHeight/2;
+	return positionOnMap;
+}
+
+Pair GetGridPosition(Vector2 positionOnMap, int cellSize){
+	return Pair(positionOnMap.x/cellSize, positionOnMap.y/cellSize);
+}
+
+Vector2 GetPositionOnMap(Pair gridPosition, int cellSize){
+	Vector2 positionOnMap;
+	positionOnMap.x = gridPosition.first*cellSize;
+	positionOnMap.y = gridPosition.second*cellSize;
+	return positionOnMap;
 }
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
@@ -261,4 +286,46 @@ static bool IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap,  
 	{
 		return false;
 	}
+}
+
+void DrawMouseGrid(int mouseGridSizeX, int mouseGridSizeY, MouseInfo mouseInfo, MapInfo mapInfo, std::vector<std::vector<Tile>> grid)
+{
+	
+	Vector2 virtualPositionOnMap;
+	virtualPositionOnMap.x = mouseInfo.currentPositionOnMap.x - (mapInfo.cellSize/2*(mouseGridSizeX-1));
+	virtualPositionOnMap.y = mouseInfo.currentPositionOnMap.y - (mapInfo.cellSize/2*(mouseGridSizeY-1));
+
+	int gridCellX = virtualPositionOnMap.x/mapInfo.cellSize;
+	int gridCellY = virtualPositionOnMap.y/mapInfo.cellSize;
+
+	for (int x = 0; x < mouseGridSizeX; x++)
+	{
+		for (int y = 0; y < mouseGridSizeY; y++)
+		{
+			int virtualGridCellX = gridCellX + x;
+			int virtualGridCellY = gridCellY + y;
+			if(virtualGridCellX < 0 || virtualGridCellX >= mapInfo.columnCount || virtualGridCellY < 0 || virtualGridCellY >= mapInfo.rowCount){
+				continue;
+			}
+
+			Color color = WHITE;
+			Tile tile = grid[virtualGridCellX][virtualGridCellY];
+			if(!tile.isWalkable){
+				color = RED;
+			}
+			
+			DrawRectangle(
+				virtualGridCellX*mapInfo.cellSize - mapInfo.mapWidth/2 + mapInfo.offSet.x, 
+            	virtualGridCellY*mapInfo.cellSize - mapInfo.mapHeight/2 + mapInfo.offSet.y, 
+            	mapInfo.cellSize,
+            	mapInfo.cellSize, 
+            	Fade(color, 0.2f));
+			DrawRectangleLines(
+				virtualGridCellX*mapInfo.cellSize - mapInfo.mapWidth/2 + mapInfo.offSet.x, 
+            	virtualGridCellY*mapInfo.cellSize - mapInfo.mapHeight/2 + mapInfo.offSet.y, 
+            	mapInfo.cellSize,
+            	mapInfo.cellSize, 
+            	color);		
+		}
+	}	
 }

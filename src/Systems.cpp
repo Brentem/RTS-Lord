@@ -2,6 +2,7 @@
 
 #include "../include/Types.h"
 #include "../include/Pathfinding.h"
+#include "../include/2DMap.h"
 
 #include <stdio.h>
 
@@ -12,14 +13,15 @@ const int MAX_ENTITIES = 400;
 static vector<Path> EntityPaths;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid);
-void setTargetPosition(Scene& scene, MapInfo mapInfo);
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera);
+Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid);
+void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera);
 void updatePosition(Scene& scene);
 
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
 
-void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid)
+void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera)
 {
     if(mouseInfo == nullptr)
     {
@@ -38,8 +40,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
-    setPath(scene, mouseInfo, mapInfo, grid);
-    setTargetPosition(scene, mapInfo);
+    setPath(scene, mouseInfo, mapInfo, grid, camera);
+    setTargetPosition(scene, mapInfo, camera);
     updatePosition(scene);
 }
 
@@ -142,7 +144,7 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     }
 }
 
-void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid)
+void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
     auto view = scene.registry.view<EntityPosition, bool>();
     for(auto entity : view)
@@ -152,29 +154,68 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
 
         if(isSelected && mouseInfo->giveNewTarget)
         {
-            Vector2 currentMousePositionOnMap = (Vector2) {(mouseInfo->worldCurrentPosition.x - mapInfo.offSet.x), 
-                                                            (mouseInfo->worldCurrentPosition.y - mapInfo.offSet.y)};
-            Vector2 currentPositionOnMap = (Vector2){entityPosition.currentPosition.x, entityPosition.currentPosition.y};
-
-            EntityPaths[(uint32_t)entity] = GetPath(mapInfo, getPair(currentPositionOnMap), getPair(currentMousePositionOnMap), grid);
+            Vector2 currentPosition;
+            currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
+            currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
+            Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
+            EntityPaths[(uint32_t)entity] = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
     }
     mouseInfo->giveNewTarget = false;
 }
 
-void setTargetPosition(Scene& scene, MapInfo mapInfo)
+Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid){
+    Tile selectedTile = grid[selectedTargetGridCell.first][selectedTargetGridCell.second];
+    if(selectedTile.isWalkable){
+        return selectedTargetGridCell;
+    }
+    
+    int xFactor = 0;
+    if(startGridCell.first > selectedTargetGridCell.first ){
+        xFactor = 1;
+    } else if(startGridCell.first < selectedTargetGridCell.first){
+        xFactor = -1;
+    }
+
+    int yFactor = 0;
+    if(startGridCell.second > selectedTargetGridCell.second ){
+        yFactor = 1;
+    } else if(startGridCell.second < selectedTargetGridCell.second){
+        yFactor = -1;
+    }
+
+    for (size_t i = 1; i < 4; i++)
+    {
+        Pair tryNewTargetGridCell;
+        tryNewTargetGridCell.first = selectedTargetGridCell.first+(xFactor*i);
+        tryNewTargetGridCell.second = selectedTargetGridCell.second+(yFactor*i);
+        selectedTile = grid[tryNewTargetGridCell.first][tryNewTargetGridCell.second];
+        if(selectedTile.isWalkable){
+            return tryNewTargetGridCell;
+        }
+    }
+
+    return startGridCell;
+}
+
+void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
 {
     auto view = scene.registry.view<EntityPosition>();
     for(auto entity : view)
     {
         EntityPosition& position = view.get<EntityPosition>(entity);
 
+        //int entityIndex = GetEntityIndex(ent);
         int entityIndex = (uint32_t)entity;
 
         if((!(EntityPaths[entityIndex].empty())) && (!(EntityPaths.empty())))
         {
-            Pair pair = EntityPaths[entityIndex].back();
-            position.targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
+            Pair gridPosition = EntityPaths[entityIndex].back();
+            Vector2 positionOnMap = GetPositionOnMap(gridPosition, mapInfo.cellSize);
+            Vector2 targetPosition = (Vector2){positionOnMap.x - (mapInfo.mapWidth/2),positionOnMap.y - (mapInfo.mapHeight/2)};
+            position.targetPosition = targetPosition;
+            // position.targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
             if((position.currentPosition.x == position.targetPosition.x) &&
                 (position.currentPosition.y == position.targetPosition.y))
