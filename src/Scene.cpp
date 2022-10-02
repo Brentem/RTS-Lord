@@ -2,6 +2,9 @@
 
 #include "../include/Types.h"
 
+const Vector2 BASE = {-32, -32};
+const Vector2 RESOURCE = {-256, -32};
+
 Scene::Scene(Texture2D characterTexture)
 {
     CreatingWorkers(characterTexture);
@@ -25,6 +28,9 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         registry.emplace<EntitySize>(entity);
         registry.emplace<bool>(entity, false);
         registry.emplace<EntityType>(entity);
+        registry.emplace<Path>(entity);
+        registry.emplace<TaskState>(entity);
+        registry.emplace<TaskPositions>(entity);
     }
 
     float posX = 0.0f;
@@ -32,7 +38,7 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
 
     int counter = 0;
 
-    auto view = registry.view<EntityPosition, Texture2D, EntitySize, bool, EntityType>();
+    auto view = registry.view<EntityPosition, Texture2D, EntitySize, bool, EntityType, TaskState, TaskPositions>();
     for(auto entity : view)
     {
         if(counter % 10 == 0)
@@ -45,11 +51,15 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         Texture2D& texture = view.get<Texture2D>(entity);
         EntitySize& size = view.get<EntitySize>(entity);
         EntityType& type = view.get<EntityType>(entity);
+        TaskState& taskState = view.get<TaskState>(entity);
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
 
         entityPosition = {{posX, posY}, {posX, posY}};
         texture = characterTexture;
         size = {32.0f, 32.0f};
         type.Value = EntityType::Worker;
+        taskState.Value = TaskState::IDLE;
+        taskPositions = {BASE, RESOURCE};
 
         posX += 64.0f;
         counter++;
@@ -74,7 +84,7 @@ void Scene::CreatingBuildings()
     EntitySize& size = registry.get<EntitySize>(entity);
     EntityType& type = registry.get<EntityType>(entity);
 
-    entityPosition = {{-32, -32}, {-32, -32}};
+    entityPosition = {BASE, BASE};
     texture = baseTexture;
     size = {32.0f, 32.0f};
     type.Value = EntityType::Building;
@@ -98,7 +108,7 @@ void Scene::CreatingResources()
     EntitySize& size = registry.get<EntitySize>(entity);
     EntityType& type = registry.get<EntityType>(entity);
 
-    entityPosition = {{-256, -32}, {-256, -32}};
+    entityPosition = {RESOURCE, RESOURCE};
     texture = resourceTexture;
     size = {32.0f, 32.0f};
     type.Value = EntityType::Resource;

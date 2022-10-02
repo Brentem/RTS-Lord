@@ -3,14 +3,11 @@
 #include "../include/Types.h"
 #include "../include/Pathfinding.h"
 #include "../include/2DMap.h"
+#include "../include/Tasks.h"
 
 #include <stdio.h>
 
 using namespace std;
-
-// Temporary solution!
-const int MAX_ENTITIES = 400;
-static vector<Path> EntityPaths;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera);
@@ -28,19 +25,9 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
         return;
     }
 
-    if(EntityPaths.capacity() != MAX_ENTITIES)
-    {
-        Path initPath;
-        EntityPaths.reserve(MAX_ENTITIES);
-
-        for(int i = 0; i < MAX_ENTITIES; i++)
-        {
-            EntityPaths.push_back(initPath);
-        }
-    }
-
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
+    GatheringTask(scene, *mouseInfo, mapInfo);
     setTargetPosition(scene, mapInfo, camera);
     updatePosition(scene);
 }
@@ -146,11 +133,12 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition, bool>();
+    auto view = scene.registry.view<EntityPosition, bool, Path>();
     for(auto entity : view)
     {
         bool& isSelected = view.get<bool>(entity);
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Path& path = view.get<Path>(entity);
 
         if(isSelected && mouseInfo->giveNewTarget)
         {
@@ -159,7 +147,7 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
             currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
             Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
-            EntityPaths[(uint32_t)entity] = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -201,26 +189,23 @@ Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vec
 
 void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition>();
+    auto view = scene.registry.view<EntityPosition, Path>();
     for(auto entity : view)
     {
         EntityPosition& position = view.get<EntityPosition>(entity);
+        Path& path = view.get<Path>(entity);
 
-        //int entityIndex = GetEntityIndex(ent);
-        int entityIndex = (uint32_t)entity;
-
-        if((!(EntityPaths[entityIndex].empty())) && (!(EntityPaths.empty())))
+        if(!(path.empty()))
         {
-            Pair gridPosition = EntityPaths[entityIndex].back();
+            Pair gridPosition = path.back();
             Vector2 positionOnMap = GetPositionOnMap(gridPosition, mapInfo.cellSize);
             Vector2 targetPosition = (Vector2){positionOnMap.x - (mapInfo.mapWidth/2),positionOnMap.y - (mapInfo.mapHeight/2)};
             position.targetPosition = targetPosition;
-            // position.targetPosition = Vector2{getPositionIndex(pair.first), getPositionIndex(pair.second)};
 
             if((position.currentPosition.x == position.targetPosition.x) &&
                 (position.currentPosition.y == position.targetPosition.y))
             {
-                EntityPaths[entityIndex].pop_back();
+                path.pop_back();
             }
         }
     }

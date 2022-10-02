@@ -1,7 +1,7 @@
 #include "../include/Tasks.h"
 
-#include "../include/Types.h"
 #include "../include/Timer.h"
+#include "../include/2DMap.h"
 
 #include <stdexcept>
 #include <vector>
@@ -11,11 +11,11 @@ using namespace std;
 
 static vector<pair<entt::entity, Timer>> timers;
 
-static bool reachedEndpoint(Vector2 currentPosition, Vector2 endPoint);
+static bool gridEqual(Pair pair1, Pair pair2);
 static Timer *getEntityTimer(entt::entity id);
 static void deleteEntityTimer(entt::entity id);
 
-void GatheringTask(Scene &scene)
+void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 {
     auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions>();
     for (auto entity: view)
@@ -24,12 +24,17 @@ void GatheringTask(Scene &scene)
         EntityPosition& position = view.get<EntityPosition>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
 
+        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair selectedGrid = mouseInfo.gridCell;
+
         switch (state.Value)
         {
         case TaskState::IDLE:
         {
             // When clicked on resource
-            if (true)
+            if (gridEqual(resourceGrid, selectedGrid))
             {
                 state.Value = TaskState::TO_RESOURCE;
             }
@@ -38,7 +43,7 @@ void GatheringTask(Scene &scene)
 
         case TaskState::TO_RESOURCE:
         {
-            if (reachedEndpoint(position.currentPosition, taskPositions.resourcePosition))
+            if (gridEqual(unitGrid, resourceGrid))
             {
                 Timer timer;
                 timer.Start(5);
@@ -63,6 +68,7 @@ void GatheringTask(Scene &scene)
             timer->Update();
             if (timer->Finished())
             {
+                position.targetPosition = taskPositions.basePosition; // This should be changed to something better
                 state.Value = TaskState::TO_BASE;
             }
             break;
@@ -72,9 +78,10 @@ void GatheringTask(Scene &scene)
         {
             deleteEntityTimer(entity);
 
-            if (reachedEndpoint(position.currentPosition, taskPositions.basePosition))
+            if (gridEqual(unitGrid, baseGrid))
             {
                 // Add to gold counter
+                position.targetPosition = taskPositions.resourcePosition; // This should be changed to something better
                 state.Value = state.TO_RESOURCE;
             }
             break;
@@ -89,9 +96,9 @@ void GatheringTask(Scene &scene)
     }
 }
 
-static bool reachedEndpoint(Vector2 currentPosition, Vector2 endPoint)
+static bool gridEqual(Pair pair1, Pair pair2)
 {
-    return (currentPosition.x == endPoint.x) && (currentPosition.y == endPoint.y);
+    return (pair1.first == pair2.first) && (pair1.second == pair2.second);
 }
 
 static Timer *getEntityTimer(entt::entity id)
