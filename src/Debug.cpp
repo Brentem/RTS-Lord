@@ -31,8 +31,8 @@ void Debug_DrawDebugInfo(
     DrawText(TextFormat("mouseinfo.worldCurrentPosition X: %05f", mouseinfo.worldCurrentPosition.x), 10-viewportWidth/2 , 30-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     DrawText(TextFormat("mouseinfo.worldCurrentPosition Y: %05f", mouseinfo.worldCurrentPosition.y), 10-viewportWidth/2 , 40-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     
-    DrawText(TextFormat("mouseinfo.gridCellX: %02i", mouseinfo.gridCellX), 10-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
-    DrawText(TextFormat("mouseinfo.gridCellY: %02i", mouseinfo.gridCellY), 10-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+    DrawText(TextFormat("mouseinfo.gridCellX: %02i", mouseinfo.gridCell.first), 10-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+    DrawText(TextFormat("mouseinfo.gridCellY: %02i", mouseinfo.gridCell.second), 10-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
 
     // DrawText(TextFormat("mouseinfo.currentPositionOnMap.x: %05f", mouseinfo.currentPositionOnMap.x), 10-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     // DrawText(TextFormat("mouseinfo.currentPositionOnMap.y: %05f", mouseinfo.currentPositionOnMap.y), 10-viewportWidth/2 , 60-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);

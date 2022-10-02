@@ -205,13 +205,26 @@ void Map2D_UpdateMouseInfo(MouseInfo* mouseInfo, MapInfo* mapInfo){
 	
 	SetOffset(mapInfo);
 	
-	mouseInfo->currentPositionOnMap = (Vector2) {
-		(mouseInfo->worldCurrentPosition.x - mapInfo->offSet.x + (float)mapInfo->mapWidth/2), 
-		(mouseInfo->worldCurrentPosition.y - mapInfo->offSet.y + (float)mapInfo->mapHeight/2)
-		};
+	mouseInfo->currentPositionOnMap = GetPositionOnMap(mouseInfo->worldCurrentPosition, mapInfo->offSet, mapInfo->mapWidth, mapInfo->mapHeight);
+	mouseInfo->gridCell = GetGridPosition( mouseInfo->currentPositionOnMap, mapInfo->cellSize);
+}
 
-	mouseInfo->gridCellX = mouseInfo->currentPositionOnMap.x/mapInfo->cellSize;
-	mouseInfo->gridCellY = mouseInfo->currentPositionOnMap.y/mapInfo->cellSize;
+Vector2 GetPositionOnMap(Vector2 worldPosition, Vector2 mapOffset, int mapWidth, int mapHeight){
+	Vector2 positionOnMap;
+	positionOnMap.x = worldPosition.x - mapOffset.x + (float)mapWidth/2;
+	positionOnMap.y = worldPosition.y - mapOffset.y + (float)mapHeight/2;
+	return positionOnMap;
+}
+
+Pair GetGridPosition(Vector2 positionOnMap, int cellSize){
+	return Pair(positionOnMap.x/cellSize, positionOnMap.y/cellSize);
+}
+
+Vector2 GetPositionOnMap(Pair gridPosition, int cellSize){
+	Vector2 positionOnMap;
+	positionOnMap.x = gridPosition.first*cellSize;
+	positionOnMap.y = gridPosition.second*cellSize;
+	return positionOnMap;
 }
 
 Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseInfo, Camera2D cam){
