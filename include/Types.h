@@ -88,9 +88,34 @@ struct TaskState
 {
     enum Value
     {
-        IDLE,
+        NOT_GATHERING,
         TO_RESOURCE,
         GATHERING,
         TO_BASE
     } Value;
+};
+
+struct SelectedCell
+{
+    Pair pair;
+};
+
+struct IsSelected
+{
+    bool Value;
+
+    IsSelected(bool value)
+    {
+        Value = value;
+    }
+};
+
+struct IsMoved
+{
+    bool Value;
+
+    IsMoved(bool value)
+    {
+        Value = value;
+    }
 };

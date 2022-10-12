@@ -17,27 +17,31 @@ static void deleteEntityTimer(entt::entity id);
 
 void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 {
-    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions>();
+    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved>();
     for (auto entity: view)
     {
         TaskState& state = view.get<TaskState>(entity);
         EntityPosition& position = view.get<EntityPosition>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+        IsMoved& isMoved = view.get<IsMoved>(entity);
 
         Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair selectedGrid = mouseInfo.gridCell;
+        Pair selectedGrid = cell.pair;
 
         switch (state.Value)
         {
-        case TaskState::IDLE:
+        case TaskState::NOT_GATHERING:
         {
             // When clicked on resource
             if (gridEqual(resourceGrid, selectedGrid))
             {
                 state.Value = TaskState::TO_RESOURCE;
             }
+
+            isMoved.Value = false;
             break;
         }
 
@@ -52,6 +56,13 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
                 timers.push_back(pair);
 
                 state.Value = TaskState::GATHERING;
+            }
+
+            if(isMoved.Value)
+            {
+                isMoved = false;
+                deleteEntityTimer(entity);
+                state.Value = TaskState::NOT_GATHERING;
             }
             break;
         }
@@ -71,6 +82,13 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
                 position.targetPosition = taskPositions.basePosition; // This should be changed to something better
                 state.Value = TaskState::TO_BASE;
             }
+
+            if(isMoved.Value)
+            {
+                isMoved = false;
+                deleteEntityTimer(entity);
+                state.Value = TaskState::NOT_GATHERING;
+            }
             break;
         }
 
@@ -80,9 +98,15 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 
             if (gridEqual(unitGrid, baseGrid))
             {
-                // Add to gold counter
+                scene.gold += 10;
                 position.targetPosition = taskPositions.resourcePosition; // This should be changed to something better
                 state.Value = state.TO_RESOURCE;
+            }
+
+            if(isMoved.Value)
+            {
+                isMoved = false;
+                state.Value = TaskState::NOT_GATHERING;
             }
             break;
         }

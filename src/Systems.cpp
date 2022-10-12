@@ -50,24 +50,26 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
         }
     }
 
-    auto secondView = scene.registry.view<EntityPosition, Texture2D, EntitySize, bool>();
+    auto secondView = scene.registry.view<EntityPosition, Texture2D, EntitySize, IsSelected>();
     for(auto entity : secondView)
     {
         EntityPosition& entityPosition = secondView.get<EntityPosition>(entity);
         Texture2D& texture = secondView.get<Texture2D>(entity);
         EntitySize& size = secondView.get<EntitySize>(entity);
-        bool& isSelected = secondView.get<bool>(entity);
+        IsSelected& isSelected = secondView.get<IsSelected>(entity);
 
         Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
         Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
         DrawTextureRec(texture, frameRec, characterPositionOnMap, WHITE);
 
-        if(isSelected)
+        if(isSelected.Value)
         {
             DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
         }
     }
+
+    DrawText(TextFormat("Gold: %d", scene.gold), -200, -200, 12, WHITE);
 }
 
 void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)
@@ -102,10 +104,10 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     {
         Rectangle selectionRectangleOnMap = {selection.x - mapInfo.offSet.x, selection.y - mapInfo.offSet.y , selection.width, selection.height};
 
-        auto view = scene.registry.view<EntityPosition, EntitySize, bool>();
+        auto view = scene.registry.view<EntityPosition, EntitySize, IsSelected>();
         for(auto entity : view)
         {
-            bool& isSelected = view.get<bool>(entity);
+            IsSelected& isSelected = view.get<IsSelected>(entity);
             EntityPosition& entityPosition = view.get<EntityPosition>(entity);
             EntitySize& size = view.get<EntitySize>(entity);
             
@@ -121,7 +123,7 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
                 isSelected = false;
             }
 
-            if(isSelected)
+            if(isSelected.Value)
             {
                 mouseInfo->selectedUnits++;
             }
@@ -133,14 +135,16 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition, bool, Path>();
+    auto view = scene.registry.view<EntityPosition, IsSelected, Path, SelectedCell, IsMoved>();
     for(auto entity : view)
     {
-        bool& isSelected = view.get<bool>(entity);
+        IsSelected& isSelected = view.get<IsSelected>(entity);
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Path& path = view.get<Path>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+        IsMoved& isMoved = view.get<IsMoved>(entity);
 
-        if(isSelected && mouseInfo->giveNewTarget)
+        if(isSelected.Value && mouseInfo->giveNewTarget)
         {
             Vector2 currentPosition;
             currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
@@ -148,6 +152,8 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
             Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+            cell.pair = targetGridCell;
+            isMoved = true;
         }
     }
     mouseInfo->giveNewTarget = false;
