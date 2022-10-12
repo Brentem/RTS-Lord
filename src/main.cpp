@@ -50,7 +50,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    //ToggleFullscreen();
+    ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
@@ -73,9 +73,9 @@ int main(void)
     Scene scene(characterTexture);
 
     std::vector<HudElement*> hud;
-    hud.push_back(new MiniMap(background, cam, setting, 150, 150, 2, 10, 10));
-    hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 285));
-    hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 230, 530));
+    hud.push_back(new MiniMap(background, cam, setting, 160, 130, 2, 50, 443));
+    hud.push_back(new HudElement(uiTexture, cam, 1070, 300, 0, 300));
+    hud.push_back(new UnitSelection(characterIcon, cam, 20, 20, 280, 541));
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -122,7 +122,7 @@ int main(void)
                 MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
-                Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+                // Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 
 		    EndMode2D();

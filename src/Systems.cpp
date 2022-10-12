@@ -220,23 +220,46 @@ void updatePosition(Scene& scene)
         Vector2* currentPosition = &entityPosition.currentPosition;
         Vector2* targetPosition = &entityPosition.targetPosition;
 
+        bool isMovingDiagonally = (targetPosition->x != currentPosition->x) && (targetPosition->y != currentPosition->y);
+        
+        // TODO should be property of the entity
+        float speed = 1.0f;   
+        // TODO should be property of the entity AND calculated correctly          
+        float diagonalSpeed = 0.75f;    
+
         if(targetPosition->x > currentPosition->x){
-            currentPosition->x += 1.0f;
+            if(isMovingDiagonally){
+                currentPosition->x += diagonalSpeed;
+            } else{
+                currentPosition->x += speed;
+            }
             if(targetPosition->x < currentPosition->x) currentPosition->x = targetPosition->x;
         }
 
         if(targetPosition->x < currentPosition->x){
-            currentPosition->x -= 1.0f;
+            if(isMovingDiagonally){
+                currentPosition->x -= diagonalSpeed;
+            } else{
+                currentPosition->x -= speed;
+            }
             if(targetPosition->x > currentPosition->x) currentPosition->x = targetPosition->x;
         }
 
         if(targetPosition->y > currentPosition->y){
-            currentPosition->y += 1.0f;
+            if(isMovingDiagonally){
+                currentPosition->y += diagonalSpeed;
+            } else{
+                currentPosition->y += speed;
+            }
             if(targetPosition->y < currentPosition->y) currentPosition->y = targetPosition->y;
         }
 
         if(targetPosition->y < currentPosition->y){
-            currentPosition->y -= 1.0f;
+            if(isMovingDiagonally){
+                currentPosition->y -= diagonalSpeed;
+            } else{
+                currentPosition->y -= speed;
+            }
             if(targetPosition->y > currentPosition->y) currentPosition->y = targetPosition->y;
         }
     }
