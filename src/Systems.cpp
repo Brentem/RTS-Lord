@@ -27,7 +27,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
-    GatheringTask(scene, *mouseInfo, mapInfo);
+    GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);
     updatePosition(scene);
 }
@@ -135,7 +135,7 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition, IsSelected, Path, SelectedCell, IsMoved>();
+    auto view = scene.registry.view<EntityPosition, IsSelected, Path, SelectedCell, IsMoved, TaskState, TaskPositions, TaskStateChanged>();
     for(auto entity : view)
     {
         IsSelected& isSelected = view.get<IsSelected>(entity);
@@ -143,17 +143,37 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         Path& path = view.get<Path>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
         IsMoved& isMoved = view.get<IsMoved>(entity);
+        TaskState& state = view.get<TaskState>(entity);
+        TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+
+        Vector2 currentPosition;
+        currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
+        currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
+        Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
 
         if(isSelected.Value && mouseInfo->giveNewTarget)
         {
-            Vector2 currentPosition;
-            currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
-            currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
-            Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
             cell.pair = targetGridCell;
             isMoved = true;
+        }
+
+        // Find a better way to do this.
+        // StateChanged is used so that in setTargetPosition the path will actually be popped back.
+        // This means that the path won't reinitialize again.
+        if((state.Value == TaskState::TO_RESOURCE) && stateChanged.Value)
+        {
+            Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, resourceGridCell, grid);
+            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+        }
+        else if((state.Value == TaskState::TO_BASE) && stateChanged.Value)
+        {
+            Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, baseGridCell, grid);
+            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
     }
     mouseInfo->giveNewTarget = false;

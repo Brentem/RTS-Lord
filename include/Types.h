@@ -95,6 +95,16 @@ struct TaskState
     } Value;
 };
 
+struct TaskStateChanged
+{
+    bool Value;
+
+    TaskStateChanged(bool value)
+    {
+        Value = value;
+    }
+};
+
 struct SelectedCell
 {
     Pair pair;

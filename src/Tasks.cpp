@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// This is a bad practice, returning pointer to vector item
 static vector<pair<entt::entity, Timer>> timers;
 
 static bool gridEqual(Pair pair1, Pair pair2);
@@ -17,7 +18,7 @@ static void deleteEntityTimer(entt::entity id);
 
 void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 {
-    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved>();
+    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved, TaskStateChanged>();
     for (auto entity: view)
     {
         TaskState& state = view.get<TaskState>(entity);
@@ -25,6 +26,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
         IsMoved& isMoved = view.get<IsMoved>(entity);
+        TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
 
         Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
@@ -35,10 +37,12 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
         {
         case TaskState::NOT_GATHERING:
         {
-            // When clicked on resource
+            stateChanged.Value = false;
+
             if (gridEqual(resourceGrid, selectedGrid))
             {
                 state.Value = TaskState::TO_RESOURCE;
+                stateChanged.Value = true;
             }
 
             isMoved.Value = false;
@@ -47,6 +51,8 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 
         case TaskState::TO_RESOURCE:
         {
+            stateChanged.Value = false;
+
             if (gridEqual(unitGrid, resourceGrid))
             {
                 Timer timer;
@@ -56,6 +62,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
                 timers.push_back(pair);
 
                 state.Value = TaskState::GATHERING;
+                stateChanged.Value = true;
             }
 
             if(isMoved.Value)
@@ -69,6 +76,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 
         case TaskState::GATHERING:
         {
+            stateChanged.Value = false;
             Timer *timer = getEntityTimer(entity);
 
             if (timer == nullptr)
@@ -79,8 +87,8 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
             timer->Update();
             if (timer->Finished())
             {
-                position.targetPosition = taskPositions.basePosition; // This should be changed to something better
                 state.Value = TaskState::TO_BASE;
+                stateChanged.Value = true;
             }
 
             if(isMoved.Value)
@@ -94,13 +102,14 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 
         case TaskState::TO_BASE:
         {
+            stateChanged.Value = false;
             deleteEntityTimer(entity);
 
             if (gridEqual(unitGrid, baseGrid))
             {
                 scene.gold += 10;
-                position.targetPosition = taskPositions.resourcePosition; // This should be changed to something better
                 state.Value = state.TO_RESOURCE;
+                stateChanged.Value = true;
             }
 
             if(isMoved.Value)
@@ -125,6 +134,7 @@ static bool gridEqual(Pair pair1, Pair pair2)
     return (pair1.first == pair2.first) && (pair1.second == pair2.second);
 }
 
+// This is a bad practice, returning pointer to vector item
 static Timer *getEntityTimer(entt::entity id)
 {
     Timer *timer = nullptr;

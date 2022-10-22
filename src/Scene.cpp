@@ -35,6 +35,7 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         registry.emplace<TaskPositions>(entity);
         registry.emplace<SelectedCell>(entity);
         registry.emplace<IsMoved>(entity, false);
+        registry.emplace<TaskStateChanged>(entity, false);
     }
 
     float posX = 0.0f;
