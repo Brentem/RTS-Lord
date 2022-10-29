@@ -10,6 +10,7 @@
 using namespace std;
 
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
+void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid);
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera);
 Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid);
 void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera);
@@ -26,6 +27,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     }
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
+    setSelectedCell(scene, *mouseInfo, mapInfo, grid); // This function is important for the other functions to function properly.
+    CheckResources(scene, mapInfo);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
     GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);
@@ -133,15 +136,37 @@ void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectan
     }
 }
 
+void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid)
+{
+    auto view = scene.registry.view<EntityPosition, IsSelected, SelectedCell>();
+    for(auto entity : view)
+    {
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        IsSelected& isSelected = view.get<IsSelected>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+
+        Vector2 currentPosition;
+        currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
+        currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
+        Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+
+        if(isSelected.Value && mouseInfo.giveNewTarget)
+        {
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo.gridCell, grid);
+            cell.pair = targetGridCell;
+        }
+    }
+}
+
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition, IsSelected, Path, SelectedCell, IsMoved, TaskState, TaskPositions, TaskStateChanged>();
+    auto view = scene.registry.view<EntityPosition, IsSelected, Path, IsMoved, TaskState, TaskPositions, TaskStateChanged>();
     for(auto entity : view)
     {
         IsSelected& isSelected = view.get<IsSelected>(entity);
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Path& path = view.get<Path>(entity);
-        SelectedCell& cell = view.get<SelectedCell>(entity);
+        // SelectedCell& cell = view.get<SelectedCell>(entity);
         IsMoved& isMoved = view.get<IsMoved>(entity);
         TaskState& state = view.get<TaskState>(entity);
         TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
@@ -156,7 +181,7 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         {
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
-            cell.pair = targetGridCell;
+            // cell.pair = targetGridCell;
             isMoved = true;
         }
 

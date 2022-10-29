@@ -19,7 +19,7 @@ static void deleteEntityTimer(entt::entity id);
 void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 {
     auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved, TaskStateChanged>();
-    for (auto entity: view)
+    for(auto entity: view)
     {
         TaskState& state = view.get<TaskState>(entity);
         EntityPosition& position = view.get<EntityPosition>(entity);
@@ -129,6 +129,46 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
     }
 }
 
+void CheckResources(Scene& scene, MapInfo mapInfo)
+{
+    std::vector<Vector2> resourcePositions;
+
+    auto resourceView = scene.registry.view<EntityPosition, EntityType>();
+    for(auto entity: resourceView)
+    {
+        EntityPosition& position = resourceView.get<EntityPosition>(entity);
+        EntityType& type = resourceView.get<EntityType>(entity);
+
+        if(type.Value == EntityType::Resource)
+        {
+            resourcePositions.push_back(position.currentPosition);
+        }
+    }
+
+    auto view = scene.registry.view<TaskPositions, SelectedCell, IsSelected>();
+    for(auto entity: view)
+    {
+        TaskPositions& taskPosition = view.get<TaskPositions>(entity);
+        SelectedCell& selectedCell = view.get<SelectedCell>(entity);
+        IsSelected& isSelected = view.get<IsSelected>(entity);
+
+        Pair selectedGrid = selectedCell.pair;
+
+        if(isSelected.Value)
+        {
+            for(auto resource: resourcePositions)
+            {
+                Pair resourceGrid = GetGridPosition(GetPositionOnMap(resource, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+
+                if(gridEqual(resourceGrid, selectedGrid))
+                {
+                    taskPosition.resourcePosition = resource;
+                }
+            }
+        }
+    }
+}
+
 static bool gridEqual(Pair pair1, Pair pair2)
 {
     return (pair1.first == pair2.first) && (pair1.second == pair2.second);
@@ -139,9 +179,9 @@ static Timer *getEntityTimer(entt::entity id)
 {
     Timer *timer = nullptr;
 
-    for (size_t i = 0; i < timers.size(); i++)
+    for(size_t i = 0; i < timers.size(); i++)
     {
-        if (id == timers[i].first)
+        if(id == timers[i].first)
         {
             timer = &timers[i].second;
         }
@@ -152,9 +192,9 @@ static Timer *getEntityTimer(entt::entity id)
 
 static void deleteEntityTimer(entt::entity id)
 {
-    for (size_t i = 0; i < timers.size(); i++)
+    for(size_t i = 0; i < timers.size(); i++)
     {
-        if (id == timers[i].first)
+        if(id == timers[i].first)
         {
             timers.erase(timers.begin() + i);
         }

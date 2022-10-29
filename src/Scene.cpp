@@ -65,7 +65,8 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         size = {32.0f, 32.0f};
         type.Value = EntityType::Worker;
         taskState.Value = TaskState::NOT_GATHERING;
-        taskPositions = {BASE, RESOURCE};
+        //taskPositions = {BASE, RESOURCE};
+        taskPositions = {BASE, {0.0f, 0.0f}};
         cell.pair = Pair(0, 0);
 
         posX += 64.0f;
@@ -104,21 +105,52 @@ void Scene::CreatingResources()
     Image image = GenImageColor(32, 32, YELLOW);
     Texture2D resourceTexture = LoadTextureFromImage(image);
 
-    entt::entity entity = registry.create();
-    registry.emplace<EntityPosition>(entity);
-    registry.emplace<Texture2D>(entity);
-    registry.emplace<EntitySize>(entity);
-    registry.emplace<EntityType>(entity);
+    // entt::entity entity = registry.create();
+    // registry.emplace<EntityPosition>(entity);
+    // registry.emplace<Texture2D>(entity);
+    // registry.emplace<EntitySize>(entity);
+    // registry.emplace<EntityType>(entity);
 
-    EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
-    Texture2D& texture = registry.get<Texture2D>(entity);
-    EntitySize& size = registry.get<EntitySize>(entity);
-    EntityType& type = registry.get<EntityType>(entity);
+    // EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
+    // Texture2D& texture = registry.get<Texture2D>(entity);
+    // EntitySize& size = registry.get<EntitySize>(entity);
+    // EntityType& type = registry.get<EntityType>(entity);
 
-    entityPosition = {RESOURCE, RESOURCE};
-    texture = resourceTexture;
-    size = {32.0f, 32.0f};
-    type.Value = EntityType::Resource;
+    // entityPosition = {RESOURCE, RESOURCE};
+    // texture = resourceTexture;
+    // size = {32.0f, 32.0f};
+    // type.Value = EntityType::Resource;
+
+    std::vector<entt::entity> entities;
+
+    for(int i = 0; i < 5; i++)
+    {
+        entt::entity entity = registry.create();
+        registry.emplace<EntityPosition>(entity);
+        registry.emplace<Texture2D>(entity);
+        registry.emplace<EntitySize>(entity);
+        registry.emplace<EntityType>(entity);
+
+        entities.push_back(entity);
+    }
+
+    Vector2 newPosition = RESOURCE;
+
+    for(auto entity : entities)
+    {
+        EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
+        Texture2D& texture = registry.get<Texture2D>(entity);
+        EntitySize& size = registry.get<EntitySize>(entity);
+        EntityType& type = registry.get<EntityType>(entity);
+
+        entityPosition.currentPosition = newPosition;
+        entityPosition.targetPosition = newPosition; // If target position is set to zeroes, the resources will move to the middle of the screen.
+        texture = resourceTexture;
+        size = {32.0f, 32.0f};
+        type.Value = EntityType::Resource;
+
+        newPosition.y -= -64.0f;
+    }
 
     UnloadImage(image);
 }
