@@ -19,6 +19,7 @@ void updatePosition(Scene& scene);
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
 
+// Maybe this function does too much
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera)
 {
     if(mouseInfo == nullptr)
@@ -28,7 +29,8 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
 
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
     setSelectedCell(scene, *mouseInfo, mapInfo, grid); // This function is important for the other functions to function properly.
-    CheckResources(scene, mapInfo);
+    CheckResources(scene, mapInfo, *mouseInfo);
+    //CheckBases(scene, mapInfo, *mouseInfo, grid);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
     GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);
@@ -166,7 +168,6 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         IsSelected& isSelected = view.get<IsSelected>(entity);
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Path& path = view.get<Path>(entity);
-        // SelectedCell& cell = view.get<SelectedCell>(entity);
         IsMoved& isMoved = view.get<IsMoved>(entity);
         TaskState& state = view.get<TaskState>(entity);
         TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
@@ -181,7 +182,6 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         {
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
-            // cell.pair = targetGridCell;
             isMoved = true;
         }
 

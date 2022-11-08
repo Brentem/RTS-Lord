@@ -3,7 +3,7 @@
 #include "../include/Types.h"
 
 const Vector2 BASE = {-32, -32};
-const Vector2 RESOURCE = {-256, -32};
+const Vector2 RESOURCE = {-256, -256};
 
 Scene::Scene(Texture2D characterTexture)
 {
@@ -22,7 +22,7 @@ Scene::~Scene()
 // This function should not be in the endproduct.
 void Scene::CreatingWorkers(Texture2D characterTexture)
 {
-    for(int i = 0; i < 40; i++)
+    for(int i = 0; i < 5; i++)
     {
         entt::entity entity = registry.create();
         registry.emplace<EntityPosition>(entity);
@@ -78,32 +78,8 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
 void Scene::CreatingBuildings()
 {
     // Home base
-    Image image = GenImageColor(32, 32, BLACK);
+    Image image = GenImageColor(64, 64, BLACK);
     Texture2D baseTexture = LoadTextureFromImage(image);
-
-    entt::entity entity = registry.create();
-    registry.emplace<EntityPosition>(entity);
-    registry.emplace<Texture2D>(entity);
-    registry.emplace<EntitySize>(entity);
-    registry.emplace<EntityType>(entity);
-
-    EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
-    Texture2D& texture = registry.get<Texture2D>(entity);
-    EntitySize& size = registry.get<EntitySize>(entity);
-    EntityType& type = registry.get<EntityType>(entity);
-
-    entityPosition = {BASE, BASE};
-    texture = baseTexture;
-    size = {32.0f, 32.0f};
-    type.Value = EntityType::Building;
-
-    UnloadImage(image);
-}
-
-void Scene::CreatingResources()
-{
-    Image image = GenImageColor(32, 32, YELLOW);
-    Texture2D resourceTexture = LoadTextureFromImage(image);
 
     // entt::entity entity = registry.create();
     // registry.emplace<EntityPosition>(entity);
@@ -116,14 +92,53 @@ void Scene::CreatingResources()
     // EntitySize& size = registry.get<EntitySize>(entity);
     // EntityType& type = registry.get<EntityType>(entity);
 
-    // entityPosition = {RESOURCE, RESOURCE};
-    // texture = resourceTexture;
+    // entityPosition = {BASE, BASE};
+    // texture = baseTexture;
     // size = {32.0f, 32.0f};
-    // type.Value = EntityType::Resource;
+    // type.Value = EntityType::Building;
 
     std::vector<entt::entity> entities;
 
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < 2; i++)
+    {
+        entt::entity entity = registry.create();
+        registry.emplace<EntityPosition>(entity);
+        registry.emplace<Texture2D>(entity);
+        registry.emplace<EntitySize>(entity);
+        registry.emplace<EntityType>(entity);
+
+        entities.push_back(entity);
+    }
+
+    Vector2 newPosition = BASE;
+
+    for(auto entity : entities)
+    {
+        EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
+        Texture2D& texture = registry.get<Texture2D>(entity);
+        EntitySize& size = registry.get<EntitySize>(entity);
+        EntityType& type = registry.get<EntityType>(entity);
+
+        entityPosition.currentPosition = newPosition;
+        entityPosition.targetPosition = newPosition; // If target position is set to zeroes, the resources will move to the middle of the screen.
+        texture = baseTexture;
+        size = {64.0f, 64.0f};
+        type.Value = EntityType::Building;
+
+        newPosition.x -= 512;
+    }
+
+    UnloadImage(image);
+}
+
+void Scene::CreatingResources()
+{
+    Image image = GenImageColor(32, 32, YELLOW);
+    Texture2D resourceTexture = LoadTextureFromImage(image);
+
+    std::vector<entt::entity> entities;
+
+    for(int i = 0; i < 10; i++)
     {
         entt::entity entity = registry.create();
         registry.emplace<EntityPosition>(entity);
@@ -135,6 +150,7 @@ void Scene::CreatingResources()
     }
 
     Vector2 newPosition = RESOURCE;
+    int counter = 0;
 
     for(auto entity : entities)
     {
@@ -143,13 +159,20 @@ void Scene::CreatingResources()
         EntitySize& size = registry.get<EntitySize>(entity);
         EntityType& type = registry.get<EntityType>(entity);
 
+        if((counter != 0) && (counter % 5 == 0))
+        {
+            newPosition = RESOURCE;
+            newPosition.x -= 256;
+        }
+
         entityPosition.currentPosition = newPosition;
         entityPosition.targetPosition = newPosition; // If target position is set to zeroes, the resources will move to the middle of the screen.
         texture = resourceTexture;
         size = {32.0f, 32.0f};
         type.Value = EntityType::Resource;
 
-        newPosition.y -= -64.0f;
+        newPosition.x -= -64.0f;
+        counter++;
     }
 
     UnloadImage(image);

@@ -129,7 +129,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
     }
 }
 
-void CheckResources(Scene& scene, MapInfo mapInfo)
+void CheckResources(Scene& scene, MapInfo mapInfo, MouseInfo& mouseInfo)
 {
     std::vector<Vector2> resourcePositions;
 
@@ -154,7 +154,7 @@ void CheckResources(Scene& scene, MapInfo mapInfo)
 
         Pair selectedGrid = selectedCell.pair;
 
-        if(isSelected.Value)
+        if(isSelected.Value && mouseInfo.giveNewTarget)
         {
             for(auto resource: resourcePositions)
             {
@@ -168,6 +168,64 @@ void CheckResources(Scene& scene, MapInfo mapInfo)
         }
     }
 }
+
+void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vector<Tile>>& grid)
+{
+    std::vector<Vector2> basePositions;
+
+    auto baseView = scene.registry.view<EntityPosition, EntityType>();
+    for(auto entity : baseView)
+    {
+        EntityPosition& position = baseView.get<EntityPosition>(entity);
+        EntityType& type = baseView.get<EntityType>(entity);
+
+        if(type.Value == EntityType::Building)
+        {
+            basePositions.push_back(position.currentPosition);
+        }
+    }
+
+    auto unitView = scene.registry.view<TaskPositions, IsSelected>();
+    for(auto entity : unitView)
+    {
+        IsSelected& isSelected = unitView.get<IsSelected>(entity);
+        TaskPositions& taskPositions = unitView.get<TaskPositions>(entity);
+
+        if(isSelected.Value && mouseInfo.giveNewTarget)
+        {
+            std::vector<Path> basePaths;
+            Pair startGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            
+            for(auto basePos : basePositions)
+            {
+                Pair baseGrid = GetGridPosition(GetPositionOnMap(basePos, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+                Path path = GetPath(mapInfo, startGridCell, baseGrid, grid);
+                basePaths.push_back(path);
+            }
+
+            Vector2 currentBasePosition = {0.0f, 0.0f};
+            size_t pathSize = 0;
+
+            for(size_t i = 0; i < basePaths.size(); i++)
+            {
+                if(i == 0)
+                {
+                    currentBasePosition = basePositions[i];
+                    pathSize = basePaths[i].size();
+                }
+
+                if(basePaths[i].size() < pathSize)
+                {
+                    currentBasePosition = basePositions[i];
+                    pathSize = basePaths[i].size();
+                }
+            }
+
+            taskPositions.basePosition = currentBasePosition;
+        }
+    }
+}
+
 
 static bool gridEqual(Pair pair1, Pair pair2)
 {
