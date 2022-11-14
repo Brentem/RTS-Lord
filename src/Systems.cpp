@@ -30,7 +30,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     checkIfSelected(scene, mouseInfo, mapInfo, selection);
     setSelectedCell(scene, *mouseInfo, mapInfo, grid); // This function is important for the other functions to function properly.
     CheckResources(scene, mapInfo, *mouseInfo);
-    //CheckBases(scene, mapInfo, *mouseInfo, grid);
+    CheckBases(scene, mapInfo, *mouseInfo, grid);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
     GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);

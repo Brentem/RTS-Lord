@@ -2,7 +2,7 @@
 
 #include "../include/Types.h"
 
-const Vector2 BASE = {-32, -32};
+const Vector2 BASE = {128, -32};
 const Vector2 RESOURCE = {-256, -256};
 
 Scene::Scene(Texture2D characterTexture)
@@ -80,22 +80,6 @@ void Scene::CreatingBuildings()
     // Home base
     Image image = GenImageColor(64, 64, BLACK);
     Texture2D baseTexture = LoadTextureFromImage(image);
-
-    // entt::entity entity = registry.create();
-    // registry.emplace<EntityPosition>(entity);
-    // registry.emplace<Texture2D>(entity);
-    // registry.emplace<EntitySize>(entity);
-    // registry.emplace<EntityType>(entity);
-
-    // EntityPosition& entityPosition = registry.get<EntityPosition>(entity);
-    // Texture2D& texture = registry.get<Texture2D>(entity);
-    // EntitySize& size = registry.get<EntitySize>(entity);
-    // EntityType& type = registry.get<EntityType>(entity);
-
-    // entityPosition = {BASE, BASE};
-    // texture = baseTexture;
-    // size = {32.0f, 32.0f};
-    // type.Value = EntityType::Building;
 
     std::vector<entt::entity> entities;
 
