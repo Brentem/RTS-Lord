@@ -9,4 +9,11 @@ class Scene
         Scene(Texture2D characterTexture);
         ~Scene();
         entt::registry registry;
+        int gold;
+
+    private:
+        // Functions underneath should not be in endproduct
+        void CreatingWorkers(Texture2D characterTexture);
+        void CreatingBuildings();
+        void CreatingResources();
 };

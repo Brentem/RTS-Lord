@@ -68,16 +68,64 @@ struct EntitySize
     float height;
 };
 
+struct EntityType
+{
+    enum Value
+    {
+        Worker,
+        Building,
+        Resource
+    } Value;
+};
+
 struct TaskPositions
 {
     Vector2 basePosition;
     Vector2 resourcePosition;
 };
 
-enum TaskState
+struct TaskState
 {
-    IDLE,
-    TO_RESOURCE,
-    GATHERING,
-    TO_BASE
+    enum Value
+    {
+        NOT_GATHERING,
+        TO_RESOURCE,
+        GATHERING,
+        TO_BASE
+    } Value;
+};
+
+struct TaskStateChanged
+{
+    bool Value;
+
+    TaskStateChanged(bool value)
+    {
+        Value = value;
+    }
+};
+
+struct SelectedCell
+{
+    Pair pair;
+};
+
+struct IsSelected
+{
+    bool Value;
+
+    IsSelected(bool value)
+    {
+        Value = value;
+    }
+};
+
+struct IsMoved
+{
+    bool Value;
+
+    IsMoved(bool value)
+    {
+        Value = value;
+    }
 };

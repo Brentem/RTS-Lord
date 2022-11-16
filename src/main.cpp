@@ -50,7 +50,7 @@ int main(void)
     MonitorSettings setting = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
     InitWindow(setting.monitorWidth, setting.monitorHeight, "RTS-Lord");
-    ToggleFullscreen();
+    //ToggleFullscreen();
 
 	// setup a camera
 	Camera2D cam = Camera_Init(setting.monitorWidth, setting.monitorHeight,
