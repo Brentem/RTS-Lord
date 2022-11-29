@@ -33,4 +33,6 @@ Rectangle Map2D_GetSelectionRectangle(MouseInfo* mouseinfo, Camera2D cam);
 
 void DrawMouseGrid(int mouseGridSizeX, int mouseGridSizeY, MouseInfo mouseInfo, MapInfo mapInfo, std::vector<std::vector<Tile>> grid);
 
+void SetOffset(MapInfo* mapInfo);
+
 #endif

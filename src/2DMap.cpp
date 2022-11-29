@@ -81,7 +81,7 @@ Boundaries Map2D_GetBoundaries(MapInfo mapInfo, MonitorSettings monitorSettings,
 	return boundaries;
 }
 
-static void SetOffset(MapInfo* mapInfo){
+void SetOffset(MapInfo* mapInfo){
 	if(mapInfo == NULL)
 	{
 		return;
