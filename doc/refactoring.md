@@ -8,8 +8,6 @@ Interesting sources:
 
 - [Designing a Robust Input Handling System for Games](https://www.gamedev.net/tutorials/_/technical/game-programming/designing-a-robust-input-handling-system-for-games-r2975/)
 - [The 5 Golden Rules of Input](https://www.gamedeveloper.com/design/the-5-golden-rules-of-input)
-- [Input Polling | Game Engine series](https://www.youtube.com/watch?v=yuhNj8yGDJQ)
-- [Clicking to Select Entities // Game Engine series](https://youtu.be/CU9v3uUgRaE)
 
 ## Scene.cpp
 Maybe the name should be changed to Game and the MouseInfo, MapInfo etc. structs could be placed in this class.
