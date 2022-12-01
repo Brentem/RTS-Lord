@@ -1,9 +1,8 @@
-#include "../include/InputHandler.h"
+#include "../include/KeyboardInput.h"
 
 #include <raylib.h>
 
-// Should probable be changed to a KeyBoardInputHandler
-InputHandler::InputHandler()
+KeyboardInput::KeyboardInput()
 {
     MoveScreenUpCommand* up = new MoveScreenUpCommand();
     MoveScreenLeftCommand* left = new MoveScreenLeftCommand();
@@ -21,7 +20,7 @@ InputHandler::InputHandler()
     buttonKeyD = right;
 }
 
-InputHandler::~InputHandler()
+KeyboardInput::~KeyboardInput()
 {
     delete buttonKeyUp;
     delete buttonKeyLeft;
@@ -40,7 +39,7 @@ InputHandler::~InputHandler()
     buttonKeyD = nullptr;
 }
 
-void InputHandler::handleInput(MapInfo* mapInfo)
+void KeyboardInput::handleInput(MapInfo* mapInfo)
 {
     if(IsKeyDown(KEY_UP)) buttonKeyUp->execute(mapInfo);
     if(IsKeyDown(KEY_LEFT)) buttonKeyLeft->execute(mapInfo);

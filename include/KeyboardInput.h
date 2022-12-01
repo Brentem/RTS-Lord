@@ -2,12 +2,11 @@
 
 #include "Command.h"
 
-// Should probable be changed to a KeyBoardInputHandler
-class InputHandler
+class KeyboardInput
 {
 public:
-  InputHandler();
-  ~InputHandler();
+  KeyboardInput();
+  ~KeyboardInput();
   void handleInput(MapInfo* mapInfo);
 
 private:

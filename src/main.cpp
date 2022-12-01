@@ -13,7 +13,7 @@ extern "C"
 #include "../include/Pathfinding.h"
 #include "../include/MiniMap.h"
 #include "../include/UnitSelection.h"
-#include "../include/InputHandler.h"
+#include "../include/KeyboardInput.h"
 
 #include <stdlib.h>
 
@@ -72,7 +72,7 @@ int main(void)
     Texture2D uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
 
     Scene scene(characterTexture);
-    InputHandler inputHandler;
+    KeyboardInput keyboardInput;
 
     std::vector<HudElement*> hud;
     hud.push_back(new MiniMap(background, cam, setting, 160, 130, 2, 50, 443));
@@ -85,7 +85,7 @@ int main(void)
 
         // Update
         //----------------------------------------------------------------------------------
-        inputHandler.handleInput(&mapInfo); // Should probable be changed to a KeyBoardInputHandler
+        keyboardInput.handleInput(&mapInfo); // Should probable be changed to a KeyBoardInputHandler
         Map2D_HandleMouseInput(&mapInfo, &mouseInfo, setting, dynamic_cast<MiniMap*>(hud[0]), cam);
         Map2D_CheckBoundaries(&mapInfo, boundaries);
         Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
