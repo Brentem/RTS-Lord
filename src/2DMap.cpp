@@ -91,20 +91,6 @@ void SetOffset(MapInfo* mapInfo){
 	mapInfo->offSet.y = (float)mapInfo->mapHeight/2 + mapInfo->position.y;
 }
 
-void Map2D_HandleKeyboardInput(MapInfo* mapInfo)
-{
-	if(mapInfo == NULL)
-	{
-		return;
-	}
-
-	if (IsKeyDown(KEY_RIGHT)) mapInfo->position.x -= 5.0f;
-    if (IsKeyDown(KEY_LEFT)) mapInfo->position.x += 5.0f;
-    if (IsKeyDown(KEY_UP)) mapInfo->position.y += 5.0f;
-    if (IsKeyDown(KEY_DOWN)) mapInfo->position.y -= 5.0f;
-	SetOffset(mapInfo);
-}
-
 void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings, MiniMap* miniMap, Camera2D camera)
 {
 	if(mapInfo == nullptr || mouseInfo == nullptr || miniMap == nullptr)

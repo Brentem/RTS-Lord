@@ -15,8 +15,6 @@ Texture2D Map2DGetBackground(MapInfo info, const char *mapLayoutFileName, const 
 
 Boundaries Map2D_GetBoundaries(MapInfo info, MonitorSettings setting, float zoomFactor);
 
-void Map2D_HandleKeyboardInput(MapInfo* info);
-
 void Map2D_HandleMouseInput(MapInfo* info, MouseInfo* mouseinfo, MonitorSettings setting, MiniMap* miniMap, Camera2D camera);
 
 void Map2D_CheckBoundaries(MapInfo* info, Boundaries boundaries);
