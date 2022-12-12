@@ -3,6 +3,7 @@
 #include "Types.h"
 #include "Scene.h"
 #include "KeyboardInput.h"
+#include "MouseInput.h"
 #include "HudElement.h"
 
 #define VIEWPORT_WIDTH 800 //800 1920
@@ -26,6 +27,7 @@ private:
     Boundaries boundaries;
     Scene* scene;
     KeyboardInput* keyboardInput;
+    MouseInput* mouseInput;
     std::vector<HudElement*> hud;
     Texture2D characterTexture;
     Texture2D characterIcon;

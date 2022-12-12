@@ -25,6 +25,7 @@ Game::Game()
 
     scene = new Scene(characterTexture);
     keyboardInput = new KeyboardInput();
+    mouseInput = new MouseInput(monitorSettings);
 
     hud.push_back(new MiniMap(background, camera, monitorSettings, 160, 130, 2, 50, 443));
     hud.push_back(new HudElement(uiTexture, camera, 1070, 300, 0, 300));
@@ -37,6 +38,7 @@ Game::~Game()
 {
     delete scene;
     delete keyboardInput;
+    delete mouseInput;
 
     for(auto& element : hud)
     {
@@ -52,6 +54,7 @@ Game::~Game()
 void Game::HandleInput()
 {
     keyboardInput->HandleInput(&mapInfo);
+    mouseInput->HandleInput(&mapInfo);
     Map2D_HandleMouseInput(&mapInfo, &mouseInfo, monitorSettings, dynamic_cast<MiniMap*>(hud[0]), camera);
 }
 

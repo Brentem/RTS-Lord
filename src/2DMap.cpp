@@ -136,15 +136,15 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 
 		return;
 	} else{
-		if (mouseX < 20) mapInfo->position.x += 4.0f;
-    	if (mouseX < 5) mapInfo->position.x += 12.0f;
-    	if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
-    	if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
+		// if (mouseX < 20) mapInfo->position.x += 4.0f; // left
+    	// if (mouseX < 5) mapInfo->position.x += 12.0f; //left
+    	// if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
+    	// if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
 
-		if (mouseY < 20) mapInfo->position.y += 4.0f;
-    	if (mouseY < 5) mapInfo->position.y += 12.0f;
-    	if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
-    	if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
+		// if (mouseY < 20) mapInfo->position.y += 4.0f; //up
+    	// if (mouseY < 5) mapInfo->position.y += 12.0f; //up
+    	// if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
+    	// if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
 
 		mouseInfo->currentPosition.x = (float)mouseX;
 		mouseInfo->currentPosition.y = (float)mouseY;

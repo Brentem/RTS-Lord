@@ -4,10 +4,10 @@
 
 KeyboardInput::KeyboardInput()
 {
-    MoveScreenUpCommand* up = new MoveScreenUpCommand();
-    MoveScreenLeftCommand* left = new MoveScreenLeftCommand();
-    MoveScreenDownCommand* down = new MoveScreenDownCommand();
-    MoveScreenRightCommand* right = new MoveScreenRightCommand();
+    MoveScreenUpCommand* up = new MoveScreenUpCommand(5.0f);
+    MoveScreenLeftCommand* left = new MoveScreenLeftCommand(5.0f);
+    MoveScreenDownCommand* down = new MoveScreenDownCommand(5.0f);
+    MoveScreenRightCommand* right = new MoveScreenRightCommand(5.0f);
 
     buttonKeyUp = up;
     buttonKeyLeft = left;
