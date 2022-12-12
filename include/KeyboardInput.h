@@ -7,7 +7,7 @@ class KeyboardInput
 public:
   KeyboardInput();
   ~KeyboardInput();
-  void handleInput(MapInfo* mapInfo);
+  void HandleInput(MapInfo* mapInfo);
 
 private:
   Command* buttonKeyUp;

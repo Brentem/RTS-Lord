@@ -51,7 +51,7 @@ Game::~Game()
 
 void Game::HandleInput()
 {
-    keyboardInput->handleInput(&mapInfo);
+    keyboardInput->HandleInput(&mapInfo);
     Map2D_HandleMouseInput(&mapInfo, &mouseInfo, monitorSettings, dynamic_cast<MiniMap*>(hud[0]), camera);
 }
 

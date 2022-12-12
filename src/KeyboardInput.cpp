@@ -39,7 +39,7 @@ KeyboardInput::~KeyboardInput()
     buttonKeyD = nullptr;
 }
 
-void KeyboardInput::handleInput(MapInfo* mapInfo)
+void KeyboardInput::HandleInput(MapInfo* mapInfo)
 {
     if(IsKeyDown(KEY_UP)) buttonKeyUp->execute(mapInfo);
     if(IsKeyDown(KEY_LEFT)) buttonKeyLeft->execute(mapInfo);
