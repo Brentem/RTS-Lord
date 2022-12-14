@@ -5,6 +5,7 @@
 #include "KeyboardInput.h"
 #include "MouseInput.h"
 #include "HudElement.h"
+#include "MiniMap.h"
 
 #define VIEWPORT_WIDTH 800 //800 1920
 #define VIEWPORT_HEIGHT 600 //600 1080
@@ -37,4 +38,6 @@ private:
 
     void UpdateHudElements();
     void DrawHudElements();
+    void UpdateMouseInfo(MiniMap* miniMap);
+    bool IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap);
 };

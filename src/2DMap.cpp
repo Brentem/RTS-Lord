@@ -104,14 +104,14 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 	Vector2 currentPosition;
 	currentPosition.x = (float)mouseX;
 	currentPosition.y = (float)mouseY;
-	mouseInfo->currentPosition = currentPosition;
+	//mouseInfo->currentPosition = currentPosition;
 
 	Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
-	mouseInfo->worldCurrentPosition = worldCurrentPosition;
+	//mouseInfo->worldCurrentPosition = worldCurrentPosition;
 
-	if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
-		miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
-	}
+	// if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
+	// 	miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
+	// }
 
 	if(miniMap->isActive){
 		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){

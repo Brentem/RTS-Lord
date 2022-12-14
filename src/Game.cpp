@@ -62,6 +62,7 @@ void Game::Update()
 {
     Map2D_CheckBoundaries(&mapInfo, boundaries);
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
+    UpdateMouseInfo(static_cast<MiniMap*>(hud[0]));
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
@@ -119,4 +120,41 @@ void Game::DrawHudElements()
     {
         element->Draw();
     }
+}
+
+void Game::UpdateMouseInfo(MiniMap* miniMap)
+{
+    if(miniMap == nullptr)
+    {
+        return;
+    }
+
+    int mouseX = GetMouseX();
+	int mouseY = GetMouseY();
+
+	Vector2 currentPosition;
+	currentPosition.x = (float)mouseX;
+	currentPosition.y = (float)mouseY;
+	mouseInfo.currentPosition = currentPosition; // Don't think this this mouseInfo variable is ever used.
+
+	Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
+	mouseInfo.worldCurrentPosition = worldCurrentPosition;
+
+	if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
+		miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap);
+	}
+}
+
+bool Game::IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap)
+{
+    if(miniMap == nullptr)
+    {
+        return false;
+    }
+
+    bool expression1 = worldCurrentPosition.x > miniMap->position.x;
+    bool expression2 = (worldCurrentPosition.x < (miniMap->position.x + miniMap->width)) && expression1;
+    bool expression3 = (worldCurrentPosition.y > miniMap->position.y) && expression2;
+
+    return (worldCurrentPosition.y < (miniMap->position.y + miniMap->height)) && expression3;
 }
