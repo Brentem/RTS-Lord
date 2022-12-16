@@ -274,9 +274,9 @@ void updatePosition(Scene& scene)
         bool isMovingDiagonally = (targetPosition->x != currentPosition->x) && (targetPosition->y != currentPosition->y);
         
         // TODO should be property of the entity
-        float speed = 1.0f;   
+        float speed = 2.0f;   
         // TODO should be property of the entity AND calculated correctly          
-        float diagonalSpeed = 0.75f;    
+        float diagonalSpeed = speed / (sqrt(2)); 
 
         if(targetPosition->x > currentPosition->x){
             if(isMovingDiagonally){

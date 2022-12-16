@@ -154,7 +154,9 @@ static vector<Cell*> generateChildren(MapInfo mapInfo, Cell* currentCell, vector
         
         // Handle case if coordinates aren't available in grid
         if((cellCoordinates.first >= mapInfo.columnCount) ||
-            (cellCoordinates.second >= mapInfo.rowCount))
+            (cellCoordinates.second >= mapInfo.rowCount) || 
+            (cellCoordinates.first < 0) || 
+            (cellCoordinates.second < 0))
         {
             continue;
         }
