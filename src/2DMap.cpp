@@ -113,29 +113,29 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 	// 	miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
 	// }
 
-	if(miniMap->isActive){
-		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+	// if(miniMap->isActive){
+	// 	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
 
-			// Position on minimap
-			int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
-			int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
+	// 		// Position on minimap
+	// 		int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
+	// 		int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
 
-			// Don't navigate out the minimap
-			if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
-			if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
-			if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
-			if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
+	// 		// Don't navigate out the minimap
+	// 		if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
+	// 		if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
+	// 		if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
+	// 		if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
 
-			float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
-			float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
+	// 		float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
+	// 		float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
 
-			mapInfo->position.x = posXOnMap;
-			mapInfo->position.y = posYOnMap;
-			SetOffset(mapInfo);
-		}
+	// 		mapInfo->position.x = posXOnMap;
+	// 		mapInfo->position.y = posYOnMap;
+	// 		SetOffset(mapInfo);
+	// 	}
 
-		return;
-	} else{
+	// 	return;
+	// } else{
 		// if (mouseX < 20) mapInfo->position.x += 4.0f; // left
     	// if (mouseX < 5) mapInfo->position.x += 12.0f; //left
     	// if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
@@ -168,7 +168,7 @@ void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSetti
 		}
 			
 		mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
-	}
+	// }
 	
 	mouseInfo->worldStartPosition = GetScreenToWorld2D(mouseInfo->startPosition, camera); 
 

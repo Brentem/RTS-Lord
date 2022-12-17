@@ -62,13 +62,14 @@ void Game::Update()
 {
     Map2D_CheckBoundaries(&mapInfo, boundaries);
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
-    UpdateMouseInfo(static_cast<MiniMap*>(hud[0]));
+    updateMouseInfo(static_cast<MiniMap*>(hud[0]));
+    updateMapInfo(static_cast<MiniMap*>(hud[0]));
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
     MovementSystem(*scene, &mouseInfo, mapInfo, selectionRectangle, grid, camera);
 
-    UpdateHudElements();
+    updateHudElements();
 
     UnitSelection* unitSelection = dynamic_cast<UnitSelection*>(hud[2]);
     unitSelection->selectedUnits = mouseInfo.selectedUnits;
@@ -91,7 +92,7 @@ void Game::Render()
 
             //DrawMouseGrid(5, 3, mouseInfo, mapInfo, grid);
 
-            DrawHudElements();
+            drawHudElements();
             MiniMapCharactersSystem(*scene, dynamic_cast<MiniMap*>(hud[0]));
 
             // Render some Debug information
@@ -101,7 +102,7 @@ void Game::Render()
     EndDrawing();
 }
 
-void Game::UpdateHudElements()
+void Game::updateHudElements()
 {
     for(HudElement* element: hud)
     {
@@ -114,7 +115,7 @@ void Game::UpdateHudElements()
     }
 }
 
-void Game::DrawHudElements()
+void Game::drawHudElements()
 {
     for(HudElement* element: hud)
     {
@@ -122,7 +123,7 @@ void Game::DrawHudElements()
     }
 }
 
-void Game::UpdateMouseInfo(MiniMap* miniMap)
+void Game::updateMouseInfo(MiniMap* miniMap)
 {
     if(miniMap == nullptr)
     {
@@ -141,11 +142,44 @@ void Game::UpdateMouseInfo(MiniMap* miniMap)
 	mouseInfo.worldCurrentPosition = worldCurrentPosition;
 
 	if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
-		miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap);
+		miniMap->isActive = isMouseOverMiniMap(worldCurrentPosition, miniMap);
 	}
 }
 
-bool Game::IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap)
+void Game::updateMapInfo(MiniMap* miniMap)
+{
+    if(miniMap == nullptr)
+    {
+        return;
+    }
+
+    if(!miniMap->isActive)
+    {
+        return;
+    }
+
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
+		// Position on minimap
+		int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - mouseInfo.worldCurrentPosition.x;
+		int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- mouseInfo.worldCurrentPosition.y;
+
+        // Don't navigate out the minimap
+		if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
+		if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
+		if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
+		if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
+
+        float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
+		float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
+
+        mapInfo.position.x = posXOnMap;
+        mapInfo.position.y = posYOnMap;
+        SetOffset(&mapInfo);
+    }
+}
+
+bool Game::isMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap)
 {
     if(miniMap == nullptr)
     {

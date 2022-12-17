@@ -36,8 +36,9 @@ private:
     Texture2D background;
     Rectangle selectionRectangle;
 
-    void UpdateHudElements();
-    void DrawHudElements();
-    void UpdateMouseInfo(MiniMap* miniMap);
-    bool IsMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap);
+    void updateHudElements();
+    void drawHudElements();
+    void updateMouseInfo(MiniMap* miniMap);
+    void updateMapInfo(MiniMap* miniMap);
+    bool isMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap);
 };
