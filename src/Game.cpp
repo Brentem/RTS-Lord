@@ -55,13 +55,12 @@ void Game::HandleInput()
 {
     keyboardInput->HandleInput(&mapInfo);
     mouseInput->HandleInput(&mapInfo);
-    Map2D_HandleMouseInput(&mapInfo, &mouseInfo, monitorSettings, dynamic_cast<MiniMap*>(hud[0]), camera);
 }
 
 void Game::Update()
 {
     Map2D_CheckBoundaries(&mapInfo, boundaries);
-    //
+    
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
     updateMouseInfo(static_cast<MiniMap*>(hud[0]));
     updateMapInfo(static_cast<MiniMap*>(hud[0]));
