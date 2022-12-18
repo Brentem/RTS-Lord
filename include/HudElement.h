@@ -16,5 +16,6 @@ class HudElement
         Vector2 position;
         
         HudElement(Texture2D texture, Camera2D cam, int width, int height, int marginX, int marginY);
+        virtual ~HudElement() = default;
         virtual void Draw();
 };
