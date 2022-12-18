@@ -146,11 +146,7 @@ void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         IsSelected& isSelected = view.get<IsSelected>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
-
-        Vector2 currentPosition;
-        currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
-        currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
-        Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+        Pair startGridCell = GetGridPosition(GetPositionOnMap(entityPosition.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
 
         if(isSelected.Value && mouseInfo.giveNewTarget)
         {
@@ -172,11 +168,7 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         TaskState& state = view.get<TaskState>(entity);
         TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
-
-        Vector2 currentPosition;
-        currentPosition.x = entityPosition.currentPosition.x + mapInfo.offSet.x;
-        currentPosition.y = entityPosition.currentPosition.y + mapInfo.offSet.y;
-        Pair startGridCell = GetGridPosition(GetPositionOnMap(currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+        Pair startGridCell = GetGridPosition(GetPositionOnMap(entityPosition.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
 
         if(isSelected.Value && mouseInfo->giveNewTarget)
         {
@@ -190,13 +182,13 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         // This means that the path won't reinitialize again.
         if((state.Value == TaskState::TO_RESOURCE) && stateChanged.Value)
         {
-            Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, resourceGridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
         else if((state.Value == TaskState::TO_BASE) && stateChanged.Value)
         {
-            Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, baseGridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }

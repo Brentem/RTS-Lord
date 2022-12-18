@@ -216,6 +216,13 @@ Vector2 GetPositionOnMap(Vector2 worldPosition, Vector2 mapOffset, int mapWidth,
 	return positionOnMap;
 }
 
+Vector2 GetPositionOnMap(Vector2 worldPosition, int mapWidth, int mapHeight){
+	Vector2 positionOnMap;
+	positionOnMap.x = worldPosition.x + (float)mapWidth/2;
+	positionOnMap.y = worldPosition.y + (float)mapHeight/2;
+	return positionOnMap;
+}
+
 Pair GetGridPosition(Vector2 positionOnMap, int cellSize){
 	return Pair(positionOnMap.x/cellSize, positionOnMap.y/cellSize);
 }
