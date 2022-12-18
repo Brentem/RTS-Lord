@@ -13,12 +13,79 @@ void Debug_DrawDebugInfo(
     MapInfo mapinfo,
     Camera2D cam, 
     int viewportWidth, 
-    int viewportHeight
+    int viewportHeight,
+    Scene& scene
     //MiniMapInfo miniMapInfo
     )
     {
 
-    // DrawText(TextFormat("miniMapInfo.position.x = %01f", miniMapInfo.position.x), 10-viewportWidth/2 , 10-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+    int posy = 10;
+    DrawBasesDebugInfo(posy, scene, mapinfo, viewportWidth, viewportHeight);
+    DrawSelectedUnitDebugInfo(posy, scene, mapinfo, viewportWidth, viewportHeight);
+}
+
+void DrawSelectedUnitDebugInfo(int& posy, Scene& scene, MapInfo mapinfo, int viewportWidth, int viewportHeight){
+    auto unitView = scene.registry.view<EntityPosition, IsSelected>();
+    for(auto entity : unitView)
+    {
+        IsSelected& isSelected = unitView.get<IsSelected>(entity);
+        EntityPosition& position = unitView.get<EntityPosition>(entity);
+        if(isSelected.Value)
+        {
+            DrawText(TextFormat("position.currentPosition.x = %01f", position.currentPosition.x), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("position.currentPosition.y = %01f", position.currentPosition.y), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+
+            Vector2 positionOnMap;
+	        positionOnMap.x = position.currentPosition.x + (float)mapinfo.mapWidth/2;
+	        positionOnMap.y = position.currentPosition.y + (float)mapinfo.mapHeight/2;
+            DrawText(TextFormat("positionOnMap.x = %01f", positionOnMap.x), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("positionOnMap.y = %01f", positionOnMap.y), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+
+            Pair gridPosition = GetGridPosition(positionOnMap, mapinfo.cellSize);
+            DrawText(TextFormat("gridPosition.first = %01i", gridPosition.first), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("gridPosition.second = %01i", gridPosition.second), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 15;
+        }
+    }
+}
+
+void DrawBasesDebugInfo(int& posy, Scene& scene, MapInfo mapinfo, int viewportWidth, int viewportHeight){
+    auto baseView = scene.registry.view<EntityPosition, EntityType>();
+    for(auto entity : baseView)
+    {
+        EntityPosition& position = baseView.get<EntityPosition>(entity);
+        EntityType& type = baseView.get<EntityType>(entity);
+        if(type.Value == EntityType::Building)
+        {
+            DrawText(TextFormat("position.currentPosition.x = %01f", position.currentPosition.x), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("position.currentPosition.y = %01f", position.currentPosition.y), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+
+            Vector2 positionOnMap;
+	        positionOnMap.x = position.currentPosition.x + (float)mapinfo.mapWidth/2;
+	        positionOnMap.y = position.currentPosition.y + (float)mapinfo.mapHeight/2;
+            DrawText(TextFormat("positionOnMap.x = %01f", positionOnMap.x), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("positionOnMap.y = %01f", positionOnMap.y), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+
+            Pair gridPosition = GetGridPosition(positionOnMap, mapinfo.cellSize);
+            DrawText(TextFormat("gridPosition.first = %01i", gridPosition.first), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 10;
+            DrawText(TextFormat("gridPosition.second = %01i", gridPosition.second), 600-viewportWidth/2 , posy-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
+            posy += 15;
+        }
+    }
+}
+
+void DrawDebugInfoSet1(MouseInfo mouseinfo, MapInfo mapinfo, Camera2D cam, int viewportWidth, int viewportHeight){
+   // DrawText(TextFormat("miniMapInfo.position.x = %01f", miniMapInfo.position.x), 10-viewportWidth/2 , 10-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     // DrawText(TextFormat("miniMapInfo.position.y = %01f", miniMapInfo.position.y), 10-viewportWidth/2 , 20-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     // DrawText(TextFormat("miniMapInfo.isActive = %01i", miniMapInfo.isActive), 10-viewportWidth/2 , 50-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);
     DrawText(TextFormat("mouseinfo.currentPosition.x = %01f", mouseinfo.currentPosition.x), 10-viewportWidth/2 , 10-viewportHeight/2 , DEBUG_FONT_SIZE, WHITE);

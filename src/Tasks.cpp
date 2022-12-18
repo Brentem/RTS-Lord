@@ -28,9 +28,9 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
         IsMoved& isMoved = view.get<IsMoved>(entity);
         TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
 
-        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair selectedGrid = cell.pair;
 
         switch (state.Value)
@@ -158,7 +158,7 @@ void CheckResources(Scene& scene, MapInfo mapInfo, MouseInfo& mouseInfo)
         {
             for(auto resource: resourcePositions)
             {
-                Pair resourceGrid = GetGridPosition(GetPositionOnMap(resource, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+                Pair resourceGrid = GetGridPosition(GetPositionOnMap(resource, mapInfo.mapWidth, mapInfo.mapHeight), 32);
 
                 if(gridEqual(resourceGrid, selectedGrid))
                 {
@@ -194,11 +194,12 @@ void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vec
         if(isSelected.Value && mouseInfo.giveNewTarget)
         {
             std::vector<Path> basePaths;
-            Pair startGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+
+            Pair startGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             
             for(auto basePos : basePositions)
             {
-                Pair baseGrid = GetGridPosition(GetPositionOnMap(basePos, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+                Pair baseGrid = GetGridPosition(GetPositionOnMap(basePos, mapInfo.mapWidth, mapInfo.mapHeight), 32);
                 Path path = GetPath(mapInfo, startGridCell, baseGrid, grid);
                 basePaths.push_back(path);
             }

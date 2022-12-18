@@ -21,6 +21,8 @@ void Map2D_UpdateMouseInfo(MouseInfo* mouseInfo, MapInfo* mapInfo);
 
 Vector2 GetPositionOnMap(Vector2 worldPosition, Vector2 mapOffset, int mapWidth, int mapHeight);
 
+Vector2 GetPositionOnMap(Vector2 worldPosition, int mapWidth, int mapHeight);
+
 Pair GetGridPosition(Vector2 positionOnMap, int cellSize);
 
 Vector2 GetPositionOnMap(Pair gridPosition, int cellSize);
