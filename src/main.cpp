@@ -122,7 +122,7 @@ int main(void)
                 MiniMapCharactersSystem(scene, dynamic_cast<MiniMap*>(hud[0]));
 
                 // Render some Debug information
-                // Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+                // Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, scene);
 
 
 		    EndMode2D();

@@ -194,11 +194,21 @@ void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vec
         if(isSelected.Value && mouseInfo.giveNewTarget)
         {
             std::vector<Path> basePaths;
-            Pair startGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+
+            Vector2 positionOnMap;
+	        positionOnMap.x = taskPositions.resourcePosition.x + (float)mapInfo.mapWidth/2;
+            positionOnMap.y = taskPositions.resourcePosition.y + (float)mapInfo.mapHeight/2;
+            Pair startGridCell = GetGridPosition(positionOnMap, mapInfo.cellSize);
+            // Pair startGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             
             for(auto basePos : basePositions)
             {
-                Pair baseGrid = GetGridPosition(GetPositionOnMap(basePos, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+
+                Vector2 positionOnMap;
+	            positionOnMap.x = basePos.x + (float)mapInfo.mapWidth/2;
+                positionOnMap.y = basePos.y + (float)mapInfo.mapHeight/2;
+                Pair baseGrid = GetGridPosition(positionOnMap, mapInfo.cellSize);
+                // Pair baseGrid = GetGridPosition(GetPositionOnMap(basePos, mapInfo.offSet, mapInfo.mapWidth, mapInfo.mapHeight), 32);
                 Path path = GetPath(mapInfo, startGridCell, baseGrid, grid);
                 basePaths.push_back(path);
             }

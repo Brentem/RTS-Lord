@@ -2,6 +2,7 @@
 #define DEBUG_H
 
 #include "Types.h"
+#include "../include/Scene.h"
 
 extern "C"
 {
@@ -14,8 +15,13 @@ void Debug_DrawDebugInfo(
     MapInfo mapinfo,
     Camera2D cam, 
     int viewportWidth, 
-    int viewportHeight
+    int viewportHeight,
+    Scene& scene
     //MiniMapInfo miniMapInfo
     );
+
+void DrawBasesDebugInfo(int& posy, Scene& scene, MapInfo mapinfo, int viewportWidth, int viewportHeight);
+
+void DrawSelectedUnitDebugInfo(int& posy, Scene& scene, MapInfo mapinfo, int viewportWidth, int viewportHeight);
 
 #endif
