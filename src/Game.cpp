@@ -6,6 +6,7 @@
 #include "../include/Grid.h"
 #include "../include/UnitSelection.h"
 #include "../include/Systems.h"
+#include "../include/Debug.h"
 
 Game::Game()
 {
@@ -64,7 +65,7 @@ void Game::Update()
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
     updateMouseInfo(static_cast<MiniMap*>(hud[0]));
     updateMapInfo(static_cast<MiniMap*>(hud[0]));
-    updateMouseSelection();
+    updateMouseSelection(static_cast<MiniMap*>(hud[0]));
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
@@ -97,7 +98,7 @@ void Game::Render()
             MiniMapCharactersSystem(*scene, dynamic_cast<MiniMap*>(hud[0]));
 
             // Render some Debug information
-            // Debug_DrawDebugInfo(mouseInfo, mapInfo, cam, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, scene);
+            // Debug_DrawDebugInfo(mouseInfo, mapInfo, camera, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, *scene);
 
 		EndMode2D();
     EndDrawing();
@@ -180,9 +181,9 @@ void Game::updateMapInfo(MiniMap* miniMap)
     }
 }
 
-void Game::updateMouseSelection()
+void Game::updateMouseSelection(MiniMap* miniMap)
 {
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    if(!miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
     {
         mouseInfo.selectedUnits = 0;
         mouseInfo.isSelecting = false;

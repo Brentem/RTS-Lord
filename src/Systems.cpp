@@ -173,7 +173,16 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         if(isSelected.Value && mouseInfo->giveNewTarget)
         {
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
-            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+
+            // Prevent quirky behaviour
+            // Delete the gridposition where it came from
+            Path newPath = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+            Pair first = newPath.back();
+            if(first.first == startGridCell.first && first.second == startGridCell.second){
+                newPath.pop_back();
+            }
+
+            path = newPath;
             isMoved = true;
         }
 
@@ -268,7 +277,7 @@ void updatePosition(Scene& scene)
         // TODO should be property of the entity
         float speed = 1.0f;   
         // TODO should be property of the entity AND calculated correctly          
-        float diagonalSpeed = 0.75f;    
+        float diagonalSpeed = speed / (sqrt(2));    
 
         if(targetPosition->x > currentPosition->x){
             if(isMovingDiagonally){
