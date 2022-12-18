@@ -3,7 +3,7 @@
 #include "../include/Types.h"
 
 const Vector2 BASE = {128, -32};
-const Vector2 RESOURCE = {-256, -256};
+const Vector2 RESOURCE = {-224, -256};
 
 Scene::Scene(Texture2D characterTexture)
 {
