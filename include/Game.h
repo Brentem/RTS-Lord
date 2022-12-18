@@ -40,5 +40,6 @@ private:
     void drawHudElements();
     void updateMouseInfo(MiniMap* miniMap);
     void updateMapInfo(MiniMap* miniMap);
+    void updateMouseSelection();
     bool isMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap);
 };

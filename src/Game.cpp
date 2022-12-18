@@ -61,9 +61,11 @@ void Game::HandleInput()
 void Game::Update()
 {
     Map2D_CheckBoundaries(&mapInfo, boundaries);
+    //
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
     updateMouseInfo(static_cast<MiniMap*>(hud[0]));
     updateMapInfo(static_cast<MiniMap*>(hud[0]));
+    updateMouseSelection();
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
@@ -177,6 +179,33 @@ void Game::updateMapInfo(MiniMap* miniMap)
         mapInfo.position.y = posYOnMap;
         SetOffset(&mapInfo);
     }
+}
+
+void Game::updateMouseSelection()
+{
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
+        mouseInfo.selectedUnits = 0;
+        mouseInfo.isSelecting = false;
+
+        if(!mouseInfo.isdragging)
+        {
+            mouseInfo.isdragging = true;
+            mouseInfo.startPosition = mouseInfo.currentPosition;
+        }
+    }
+    else
+    {
+        if(mouseInfo.isdragging)
+        {
+            mouseInfo.isSelecting = true;
+        }
+
+        mouseInfo.isdragging = false;
+    }
+
+    mouseInfo.giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
+    mouseInfo.worldStartPosition = GetScreenToWorld2D(mouseInfo.startPosition, camera); 
 }
 
 bool Game::isMouseOverMiniMap(Vector2 worldCurrentPosition, MiniMap* miniMap)

@@ -93,84 +93,84 @@ void SetOffset(MapInfo* mapInfo){
 
 void Map2D_HandleMouseInput(MapInfo* mapInfo, MouseInfo* mouseInfo, MonitorSettings monitorSettings, MiniMap* miniMap, Camera2D camera)
 {
-	if(mapInfo == nullptr || mouseInfo == nullptr || miniMap == nullptr)
-	{
-		return;
-	}
-
-	int mouseX = GetMouseX();
-	int mouseY = GetMouseY();
-
-	Vector2 currentPosition;
-	currentPosition.x = (float)mouseX;
-	currentPosition.y = (float)mouseY;
-	//mouseInfo->currentPosition = currentPosition;
-
-	Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
-	//mouseInfo->worldCurrentPosition = worldCurrentPosition;
-
-	// if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
-	// 	miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
-	// }
-
-	// if(miniMap->isActive){
-	// 	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-
-	// 		// Position on minimap
-	// 		int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
-	// 		int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
-
-	// 		// Don't navigate out the minimap
-	// 		if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
-	// 		if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
-	// 		if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
-	// 		if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
-
-	// 		float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
-	// 		float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
-
-	// 		mapInfo->position.x = posXOnMap;
-	// 		mapInfo->position.y = posYOnMap;
-	// 		SetOffset(mapInfo);
-	// 	}
-
+	// if(mapInfo == nullptr || mouseInfo == nullptr || miniMap == nullptr)
+	// {
 	// 	return;
-	// } else{
-		// if (mouseX < 20) mapInfo->position.x += 4.0f; // left
-    	// if (mouseX < 5) mapInfo->position.x += 12.0f; //left
-    	// if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
-    	// if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
-
-		// if (mouseY < 20) mapInfo->position.y += 4.0f; //up
-    	// if (mouseY < 5) mapInfo->position.y += 12.0f; //up
-    	// if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
-    	// if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
-
-		mouseInfo->currentPosition.x = (float)mouseX;
-		mouseInfo->currentPosition.y = (float)mouseY;
-
-		if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-			mouseInfo->selectedUnits = 0;
-			mouseInfo->isSelecting = false;
-			if(mouseInfo->isdragging){
-
-			} else {
-				mouseInfo->isdragging = true;
-				mouseInfo->startPosition.x = (float)mouseX;
-				mouseInfo->startPosition.y = (float)mouseY;
-			}
-		} else{
-			if(mouseInfo->isdragging){
-				// Done dragging => select units
-				mouseInfo->isSelecting = true;
-		}
-		mouseInfo->isdragging = false;
-		}
-			
-		mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
 	// }
+
+	// int mouseX = GetMouseX();
+	// int mouseY = GetMouseY();
+
+	// Vector2 currentPosition;
+	// currentPosition.x = (float)mouseX;
+	// currentPosition.y = (float)mouseY;
+	// //mouseInfo->currentPosition = currentPosition;
+
+	// Vector2 worldCurrentPosition = GetScreenToWorld2D(currentPosition, camera); 
+	// //mouseInfo->worldCurrentPosition = worldCurrentPosition;
+
+	// // if(!(miniMap->isActive && IsMouseButtonDown(MOUSE_BUTTON_LEFT))){
+	// // 	miniMap->isActive = IsMouseOverMiniMap(worldCurrentPosition, miniMap, camera);
+	// // }
+
+	// // if(miniMap->isActive){
+	// // 	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+
+	// // 		// Position on minimap
+	// // 		int posXOnMinimap = miniMap->position.x + miniMap->miniMapOffSet.x - worldCurrentPosition.x;
+	// // 		int posYOnMinimap = miniMap->position.y + miniMap->miniMapOffSet.y- worldCurrentPosition.y;
+
+	// // 		// Don't navigate out the minimap
+	// // 		if(posXOnMinimap > miniMap->widgetBoundaries.leftBoundary) posXOnMinimap = miniMap->widgetBoundaries.leftBoundary;
+	// // 		if(posXOnMinimap < miniMap->widgetBoundaries.rightBoundary) posXOnMinimap = miniMap->widgetBoundaries.rightBoundary;
+	// // 		if(posYOnMinimap > miniMap->widgetBoundaries.upperBoundary) posYOnMinimap = miniMap->widgetBoundaries.upperBoundary;
+	// // 		if(posYOnMinimap < miniMap->widgetBoundaries.lowerBoundary) posYOnMinimap = miniMap->widgetBoundaries.lowerBoundary;
+
+	// // 		float posXOnMap = posXOnMinimap/miniMap->zoomFactor;
+	// // 		float posYOnMap = posYOnMinimap/miniMap->zoomFactor;
+
+	// // 		mapInfo->position.x = posXOnMap;
+	// // 		mapInfo->position.y = posYOnMap;
+	// // 		SetOffset(mapInfo);
+	// // 	}
+
+	// // 	return;
+	// // } else{
+	// 	// if (mouseX < 20) mapInfo->position.x += 4.0f; // left
+    // 	// if (mouseX < 5) mapInfo->position.x += 12.0f; //left
+    // 	// if (mouseX > monitorSettings.monitorWidth-20) mapInfo->position.x -= 4.0f;
+    // 	// if (mouseX > monitorSettings.monitorWidth-5) mapInfo->position.x -= 12.0f;
+
+	// 	// if (mouseY < 20) mapInfo->position.y += 4.0f; //up
+    // 	// if (mouseY < 5) mapInfo->position.y += 12.0f; //up
+    // 	// if (mouseY > monitorSettings.monitorHeight-40) mapInfo->position.y -= 4.0f;
+    // 	// if (mouseY > monitorSettings.monitorHeight-25) mapInfo->position.y -= 12.0f;
+
+	// 	mouseInfo->currentPosition.x = (float)mouseX;
+	// 	mouseInfo->currentPosition.y = (float)mouseY;
+
+	// 	if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+	// 		mouseInfo->selectedUnits = 0;
+	// 		mouseInfo->isSelecting = false;
+	// 		if(mouseInfo->isdragging){
+
+	// 		} else {
+	// 			mouseInfo->isdragging = true;
+	// 			mouseInfo->startPosition.x = (float)mouseX;
+	// 			mouseInfo->startPosition.y = (float)mouseY;
+	// 		}
+	// 	} else{
+	// 		if(mouseInfo->isdragging){
+	// 			// Done dragging => select units
+	// 			mouseInfo->isSelecting = true;
+	// 	}
+	// 	mouseInfo->isdragging = false;
+	// 	}
+			
+	// 	mouseInfo->giveNewTarget = IsMouseButtonDown(MOUSE_BUTTON_RIGHT);
+	// // }
 	
-	mouseInfo->worldStartPosition = GetScreenToWorld2D(mouseInfo->startPosition, camera); 
+	// mouseInfo->worldStartPosition = GetScreenToWorld2D(mouseInfo->startPosition, camera); 
 
 }
 
