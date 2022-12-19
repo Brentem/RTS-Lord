@@ -174,16 +174,25 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         {
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, mouseInfo->gridCell, grid);
 
-            // Prevent quirky behaviour
-            // Delete the gridposition where it came from
-            Path newPath = GetPath(mapInfo, startGridCell, targetGridCell, grid);
-            Pair first = newPath.back();
-            if(first.first == startGridCell.first && first.second == startGridCell.second){
-                newPath.pop_back();
+            // No need to give a new target if the currentTarget is the same as the new Target
+            bool giveNewTarget = true;
+            if(path.size() > 0){
+                Pair currentTarget = path[0];
+                giveNewTarget = !(currentTarget.first == targetGridCell.first && currentTarget.second == targetGridCell.second);
             }
 
-            path = newPath;
-            isMoved = true;
+            if(giveNewTarget){
+                // Prevent quirky behaviour
+                // Delete the gridposition where it came from
+                Path newPath = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+                Pair first = newPath.back();
+                if(first.first == startGridCell.first && first.second == startGridCell.second){
+                    newPath.pop_back();
+                }
+
+                path = newPath;
+                isMoved = true;
+            }
         }
 
         // Find a better way to do this.
