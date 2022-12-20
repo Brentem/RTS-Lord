@@ -20,7 +20,7 @@ void Debug_DrawDebugInfo(
     {
 
     int posy = 10;
-    DrawBasesDebugInfo(posy, scene, mapinfo, viewportWidth, viewportHeight);
+    //DrawBasesDebugInfo(posy, scene, mapinfo, viewportWidth, viewportHeight);
     DrawSelectedUnitDebugInfo(posy, scene, mapinfo, viewportWidth, viewportHeight);
 }
 
