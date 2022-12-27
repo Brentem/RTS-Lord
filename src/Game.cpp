@@ -59,13 +59,12 @@ void Game::HandleInput()
 }
 
 void Game::Update(float deltaT)
-{
-    Map2D_CheckBoundaries(&mapInfo, boundaries);
-    
+{  
     Map2D_UpdateMouseInfo(&mouseInfo, &mapInfo);
     updateMouseInfo(static_cast<MiniMap*>(hud[0]));
     updateMapInfo(static_cast<MiniMap*>(hud[0]));
     updateMouseSelection(static_cast<MiniMap*>(hud[0]));
+    Map2D_CheckBoundaries(&mapInfo, boundaries);
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
