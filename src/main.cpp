@@ -4,6 +4,7 @@ extern "C"
 }
 
 #include "../include/Game.h"
+#include <chrono>
 
 int main(void) 
 {
@@ -12,20 +13,29 @@ int main(void)
     Game game;
     // //--------------------------------------------------------------------------------------
 
+    // Initialize the elapsed time variable
+    std::chrono::steady_clock::time_point elapsedTime = std::chrono::steady_clock::now();
+
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        // Get the elapsed time for the current frame
+        std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+        std::chrono::duration<float> deltaT = currentTime - elapsedTime;
 
         // Update
         //----------------------------------------------------------------------------------
         game.HandleInput();
-        game.Update();
+        game.Update(deltaT.count());
         //----------------------------------------------------------------------------------
 
         // Draw
         //----------------------------------------------------------------------------------
         game.Render();
         //----------------------------------------------------------------------------------
+
+        // Update the elapsed time variable for the next frame
+        elapsedTime = currentTime;
     }
 
     //--------------------------------------------------------------------------------------

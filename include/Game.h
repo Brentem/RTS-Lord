@@ -16,7 +16,7 @@ public:
     Game();
     ~Game();
     void HandleInput();
-    void Update();
+    void Update(float deltaT);
     void Render();
 
 private:

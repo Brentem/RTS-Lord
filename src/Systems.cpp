@@ -14,13 +14,13 @@ void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera);
 Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid);
 void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera);
-void updatePosition(Scene& scene);
+void updatePosition(Scene& scene, float deltaT);
 
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
 
 // Maybe this function does too much
-void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera)
+void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera, float deltaT)
 {
     if(mouseInfo == nullptr)
     {
@@ -34,7 +34,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     setPath(scene, mouseInfo, mapInfo, grid, camera);
     GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);
-    updatePosition(scene);
+    updatePosition(scene, deltaT);
 }
 
 void RenderSystem(Scene& scene, MapInfo mapInfo)
@@ -272,7 +272,7 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
     }
 }
 
-void updatePosition(Scene& scene)
+void updatePosition(Scene& scene, float deltaT)
 {
     auto view = scene.registry.view<EntityPosition>();
     for(auto entity : view)
@@ -284,7 +284,7 @@ void updatePosition(Scene& scene)
         bool isMovingDiagonally = (targetPosition->x != currentPosition->x) && (targetPosition->y != currentPosition->y);
         
         // TODO should be property of the entity
-        float speed = 1.0f;   
+        float speed = 50.0f * deltaT;   
         // TODO should be property of the entity AND calculated correctly          
         float diagonalSpeed = speed / (sqrt(2));    
 
