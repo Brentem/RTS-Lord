@@ -58,7 +58,7 @@ void Game::HandleInput()
     mouseInput->HandleInput(&mapInfo);
 }
 
-void Game::Update()
+void Game::Update(float deltaT)
 {
     Map2D_CheckBoundaries(&mapInfo, boundaries);
     
@@ -69,7 +69,7 @@ void Game::Update()
             
     selectionRectangle = Map2D_GetSelectionRectangle(&mouseInfo, camera);
 
-    MovementSystem(*scene, &mouseInfo, mapInfo, selectionRectangle, grid, camera);
+    MovementSystem(*scene, &mouseInfo, mapInfo, selectionRectangle, grid, camera, deltaT);
 
     updateHudElements();
 
