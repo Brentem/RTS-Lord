@@ -1,6 +1,6 @@
 #include "../include/MiniMap.h"
 
-MiniMap::MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSettings,
+MiniMap::MiniMap(Texture2D* texture, Camera2D cam, MonitorSettings monitorSettings,
  int width, int height, int padding, int marginX, int marginY)
 : HudElement(texture, cam, width, height, marginX, marginY)
 {
@@ -15,7 +15,7 @@ MiniMap::MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSetting
 	int maxHeight = height - (padding * 2);
 	if(maxHeight<0) maxHeight = 1;
 	
-	Image backgroundImage = LoadImageFromTexture(texture);
+	Image backgroundImage = LoadImageFromTexture(*texture);
     float zoomX = (float)backgroundImage.width/maxWidth;
     float zoomY =  (float)backgroundImage.height/maxHeight;
     float zoom = (zoomY > zoomX) ? zoomY : zoomX;
@@ -24,7 +24,8 @@ MiniMap::MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSetting
 	maxHeight = backgroundImage.height/zoom;
 
 	ImageResize(&backgroundImage, maxWidth, maxHeight);
-	this->texture = LoadTextureFromImage(backgroundImage);
+	Texture2D* texturePtr = this->texture;
+	*texturePtr = LoadTextureFromImage(backgroundImage);
 	UnloadImage(backgroundImage);
 
     // Calculate miniMapOffSet
@@ -52,8 +53,8 @@ void MiniMap::Update(MapInfo info)
 {
     // Draw current mapposition => widget???
 	// Widget centered on minimap
-    posXScreen = offsetPosX + (int)HudElement::texture.width/2 - (int)miniMapWidgetWidth/2;
-    posYScreen = offsetPosY + (int)HudElement::texture.height/2 - (int)miniMapWidgetHeight/2;
+    posXScreen = offsetPosX + (int)HudElement::texture->width/2 - (int)miniMapWidgetWidth/2;
+    posYScreen = offsetPosY + (int)HudElement::texture->height/2 - (int)miniMapWidgetHeight/2;
 
     // Process offset of background
 	posXScreen = posXScreen - (int)info.offSet.x*zoomFactor;
@@ -63,7 +64,7 @@ void MiniMap::Update(MapInfo info)
 void MiniMap::Draw()
 {
     DrawRectangle(position.x, position.y, width, height, BLACK);
-    DrawTexture(texture, offsetPosX, offsetPosY, WHITE);
+    DrawTexture(*texture, offsetPosX, offsetPosY, WHITE);
 
     // White rectangle
     if(isActive){

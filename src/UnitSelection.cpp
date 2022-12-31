@@ -2,7 +2,7 @@
 
 #include "../include/Types.h"
 
-UnitSelection::UnitSelection(Texture2D texture, Camera2D cam, int width, int height, int marginX, int marginY)
+UnitSelection::UnitSelection(Texture2D* texture, Camera2D cam, int width, int height, int marginX, int marginY)
 : HudElement(texture, cam, width, height, marginX, marginY)
 {
     selectedUnits = 0;
@@ -12,8 +12,8 @@ void UnitSelection::Draw()
 {
     Vector2 defaultPosition = position;
 
-    texture.width = width;
-    texture.height = height;
+    texture->width = width;
+    texture->height = height;
 
     for(int i = 0; i < selectedUnits; i++)
     {
@@ -23,7 +23,7 @@ void UnitSelection::Draw()
             defaultPosition.x = position.x;
         }
 
-        DrawTexture(texture, defaultPosition.x, defaultPosition.y, WHITE);
+        DrawTexture(*texture, defaultPosition.x, defaultPosition.y, WHITE);
         defaultPosition.x += 32;
     }
 }

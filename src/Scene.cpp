@@ -65,7 +65,6 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         size = {32.0f, 32.0f};
         type.Value = EntityType::Worker;
         taskState.Value = TaskState::NOT_GATHERING;
-        //taskPositions = {BASE, RESOURCE};
         taskPositions = {BASE, {0.0f, 0.0f}};
         cell.pair = Pair(0, 0);
 

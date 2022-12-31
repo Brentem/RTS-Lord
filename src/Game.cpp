@@ -7,9 +7,12 @@
 #include "../include/UnitSelection.h"
 #include "../include/Systems.h"
 #include "../include/Debug.h"
+#include "../include/AssetManager.h"
 
 Game::Game()
 {
+    LoadAssets();
+
     monitorSettings = Monitor_GetSettings(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     InitWindow(monitorSettings.monitorWidth, monitorSettings.monitorHeight, "RTS-Lord");
     camera = Camera_Init(monitorSettings.monitorWidth, monitorSettings.monitorHeight,
@@ -19,10 +22,12 @@ Game::Game()
     mouseInfo = {0.0f, 0.0f, 0.0f, 0.0f, 0, false, false, false};
     boundaries = Map2D_GetBoundaries(mapInfo, monitorSettings, camera.zoom);
 
-    background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
+    *background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     characterTexture = LoadTexture("assets/Character_Down2.png");
-    characterIcon = LoadTexture("assets/ui/Character_Icon.png");
-    uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
+    // characterIcon = LoadTexture("assets/ui/Character_Icon.png");
+    // uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
+    Texture2D* characterIcon = GetTextureUI("Character_Icon.png");
+    Texture2D* uiTexture = GetTextureUI("UI_placeholder.png");
 
     scene = new Scene(characterTexture);
     keyboardInput = new KeyboardInput();
@@ -47,9 +52,9 @@ Game::~Game()
     }
 
     UnloadTexture(characterTexture);
-    UnloadTexture(background);
-    UnloadTexture(uiTexture);
-    UnloadTexture(characterIcon);
+    UnloadTexture(*background);
+
+    UnloadAssets();
 }
 
 void Game::HandleInput()
@@ -83,7 +88,7 @@ void Game::Render()
         ClearBackground(RAYWHITE);
 		BeginMode2D(camera);
 		    // draw the entire background image for the entire world. The camera will clip it to the screen
-		    DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
+		    DrawTexture(*background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
             RenderSystem(*scene, mapInfo);
 

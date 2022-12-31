@@ -1,6 +1,6 @@
 #include "../include/HudElement.h"
 
-HudElement::HudElement(Texture2D texture, Camera2D cam, int width, int height, int marginX, int marginY)
+HudElement::HudElement(Texture2D* texture, Camera2D cam, int width, int height, int marginX, int marginY)
 {
     this->texture = texture;
     this->width = width;
@@ -12,8 +12,8 @@ HudElement::HudElement(Texture2D texture, Camera2D cam, int width, int height, i
 
 void HudElement::Draw()
 {
-    texture.width = width;
-    texture.height = height;
+    texture->width = width;
+    texture->height = height;
 
-    DrawTexture(texture, position.x, position.y, WHITE);
+    DrawTexture(*texture, position.x, position.y, WHITE);
 }
