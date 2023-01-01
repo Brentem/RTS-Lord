@@ -1,16 +1,17 @@
 #include "../include/AssetManager.h"
 
-#include <unordered_map>
 #include <filesystem>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
-static unordered_map<string, Texture2D> textureBuffer;
+AssetManager* AssetManager::assetManagerInstance_{nullptr};
+mutex AssetManager::mutex_;
 
-void LoadAssets()
+AssetManager::AssetManager()
 {
-    string path = "assets";
+    string path = "assets/ui";
     vector<string> fileNames;
     for(auto& entry : filesystem::directory_iterator(path))
     {
@@ -20,32 +21,59 @@ void LoadAssets()
     for(auto& fileName : fileNames)
     {
         const char* texturePath = fileName.c_str();
-        string textureName = fileName.substr(7);
+        string textureName = fileName.substr(10);
         Texture2D texture = LoadTexture(texturePath);
-        textureBuffer.insert({textureName, texture});
+        uiTextureBuffer.insert({textureName, texture});
     }
 }
 
-void UnloadAssets()
+AssetManager::~AssetManager()
 {
-    for(auto& texture : textureBuffer)
+    for(auto& texture : uiTextureBuffer)
     {
         UnloadTexture(texture.second);
     }
 
-    textureBuffer.clear();
+    uiTextureBuffer.clear();
 }
 
-Texture2D* GetTexture(const string& textureName)
+AssetManager* AssetManager::GetInstance()
 {
-    Texture2D* texture = nullptr;
+    lock_guard<mutex> lock(mutex_);
 
-    auto iteratorMap = textureBuffer.find(textureName);
+    if(assetManagerInstance_ == nullptr)
+    {
+        assetManagerInstance_ = new AssetManager();
+    }
 
-    if(iteratorMap != textureBuffer.end())
+    return assetManagerInstance_;
+}
+
+void AssetManager::DeleteInstance()
+{
+    lock_guard<mutex> lock(mutex_);
+
+    if(assetManagerInstance_ != nullptr)
+    {
+        delete assetManagerInstance_;
+        assetManagerInstance_ = nullptr;
+    }
+}
+
+Texture2D AssetManager::GetTextureUI(const string& uiTextureName)
+{
+    Texture2D texture;
+
+    auto iteratorMap = uiTextureBuffer.find(uiTextureName);
+
+    if(iteratorMap != uiTextureBuffer.end())
     {
         auto iteratorPair = *iteratorMap;
-        texture = &iteratorPair.second;
+        texture = iteratorPair.second;
+    }
+    else
+    {
+        throw invalid_argument("Given uiTextureName doesn't give a valid texture!");
     }
 
     return texture;

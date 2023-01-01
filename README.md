@@ -22,3 +22,4 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 * [How can I get the list of files in a directory using C or C++?](https://stackoverflow.com/a/612176)
 * [Convert iterator to pointer?](https://stackoverflow.com/a/2160319)
 * [Checking if an iterator is valid](https://stackoverflow.com/a/2062968)
+* [Singleton in C++](https://refactoring.guru/design-patterns/singleton/cpp/example#example-1)

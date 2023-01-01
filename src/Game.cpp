@@ -7,6 +7,7 @@
 #include "../include/UnitSelection.h"
 #include "../include/Systems.h"
 #include "../include/Debug.h"
+#include "../include/AssetManager.h"
 
 Game::Game()
 {
@@ -21,9 +22,10 @@ Game::Game()
 
     background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     characterTexture = LoadTexture("assets/Character_Down2.png");
-    characterIcon = LoadTexture("assets/ui/Character_Icon.png");
-    uiTexture = LoadTexture("assets/ui/UI_placeholder.png");
 
+    AssetManager* manager = AssetManager::GetInstance();
+    characterIcon = manager->GetTextureUI("Character_Icon.png");
+    uiTexture = manager->GetTextureUI("UI_placeholder.png");
     scene = new Scene(characterTexture);
     keyboardInput = new KeyboardInput();
     mouseInput = new MouseInput(monitorSettings);
