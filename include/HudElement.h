@@ -8,14 +8,14 @@ extern "C"
 class HudElement
 {
     protected:
-        Texture2D* texture;
+        Texture2D texture;
         int width;
         int height;
 
     public:
         Vector2 position;
         
-        HudElement(Texture2D* texture, Camera2D cam, int width, int height, int marginX, int marginY);
+        HudElement(Texture2D texture, Camera2D cam, int width, int height, int marginX, int marginY);
         virtual ~HudElement() = default;
         virtual void Draw();
 };

@@ -24,7 +24,7 @@ class MiniMap : public HudElement
         int miniMapWidgetHeight;
         bool isActive;
 
-        MiniMap(Texture2D* texture, Camera2D cam, MonitorSettings monitorSettings,
+        MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSettings,
          int width, int height, int padding, int marginX, int marginY);
 
         void Update(MapInfo info);

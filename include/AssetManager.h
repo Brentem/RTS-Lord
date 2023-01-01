@@ -7,4 +7,3 @@
 void LoadAssets();
 void UnloadAssets();
 Texture2D* GetTexture(const std::string& textureName);
-Texture2D* GetTextureUI(const std::string& uiName);
