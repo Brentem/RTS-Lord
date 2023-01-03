@@ -23,16 +23,13 @@ Game::Game()
     background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
     characterTexture = LoadTexture("assets/Character_Down2.png");
 
-    AssetManager* manager = AssetManager::GetInstance();
-    characterIcon = manager->GetTextureUI("Character_Icon.png");
-    uiTexture = manager->GetTextureUI("UI_placeholder.png");
     scene = new Scene(characterTexture);
     keyboardInput = new KeyboardInput();
     mouseInput = new MouseInput(monitorSettings);
 
     hud.push_back(new MiniMap(background, camera, monitorSettings, 160, 130, 2, 50, 443));
-    hud.push_back(new HudElement(uiTexture, camera, 1070, 300, 0, 300));
-    hud.push_back(new UnitSelection(characterIcon, camera, 20, 20, 280, 541));
+    hud.push_back(new HudElement("UI_placeholder.png", camera, 1070, 300, 0, 300));
+    hud.push_back(new UnitSelection("Character_Icon.png", camera, 20, 20, 280, 541));
 
     SetTargetFPS(60);
 }
@@ -50,8 +47,6 @@ Game::~Game()
 
     UnloadTexture(characterTexture);
     UnloadTexture(background);
-    UnloadTexture(uiTexture);
-    UnloadTexture(characterIcon);
 }
 
 void Game::HandleInput()

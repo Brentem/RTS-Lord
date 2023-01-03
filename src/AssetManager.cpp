@@ -25,6 +25,21 @@ AssetManager::AssetManager()
         Texture2D texture = LoadTexture(texturePath);
         uiTextureBuffer.insert({textureName, texture});
     }
+
+    path = "assets";
+    fileNames.clear();
+    for(auto& entry : filesystem::directory_iterator(path))
+    {
+        fileNames.push_back(entry.path().string());
+    }
+
+    for(auto& fileName : fileNames)
+    {
+        const char* texturePath = fileName.c_str();
+        string textureName = fileName.substr(7);
+        Texture2D texture = LoadTexture(texturePath);
+        textureBuffer.insert({textureName, texture});
+    }
 }
 
 AssetManager::~AssetManager()
@@ -60,21 +75,30 @@ void AssetManager::DeleteInstance()
     }
 }
 
-Texture2D AssetManager::GetTextureUI(const string& uiTextureName)
+Texture2D& AssetManager::GetTexture(const string& textureName)
 {
-    Texture2D texture;
+    auto iteratorMap = textureBuffer.find(textureName);
 
-    auto iteratorMap = uiTextureBuffer.find(uiTextureName);
-
-    if(iteratorMap != uiTextureBuffer.end())
-    {
-        auto iteratorPair = *iteratorMap;
-        texture = iteratorPair.second;
-    }
-    else
+    if(iteratorMap == textureBuffer.end())
     {
         throw invalid_argument("Given uiTextureName doesn't give a valid texture!");
     }
 
-    return texture;
+    auto& iteratorPair = *iteratorMap;
+    
+    return iteratorPair.second;
+}
+
+Texture2D& AssetManager::GetTextureUI(const string& uiTextureName)
+{
+    auto iteratorMap = uiTextureBuffer.find(uiTextureName);
+
+    if(iteratorMap == uiTextureBuffer.end())
+    {
+        throw invalid_argument("Given uiTextureName doesn't give a valid texture!");
+    }
+
+    auto& iteratorPair = *iteratorMap;
+    
+    return iteratorPair.second;
 }

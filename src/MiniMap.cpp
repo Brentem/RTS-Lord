@@ -2,7 +2,7 @@
 
 MiniMap::MiniMap(Texture2D texture, Camera2D cam, MonitorSettings monitorSettings,
  int width, int height, int padding, int marginX, int marginY)
-: HudElement(texture, cam, width, height, marginX, marginY)
+: HudElement("", cam, width, height, marginX, marginY)
 {
     this->padding = padding;
     this->width = width;
@@ -52,8 +52,8 @@ void MiniMap::Update(MapInfo info)
 {
     // Draw current mapposition => widget???
 	// Widget centered on minimap
-    posXScreen = offsetPosX + (int)HudElement::texture.width/2 - (int)miniMapWidgetWidth/2;
-    posYScreen = offsetPosY + (int)HudElement::texture.height/2 - (int)miniMapWidgetHeight/2;
+    posXScreen = offsetPosX + (int)texture.width/2 - (int)miniMapWidgetWidth/2;
+    posYScreen = offsetPosY + (int)texture.height/2 - (int)miniMapWidgetHeight/2;
 
     // Process offset of background
 	posXScreen = posXScreen - (int)info.offSet.x*zoomFactor;
