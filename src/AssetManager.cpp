@@ -54,7 +54,7 @@ Texture2D& AssetManager::GetTexture(const string& textureName)
 
     if(iteratorMap == textureBuffer.end())
     {
-        throw invalid_argument("Given uiTextureName doesn't give a valid texture!");
+        throw invalid_argument("Given textureName doesn't give a valid texture!");
     }
 
     auto& iteratorPair = *iteratorMap;

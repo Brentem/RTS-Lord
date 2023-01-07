@@ -7,7 +7,6 @@
 #include "../include/UnitSelection.h"
 #include "../include/Systems.h"
 #include "../include/Debug.h"
-#include "../include/AssetManager.h"
 
 Game::Game()
 {
@@ -21,9 +20,8 @@ Game::Game()
     boundaries = Map2D_GetBoundaries(mapInfo, monitorSettings, camera.zoom);
 
     background = Map2DGetBackground(mapInfo, "assets/map1.png", "assets/spritesheet.png");
-    characterTexture = LoadTexture("assets/Character_Down2.png");
 
-    scene = new Scene(characterTexture);
+    scene = new Scene();
     keyboardInput = new KeyboardInput();
     mouseInput = new MouseInput(monitorSettings);
 
@@ -45,7 +43,6 @@ Game::~Game()
         delete element;
     }
 
-    UnloadTexture(characterTexture);
     UnloadTexture(background);
 }
 
