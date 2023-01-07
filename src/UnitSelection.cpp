@@ -19,7 +19,7 @@ void UnitSelection::Draw()
 
     if (assetManager)
     {
-        Texture2D texture = assetManager->GetTextureUI(textureName);
+        Texture2D texture = assetManager->GetTexture(textureName);
         texture.width = width;
         texture.height = height;
 

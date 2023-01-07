@@ -11,45 +11,18 @@ mutex AssetManager::mutex_;
 
 AssetManager::AssetManager()
 {
-    string path = "assets/ui";
-    vector<string> fileNames;
-    for(auto& entry : filesystem::directory_iterator(path))
-    {
-        fileNames.push_back(entry.path().string());
-    }
-
-    for(auto& fileName : fileNames)
-    {
-        const char* texturePath = fileName.c_str();
-        string textureName = fileName.substr(10);
-        Texture2D texture = LoadTexture(texturePath);
-        uiTextureBuffer.insert({textureName, texture});
-    }
-
-    path = "assets";
-    fileNames.clear();
-    for(auto& entry : filesystem::directory_iterator(path))
-    {
-        fileNames.push_back(entry.path().string());
-    }
-
-    for(auto& fileName : fileNames)
-    {
-        const char* texturePath = fileName.c_str();
-        string textureName = fileName.substr(7);
-        Texture2D texture = LoadTexture(texturePath);
-        textureBuffer.insert({textureName, texture});
-    }
+    fillBuffer("assets", 7);
+    fillBuffer("assets/ui", 10);
 }
 
 AssetManager::~AssetManager()
 {
-    for(auto& texture : uiTextureBuffer)
+    for(auto& texture : textureBuffer)
     {
         UnloadTexture(texture.second);
     }
 
-    uiTextureBuffer.clear();
+    textureBuffer.clear();
 }
 
 AssetManager* AssetManager::GetInstance()
@@ -89,16 +62,19 @@ Texture2D& AssetManager::GetTexture(const string& textureName)
     return iteratorPair.second;
 }
 
-Texture2D& AssetManager::GetTextureUI(const string& uiTextureName)
+void AssetManager::fillBuffer(const string& folderName, const int strNamePos)
 {
-    auto iteratorMap = uiTextureBuffer.find(uiTextureName);
-
-    if(iteratorMap == uiTextureBuffer.end())
+    vector<string> fileNames;
+    for(auto& entry : filesystem::directory_iterator(folderName))
     {
-        throw invalid_argument("Given uiTextureName doesn't give a valid texture!");
+        fileNames.push_back(entry.path().string());
     }
 
-    auto& iteratorPair = *iteratorMap;
-    
-    return iteratorPair.second;
+    for(auto& fileName : fileNames)
+    {
+        const char* texturePath = fileName.c_str();
+        string textureName = fileName.substr(strNamePos);
+        Texture2D texture = LoadTexture(texturePath);
+        textureBuffer.insert({textureName, texture});
+    }
 }

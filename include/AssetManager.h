@@ -6,13 +6,16 @@
 #include <mutex>
 #include <unordered_map>
 
+typedef std::unordered_map<std::string, Texture2D> TextureBuffer;
+
 class AssetManager
 {
 private:
     static AssetManager* assetManagerInstance_;
     static std::mutex mutex_;
-    std::unordered_map<std::string, Texture2D> textureBuffer;
-    std::unordered_map<std::string, Texture2D> uiTextureBuffer;
+    TextureBuffer textureBuffer;
+
+    void fillBuffer(const std::string& folderName, const int strNamePos);
 
 protected:
     AssetManager();
@@ -24,5 +27,4 @@ public:
     static AssetManager* GetInstance();
     static void DeleteInstance();
     Texture2D& GetTexture(const std::string& textureName);
-    Texture2D& GetTextureUI(const std::string& uiTextureName);
 };

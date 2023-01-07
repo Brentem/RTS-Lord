@@ -20,7 +20,7 @@ void HudElement::Draw()
 
     if(assetManager)
     {
-        Texture texture = assetManager->GetTextureUI(textureName);
+        Texture texture = assetManager->GetTexture(textureName);
         texture.width = width;
         texture.height = height;
 
