@@ -6,14 +6,14 @@
 class Scene
 {
     public:
-        Scene(Texture2D characterTexture);
+        Scene();
         ~Scene();
         entt::registry registry;
         int gold;
 
     private:
         // Functions underneath should not be in endproduct
-        void CreatingWorkers(Texture2D characterTexture);
+        void CreatingWorkers();
         void CreatingBuildings();
         void CreatingResources();
 };

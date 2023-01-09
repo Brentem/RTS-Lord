@@ -30,9 +30,6 @@ private:
     KeyboardInput* keyboardInput;
     MouseInput* mouseInput;
     std::vector<HudElement*> hud;
-    Texture2D characterTexture;
-    Texture2D characterIcon;
-    Texture2D uiTexture;
     Texture2D background;
     Rectangle selectionRectangle;
 

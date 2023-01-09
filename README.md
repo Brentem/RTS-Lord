@@ -7,7 +7,7 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 
 ## Built With
 * C++17
-* [raylib 4.0.0](https://www.raylib.com/)
+* [raylib 4.2.0](https://www.raylib.com/)
 * [EnTT v3.10.3](https://github.com/skypjack/entt)
 
 ## Information Used
@@ -19,3 +19,7 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 * [Using Timers in Raylib](https://www.youtube.com/watch?v=vGlvTWUctTQ)
 * [Intro to EnTT (ECS) | Game Engine series](https://youtu.be/D4hz0wEB978)
 * [Command](https://gameprogrammingpatterns.com/command.html)
+* [How can I get the list of files in a directory using C or C++?](https://stackoverflow.com/a/612176)
+* [Convert iterator to pointer?](https://stackoverflow.com/a/2160319)
+* [Checking if an iterator is valid](https://stackoverflow.com/a/2062968)
+* [Singleton in C++](https://refactoring.guru/design-patterns/singleton/cpp/example#example-1)

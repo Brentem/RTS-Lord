@@ -1,8 +1,12 @@
 #include "../include/HudElement.h"
 
-HudElement::HudElement(Texture2D texture, Camera2D cam, int width, int height, int marginX, int marginY)
+#include "../include/AssetManager.h"
+
+using namespace std;
+
+HudElement::HudElement(string textureName, Camera2D cam, int width, int height, int marginX, int marginY)
 {
-    this->texture = texture;
+    this->textureName = textureName;
     this->width = width;
     this->height = height;
 
@@ -12,8 +16,14 @@ HudElement::HudElement(Texture2D texture, Camera2D cam, int width, int height, i
 
 void HudElement::Draw()
 {
-    texture.width = width;
-    texture.height = height;
+    AssetManager* assetManager = AssetManager::GetInstance();
 
-    DrawTexture(texture, position.x, position.y, WHITE);
+    if(assetManager)
+    {
+        Texture texture = assetManager->GetTexture(textureName);
+        texture.width = width;
+        texture.height = height;
+
+        DrawTexture(texture, position.x, position.y, WHITE);
+    }
 }

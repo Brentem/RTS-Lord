@@ -7,6 +7,7 @@
 class MiniMap : public HudElement
 {
     private:
+        Texture2D texture;
         int offsetPosX;
         int offsetPosY;
 

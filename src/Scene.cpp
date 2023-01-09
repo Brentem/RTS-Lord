@@ -1,13 +1,14 @@
 #include "../include/Scene.h"
 
+#include "../include/AssetManager.h"
 #include "../include/Types.h"
 
 const Vector2 BASE = {128, -32};
 const Vector2 RESOURCE = {-224, -256};
 
-Scene::Scene(Texture2D characterTexture)
+Scene::Scene()
 {
-    CreatingWorkers(characterTexture);
+    CreatingWorkers();
     CreatingBuildings();
     CreatingResources();
 
@@ -20,7 +21,7 @@ Scene::~Scene()
 }
 
 // This function should not be in the endproduct.
-void Scene::CreatingWorkers(Texture2D characterTexture)
+void Scene::CreatingWorkers()
 {
     for(int i = 0; i < 5; i++)
     {
@@ -42,6 +43,9 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
     float posY = 0.0f;
 
     int counter = 0;
+
+    AssetManager* manager = AssetManager::GetInstance();
+    Texture2D characterTexture = manager->GetTexture("Character_Down2.png");
 
     auto view = registry.view<EntityPosition, Texture2D, EntitySize, EntityType, TaskState, TaskPositions, SelectedCell>();
     for(auto entity : view)
@@ -65,7 +69,6 @@ void Scene::CreatingWorkers(Texture2D characterTexture)
         size = {32.0f, 32.0f};
         type.Value = EntityType::Worker;
         taskState.Value = TaskState::NOT_GATHERING;
-        //taskPositions = {BASE, RESOURCE};
         taskPositions = {BASE, {0.0f, 0.0f}};
         cell.pair = Pair(0, 0);
 
@@ -79,7 +82,7 @@ void Scene::CreatingBuildings()
 {
     // Home base
     Image image = GenImageColor(64, 64, BLACK);
-    Texture2D baseTexture = LoadTextureFromImage(image);
+    Texture2D baseTexture = LoadTextureFromImage(image); // This texture isn't deleted ever.
 
     std::vector<entt::entity> entities;
 
@@ -118,7 +121,7 @@ void Scene::CreatingBuildings()
 void Scene::CreatingResources()
 {
     Image image = GenImageColor(32, 32, YELLOW);
-    Texture2D resourceTexture = LoadTextureFromImage(image);
+    Texture2D resourceTexture = LoadTextureFromImage(image); // This texture isn't deleted ever.
 
     std::vector<entt::entity> entities;
 

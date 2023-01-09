@@ -4,6 +4,7 @@ extern "C"
 }
 
 #include "../include/Game.h"
+#include "../include/AssetManager.h"
 #include <chrono>
 
 int main(void) 
@@ -37,6 +38,8 @@ int main(void)
         // Update the elapsed time variable for the next frame
         elapsedTime = currentTime;
     }
+
+    AssetManager::DeleteInstance();
 
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
