@@ -105,6 +105,16 @@ struct TaskStateChanged
     }
 };
 
+struct UnitState
+{
+    enum Value
+    {
+        IDLE,
+        WALKING,
+        GATHERING
+    } Value = IDLE;
+};
+
 struct SelectedCell
 {
     Pair pair;
@@ -128,4 +138,9 @@ struct IsMoved
     {
         Value = value;
     }
+};
+
+enum Event
+{
+    MovementChanged
 };
