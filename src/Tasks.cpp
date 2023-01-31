@@ -9,16 +9,12 @@
 
 using namespace std;
 
-// This is a bad practice, returning pointer to vector item
-static vector<pair<entt::entity, Timer>> timers;
-
 static bool gridEqual(Pair pair1, Pair pair2);
-static Timer *getEntityTimer(entt::entity id);
-static void deleteEntityTimer(entt::entity id);
+static void setNotGatheringState(IsMoved& isMoved, TaskState& state);
 
 void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 {
-    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved, TaskStateChanged>();
+    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved, TaskStateChanged, Timer>();
     for(auto entity: view)
     {
         TaskState& state = view.get<TaskState>(entity);
@@ -27,6 +23,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
         SelectedCell& cell = view.get<SelectedCell>(entity);
         IsMoved& isMoved = view.get<IsMoved>(entity);
         TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
+        Timer& timer = view.get<Timer>(entity);
 
         Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
@@ -55,55 +52,34 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
 
             if (gridEqual(unitGrid, resourceGrid))
             {
-                Timer timer;
                 timer.Start(5);
-
-                pair<entt::entity, Timer> pair(entity, timer);
-                timers.push_back(pair);
 
                 state.Value = TaskState::GATHERING;
                 stateChanged.Value = true;
             }
 
-            if(isMoved.Value)
-            {
-                isMoved = false;
-                deleteEntityTimer(entity);
-                state.Value = TaskState::NOT_GATHERING;
-            }
+            setNotGatheringState(isMoved, state);
             break;
         }
 
         case TaskState::GATHERING:
         {
             stateChanged.Value = false;
-            Timer *timer = getEntityTimer(entity);
 
-            if (timer == nullptr)
-            {
-                runtime_error("If unit is in this state, timer should not be null!");
-            }
-
-            timer->Update();
-            if (timer->Finished())
+            timer.Update();
+            if (timer.Finished())
             {
                 state.Value = TaskState::TO_BASE;
                 stateChanged.Value = true;
             }
 
-            if(isMoved.Value)
-            {
-                isMoved = false;
-                deleteEntityTimer(entity);
-                state.Value = TaskState::NOT_GATHERING;
-            }
+            setNotGatheringState(isMoved, state);
             break;
         }
 
         case TaskState::TO_BASE:
         {
             stateChanged.Value = false;
-            deleteEntityTimer(entity);
 
             if (gridEqual(unitGrid, baseGrid))
             {
@@ -112,11 +88,7 @@ void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
                 stateChanged.Value = true;
             }
 
-            if(isMoved.Value)
-            {
-                isMoved = false;
-                state.Value = TaskState::NOT_GATHERING;
-            }
+            setNotGatheringState(isMoved, state);
             break;
         }
 
@@ -233,29 +205,11 @@ static bool gridEqual(Pair pair1, Pair pair2)
     return (pair1.first == pair2.first) && (pair1.second == pair2.second);
 }
 
-// This is a bad practice, returning pointer to vector item
-static Timer *getEntityTimer(entt::entity id)
+static void setNotGatheringState(IsMoved& isMoved, TaskState& state)
 {
-    Timer *timer = nullptr;
-
-    for(size_t i = 0; i < timers.size(); i++)
+    if(isMoved.Value)
     {
-        if(id == timers[i].first)
-        {
-            timer = &timers[i].second;
-        }
-    }
-
-    return timer;
-}
-
-static void deleteEntityTimer(entt::entity id)
-{
-    for(size_t i = 0; i < timers.size(); i++)
-    {
-        if(id == timers[i].first)
-        {
-            timers.erase(timers.begin() + i);
-        }
+        isMoved.Value = false;
+        state.Value = TaskState::NOT_GATHERING;
     }
 }

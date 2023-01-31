@@ -2,6 +2,7 @@
 
 #include "../include/AssetManager.h"
 #include "../include/Types.h"
+#include "../include/Timer.h"
 
 const Vector2 BASE = {128, -32};
 const Vector2 RESOURCE = {-224, -256};
@@ -37,6 +38,7 @@ void Scene::CreatingWorkers()
         registry.emplace<SelectedCell>(entity);
         registry.emplace<IsMoved>(entity, false);
         registry.emplace<TaskStateChanged>(entity, false);
+        registry.emplace<Timer>(entity);
     }
 
     float posX = 0.0f;
