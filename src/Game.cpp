@@ -30,6 +30,7 @@ Game::Game()
     hud.push_back(new UnitSelection("Character_Icon.png", camera, 20, 20, 280, 541));
 
     SetTargetFPS(60);
+    InitSystem();
 }
 
 Game::~Game()

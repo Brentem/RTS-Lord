@@ -39,6 +39,7 @@ void Scene::CreatingWorkers()
         registry.emplace<IsMoved>(entity, false);
         registry.emplace<TaskStateChanged>(entity, false);
         registry.emplace<Timer>(entity);
+        registry.emplace<UnitState>(entity);
     }
 
     float posX = 0.0f;

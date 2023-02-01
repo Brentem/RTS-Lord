@@ -4,6 +4,7 @@
 #include "../include/Pathfinding.h"
 #include "../include/2DMap.h"
 #include "../include/Tasks.h"
+#include "../include/Subjects.h"
 
 #include <stdio.h>
 
@@ -18,6 +19,14 @@ void updatePosition(Scene& scene, float deltaT);
 
 Pair getPair(Vector2 position);
 float getPositionIndex(int pairIndex);
+
+UnitStateMachineObserver stateObserver;
+Subject unitStateMachineSubject;
+
+void InitSystem()
+{
+    unitStateMachineSubject.AddObserver(static_cast<Observer*>(&stateObserver));
+}
 
 // Maybe this function does too much
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera, float deltaT)
@@ -192,6 +201,9 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
 
                 path = newPath;
                 isMoved = true;
+
+                // Temporary test
+                unitStateMachineSubject.notify(scene.registry, entity, Event::WALKING);
             }
         }
 
@@ -270,6 +282,20 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
             }
         }
     }
+
+    // Temporary test
+    auto testView = scene.registry.view<Path, UnitState>();
+    for(auto entity : testView)
+    {
+        UnitState& state = testView.get<UnitState>(entity);
+        Path& path = testView.get<Path>(entity);
+
+        if((path.empty()) && (state.Value == UnitState::WALKING))
+        {
+            unitStateMachineSubject.notify(scene.registry, entity, Event::IDLE);
+        }
+    }
+    // End of Temporary test
 }
 
 void updatePosition(Scene& scene, float deltaT)
