@@ -142,7 +142,6 @@ struct IsMoved
 
 enum Event
 {
-    MovementChanged
+    IDLE,
+    WALKING
 };
-
-typedef struct EntityRegistry_t_ EntityRegistry_t;
