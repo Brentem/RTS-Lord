@@ -1,10 +1,12 @@
 #include "../include/Observers.h"
 
+#include "../include/EntityRegistry.h"
+
 using namespace entt;
 
-void UnitStateMachineObserver::OnNotify(registry& registry, entity& entity, Event event)
+void UnitStateMachineObserver::OnNotify(EntityRegistry_t entityRegistry, Event event)
 {
-    UnitState& state = registry.get<UnitState>(entity);
+    UnitState& state = entityRegistry.registry.get<UnitState>(entityRegistry.entity);
 
     switch (event)
     {

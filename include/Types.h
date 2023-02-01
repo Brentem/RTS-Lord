@@ -144,3 +144,5 @@ enum Event
 {
     MovementChanged
 };
+
+typedef struct EntityRegistry_t_ EntityRegistry_t;

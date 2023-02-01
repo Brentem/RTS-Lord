@@ -17,7 +17,7 @@ void Subject::RemoveObserver(Observer* observer)
         return;
     }
 
-    for(size_t i = 0; i < observers_.size(); i++)
+    for(std::size_t i = 0; i < observers_.size(); i++)
     {
         if(observer == observers_[i])
         {
