@@ -5,6 +5,7 @@
 #include "../include/2DMap.h"
 #include "../include/Tasks.h"
 #include "../include/Subjects.h"
+#include "../include/StateMachine.h"
 
 #include <stdio.h>
 
@@ -29,6 +30,15 @@ void InitSystem()
     unitStateMachineSubject.AddObserver(static_cast<Observer*>(&stateObserver));
 }
 
+static void RunStateMachine(Scene& scene)
+{
+    auto view = scene.registry.view<UnitState>();
+    for(auto entity : view)
+    {
+        UnitStateMachine(scene.registry, entity);
+    }
+}
+
 // Maybe this function does too much
 void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection, vector<vector<Tile>>& grid, Camera2D camera, float deltaT)
 {
@@ -41,12 +51,12 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     setSelectedCell(scene, *mouseInfo, mapInfo, grid); // This function is important for the other functions to function properly.
     CheckResources(scene, mapInfo, *mouseInfo);
     CheckBases(scene, mapInfo, *mouseInfo, grid);
-    CheckResourceClick(scene, mapInfo);
+    CheckResourceClick(scene, unitStateMachineSubject, mapInfo);
     CheckResourceReached(scene, unitStateMachineSubject, mapInfo);
     CheckBaseReached(scene, unitStateMachineSubject, mapInfo);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
     setGatheringPath(scene, mapInfo, grid);
-    //GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
+    RunStateMachine(scene);
     setTargetPosition(scene, mapInfo, camera);
     updatePosition(scene, deltaT);
 }
@@ -172,16 +182,12 @@ void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<
 
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera)
 {
-    auto view = scene.registry.view<EntityPosition, IsSelected, Path, IsMoved, TaskState, TaskPositions, TaskStateChanged>();
+    auto view = scene.registry.view<EntityPosition, IsSelected, Path>();
     for(auto entity : view)
     {
         IsSelected& isSelected = view.get<IsSelected>(entity);
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Path& path = view.get<Path>(entity);
-        IsMoved& isMoved = view.get<IsMoved>(entity);
-        TaskState& state = view.get<TaskState>(entity);
-        TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
-        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
         Pair startGridCell = GetGridPosition(GetPositionOnMap(entityPosition.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
 
         if(isSelected.Value && mouseInfo->giveNewTarget)
@@ -205,27 +211,9 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
                 }
 
                 path = newPath;
-                isMoved = true;
 
-                // Temporary test
                 unitStateMachineSubject.notify(scene.registry, entity, Event::CLICKED_NEW_POSITION);
             }
-        }
-
-        // Find a better way to do this.
-        // StateChanged is used so that in setTargetPosition the path will actually be popped back.
-        // This means that the path won't reinitialize again.
-        if((state.Value == TaskState::TO_RESOURCE) && stateChanged.Value)
-        {
-            Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
-            Pair targetGridCell = GetValidTargetGridCell(startGridCell, resourceGridCell, grid);
-            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
-        }
-        else if((state.Value == TaskState::TO_BASE) && stateChanged.Value)
-        {
-            Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
-            Pair targetGridCell = GetValidTargetGridCell(startGridCell, baseGridCell, grid);
-            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
     }
     mouseInfo->giveNewTarget = false;
@@ -243,15 +231,16 @@ void setGatheringPath(Scene& scene, MapInfo mapInfo, vector<vector<Tile>>& grid)
 
         Pair startGridCell = GetGridPosition(GetPositionOnMap(entityPosition.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
 
-        if((flags.GatheringActivated) && (!flags.GatheringDone) && (flags.SetGatheringPath))
+        if((flags.GatheringActivated) && (flags.SetGatheringPath))
         {
             flags.SetGatheringPath = false;
             Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, resourceGridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
         }
-        else if(flags.GatheringActivated && flags.GatheringDone)
+        else if((flags.GatheringActivated) && (flags.SetBasePath))
         {
+            flags.SetBasePath = false;
             Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
             Pair targetGridCell = GetValidTargetGridCell(startGridCell, baseGridCell, grid);
             path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
@@ -314,21 +303,25 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
                 path.pop_back();
             }
         }
-    }
-
-    // Temporary test
-    auto testView = scene.registry.view<Path, UnitState>();
-    for(auto entity : testView)
-    {
-        UnitState& state = testView.get<UnitState>(entity);
-        Path& path = testView.get<Path>(entity);
-
-        if((path.empty()) && (state.Value == UnitState::WALKING))
+        else
         {
             unitStateMachineSubject.notify(scene.registry, entity, Event::PATH_EMPTY);
         }
     }
-    // End of Temporary test
+
+    // // Temporary test
+    // auto testView = scene.registry.view<Path, UnitState>();
+    // for(auto entity : testView)
+    // {
+    //     UnitState& state = testView.get<UnitState>(entity);
+    //     Path& path = testView.get<Path>(entity);
+
+    //     if((path.empty()) && (state.Value == UnitState::WALKING))
+    //     {
+    //         unitStateMachineSubject.notify(scene.registry, entity, Event::PATH_EMPTY);
+    //     }
+    // }
+    // // End of Temporary test
 }
 
 void updatePosition(Scene& scene, float deltaT)

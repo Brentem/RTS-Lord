@@ -10,96 +10,6 @@
 using namespace std;
 
 static bool gridEqual(Pair pair1, Pair pair2);
-static void setNotGatheringState(IsMoved& isMoved, TaskState& state);
-
-void GatheringTask(Scene &scene, MouseInfo mouseInfo, MapInfo mapInfo)
-{
-    auto view = scene.registry.view<TaskState, EntityPosition, TaskPositions, SelectedCell, IsMoved, TaskStateChanged, Timer>();
-    for(auto entity: view)
-    {
-        TaskState& state = view.get<TaskState>(entity);
-        EntityPosition& position = view.get<EntityPosition>(entity);
-        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
-        SelectedCell& cell = view.get<SelectedCell>(entity);
-        IsMoved& isMoved = view.get<IsMoved>(entity);
-        TaskStateChanged& stateChanged = view.get<TaskStateChanged>(entity);
-        Timer& timer = view.get<Timer>(entity);
-
-        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
-        Pair selectedGrid = cell.pair;
-
-        switch (state.Value)
-        {
-        case TaskState::NOT_GATHERING:
-        {
-            stateChanged.Value = false;
-
-            if (gridEqual(resourceGrid, selectedGrid))
-            {
-                state.Value = TaskState::TO_RESOURCE;
-                stateChanged.Value = true;
-            }
-
-            isMoved.Value = false;
-            break;
-        }
-
-        case TaskState::TO_RESOURCE:
-        {
-            stateChanged.Value = false;
-
-            if (gridEqual(unitGrid, resourceGrid))
-            {
-                timer.Start(5);
-
-                state.Value = TaskState::GATHERING;
-                stateChanged.Value = true;
-            }
-
-            setNotGatheringState(isMoved, state);
-            break;
-        }
-
-        case TaskState::GATHERING:
-        {
-            stateChanged.Value = false;
-
-            timer.Update();
-            if (timer.Finished())
-            {
-                state.Value = TaskState::TO_BASE;
-                stateChanged.Value = true;
-            }
-
-            setNotGatheringState(isMoved, state);
-            break;
-        }
-
-        case TaskState::TO_BASE:
-        {
-            stateChanged.Value = false;
-
-            if (gridEqual(unitGrid, baseGrid))
-            {
-                scene.gold += 10;
-                state.Value = state.TO_RESOURCE;
-                stateChanged.Value = true;
-            }
-
-            setNotGatheringState(isMoved, state);
-            break;
-        }
-
-        default:
-        {
-            throw runtime_error("Unrecognized state");
-            break;
-        }
-        }
-    }
-}
 
 void CheckResources(Scene& scene, MapInfo mapInfo, MouseInfo& mouseInfo)
 {
@@ -199,7 +109,7 @@ void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vec
     }
 }
 
-void CheckResourceClick(Scene& scene, MapInfo mapInfo)
+void CheckResourceClick(Scene& scene, Subject& subject, MapInfo mapInfo)
 {
     auto view = scene.registry.view<TaskPositions, SelectedCell, GatheringFlags>();
     for(auto entity : view)
@@ -213,8 +123,9 @@ void CheckResourceClick(Scene& scene, MapInfo mapInfo)
 
         if (gridEqual(resourceGrid, selectedGrid))
         {
-            gatheringFlags.GatheringActivated = true;
-            gatheringFlags.SetGatheringPath = true;
+            // gatheringFlags.GatheringActivated = true;
+            // gatheringFlags.SetGatheringPath = true;
+            subject.notify(scene.registry, entity, Event::CLICKED_ON_RESOURCE);
         }
     }
 }
@@ -226,7 +137,7 @@ void CheckResourceReached(Scene& scene, Subject& subject, MapInfo mapInfo)
     for(auto entity : view)
     {
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
-        SelectedCell& cell = view.get<SelectedCell>(entity);
+        // SelectedCell& cell = view.get<SelectedCell>(entity);
         EntityPosition& position = view.get<EntityPosition>(entity);
 
         Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
@@ -246,7 +157,7 @@ void CheckBaseReached(Scene& scene, Subject& subject, MapInfo mapInfo)
     for(auto entity : view)
     {
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
-        SelectedCell& cell = view.get<SelectedCell>(entity);
+        // SelectedCell& cell = view.get<SelectedCell>(entity);
         EntityPosition& position = view.get<EntityPosition>(entity);
 
         Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
@@ -262,13 +173,4 @@ void CheckBaseReached(Scene& scene, Subject& subject, MapInfo mapInfo)
 static bool gridEqual(Pair pair1, Pair pair2)
 {
     return (pair1.first == pair2.first) && (pair1.second == pair2.second);
-}
-
-static void setNotGatheringState(IsMoved& isMoved, TaskState& state)
-{
-    if(isMoved.Value)
-    {
-        isMoved.Value = false;
-        state.Value = TaskState::NOT_GATHERING;
-    }
 }

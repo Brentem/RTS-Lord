@@ -5,6 +5,7 @@ extern "C"
     #include "raylib.h"
 }
 
+#include <queue>
 #include <vector>
 #include <set>
 
@@ -84,27 +85,6 @@ struct TaskPositions
     Vector2 resourcePosition;
 };
 
-struct TaskState
-{
-    enum Value
-    {
-        NOT_GATHERING,
-        TO_RESOURCE,
-        GATHERING,
-        TO_BASE
-    } Value;
-};
-
-struct TaskStateChanged
-{
-    bool Value;
-
-    TaskStateChanged(bool value)
-    {
-        Value = value;
-    }
-};
-
 struct UnitState
 {
     enum Value
@@ -130,33 +110,30 @@ struct IsSelected
     }
 };
 
-struct IsMoved
-{
-    bool Value;
-
-    IsMoved(bool value)
-    {
-        Value = value;
-    }
-};
-
 enum Event
 {
+    NO_EVENT,
     PATH_EMPTY,
     CLICKED_NEW_POSITION,
+    CLICKED_ON_RESOURCE,
     REACHED_RESOURCE,
     REACHED_BASE
 };
 
+typedef std::queue<Event> EventQueue;
+
 struct GatheringFlags
 {
     bool GatheringActivated;
-    bool GatheringDone;
     bool SetGatheringPath;
+    bool SetBasePath;
+    bool GatheringDone;
 
     GatheringFlags()
     {
         GatheringActivated = false;
+        SetGatheringPath = false;
+        SetBasePath = false;
         GatheringDone = false;
     }
 };

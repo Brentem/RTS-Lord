@@ -33,14 +33,12 @@ void Scene::CreatingWorkers()
         registry.emplace<IsSelected>(entity, false);
         registry.emplace<EntityType>(entity);
         registry.emplace<Path>(entity);
-        registry.emplace<TaskState>(entity);
         registry.emplace<TaskPositions>(entity);
         registry.emplace<SelectedCell>(entity);
-        registry.emplace<IsMoved>(entity, false);
-        registry.emplace<TaskStateChanged>(entity, false);
         registry.emplace<Timer>(entity);
         registry.emplace<UnitState>(entity);
         registry.emplace<GatheringFlags>(entity);
+        registry.emplace<EventQueue>(entity);
     }
 
     float posX = 0.0f;
@@ -51,7 +49,7 @@ void Scene::CreatingWorkers()
     AssetManager* manager = AssetManager::GetInstance();
     Texture2D characterTexture = manager->GetTexture("Character_Down2.png");
 
-    auto view = registry.view<EntityPosition, Texture2D, EntitySize, EntityType, TaskState, TaskPositions, SelectedCell>();
+    auto view = registry.view<EntityPosition, Texture2D, EntitySize, EntityType, TaskPositions, SelectedCell>();
     for(auto entity : view)
     {
         if(counter % 10 == 0)
@@ -64,7 +62,6 @@ void Scene::CreatingWorkers()
         Texture2D& texture = view.get<Texture2D>(entity);
         EntitySize& size = view.get<EntitySize>(entity);
         EntityType& type = view.get<EntityType>(entity);
-        TaskState& taskState = view.get<TaskState>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
 
@@ -72,7 +69,6 @@ void Scene::CreatingWorkers()
         texture = characterTexture;
         size = {32.0f, 32.0f};
         type.Value = EntityType::Worker;
-        taskState.Value = TaskState::NOT_GATHERING;
         taskPositions = {BASE, {0.0f, 0.0f}};
         cell.pair = Pair(0, 0);
 

@@ -7,23 +7,33 @@
 using namespace std;
 using namespace entt;
 
-static void changeIdleState(UnitState& state, Event event);
+static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event);
 static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event event);
 static void changeGatheringState(UnitState& state, Timer& timer, GatheringFlags& flags, Event event);
 static void emptyGatheringFlags(GatheringFlags& flags);
+static void checkTimer(UnitState& state, Timer& timer, GatheringFlags& flags);
 
-void UnitStateMachine(registry& registry, entity entity, Event event)
+void UnitStateMachine(registry& registry, entity entity/*, Event event*/)
 {
     UnitState& state = registry.get<UnitState>(entity);
     GatheringFlags& gatheringFlags = registry.get<GatheringFlags>(entity);
     Timer& timer = registry.get<Timer>(entity);
+    EventQueue& fifo = registry.get<EventQueue>(entity);
+
+    Event event = Event::NO_EVENT;
+
+    if(!fifo.empty())
+    {
+        event = fifo.front();
+        fifo.pop();
+    }
 
     switch (state.Value)
     {
     case UnitState::IDLE:
         /* code */
         // RunIdleAnimation
-        changeIdleState(state, event);
+        handleEventIdle(state, gatheringFlags, event);
         break;
 
     case UnitState::WALKING:
@@ -33,34 +43,13 @@ void UnitStateMachine(registry& registry, entity entity, Event event)
 
     case UnitState::GATHERING:
         // RunGatheringAnimation
-
-        if(!timer.Started())
-        {
-            timer.Start(5);
-        }
-
-        timer.Update();
-
-        if(timer.Finished())
-        {
-            gatheringFlags.GatheringDone = true;
-            state.Value = UnitState::WALKING;
-        }
-
+        checkTimer(state, timer, gatheringFlags);
         changeGatheringState(state, timer, gatheringFlags, event);
         break;
     
     default:
         throw runtime_error("Unrecognized state");
         break;
-    }
-}
-
-static void changeIdleState(UnitState& state, Event event)
-{
-    if(event == Event::CLICKED_NEW_POSITION)
-    {
-        state.Value = UnitState::WALKING;
     }
 }
 
@@ -74,12 +63,43 @@ static void changeGatheringState(UnitState& state, Timer& timer, GatheringFlags&
     }
 }
 
+static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event)
+{
+    switch (event)
+    {
+    case CLICKED_ON_RESOURCE:
+        flags.GatheringActivated = true;
+        flags.SetGatheringPath = true;
+        break;
+
+    case CLICKED_NEW_POSITION:
+        state.Value = UnitState::WALKING;
+        break;
+    
+    default:
+        break;
+    }
+}
+
 static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event event)
 {
     switch (event)
     {
     case Event::PATH_EMPTY:
-        state.Value = UnitState::IDLE;
+        if(!flags.GatheringActivated)
+        {
+            state.Value = UnitState::IDLE;
+        }
+        break;
+
+    case CLICKED_ON_RESOURCE:
+        if(!flags.GatheringActivated)
+        {
+            flags.GatheringActivated = true;
+            flags.SetGatheringPath = true;
+            flags.GatheringDone = false;
+            flags.SetBasePath = false;
+        }
         break;
 
     case Event::CLICKED_NEW_POSITION:
@@ -88,11 +108,18 @@ static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event ev
         break;
 
     case Event::REACHED_RESOURCE:
-        state.Value = UnitState::GATHERING;
+        if((flags.GatheringActivated) && !(flags.GatheringDone))
+        {
+            state.Value = UnitState::GATHERING;
+        }
         break;
 
     case Event::REACHED_BASE:
-        flags.GatheringDone = false;
+        if(flags.GatheringActivated)
+        {
+            flags.SetGatheringPath = true;
+            flags.GatheringDone = false;
+        }
         break;
 
     default:
@@ -103,6 +130,27 @@ static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event ev
 static void emptyGatheringFlags(GatheringFlags& flags)
 {
     flags.GatheringActivated = false;
-    flags.GatheringDone = false;
     flags.SetGatheringPath = false;
+    flags.SetBasePath = false;
+    flags.GatheringDone = false;
+}
+
+static void checkTimer(UnitState& state, Timer& timer, GatheringFlags& flags)
+{
+    if(!flags.GatheringDone)
+    {
+        if(!timer.Started())
+        {
+            timer.Start(5);
+        }
+
+        timer.Update();
+
+        if(timer.Finished())
+        {
+            flags.SetBasePath = true;
+            flags.GatheringDone = true;
+            state.Value = UnitState::WALKING;
+        }
+    }
 }
