@@ -40,6 +40,7 @@ void Scene::CreatingWorkers()
         registry.emplace<TaskStateChanged>(entity, false);
         registry.emplace<Timer>(entity);
         registry.emplace<UnitState>(entity);
+        registry.emplace<GatheringFlags>(entity);
     }
 
     float posX = 0.0f;

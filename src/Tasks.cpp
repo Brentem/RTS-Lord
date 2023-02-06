@@ -199,6 +199,65 @@ void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vec
     }
 }
 
+void CheckResourceClick(Scene& scene, MapInfo mapInfo)
+{
+    auto view = scene.registry.view<TaskPositions, SelectedCell, GatheringFlags>();
+    for(auto entity : view)
+    {
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+        GatheringFlags& gatheringFlags = view.get<GatheringFlags>(entity);
+
+        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair selectedGrid = cell.pair;
+
+        if (gridEqual(resourceGrid, selectedGrid))
+        {
+            gatheringFlags.GatheringActivated = true;
+            gatheringFlags.SetGatheringPath = true;
+        }
+    }
+}
+
+void CheckResourceReached(Scene& scene, Subject& subject, MapInfo mapInfo)
+{
+    auto view = scene.registry.view<TaskPositions, SelectedCell, EntityPosition>();
+
+    for(auto entity : view)
+    {
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+        EntityPosition& position = view.get<EntityPosition>(entity);
+
+        Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+
+        if (gridEqual(unitGrid, resourceGrid))
+        {
+            subject.notify(scene.registry, entity, Event::REACHED_RESOURCE);
+        }
+    }
+}
+
+void CheckBaseReached(Scene& scene, Subject& subject, MapInfo mapInfo)
+{
+    auto view = scene.registry.view<TaskPositions, SelectedCell, EntityPosition>();
+
+    for(auto entity : view)
+    {
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+        SelectedCell& cell = view.get<SelectedCell>(entity);
+        EntityPosition& position = view.get<EntityPosition>(entity);
+
+        Pair baseGrid = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+        Pair unitGrid = GetGridPosition(GetPositionOnMap(position.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
+
+        if (gridEqual(unitGrid, baseGrid))
+        {
+            subject.notify(scene.registry, entity, Event::REACHED_BASE);
+        }
+    }
+}
 
 static bool gridEqual(Pair pair1, Pair pair2)
 {

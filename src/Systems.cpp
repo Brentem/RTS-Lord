@@ -13,6 +13,7 @@ using namespace std;
 void checkIfSelected(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectangle selection);
 void setSelectedCell(Scene& scene, MouseInfo mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid);
 void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<Tile>>& grid, Camera2D camera);
+void setGatheringPath(Scene& scene, MapInfo mapInfo, vector<vector<Tile>>& grid);
 Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid);
 void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera);
 void updatePosition(Scene& scene, float deltaT);
@@ -40,8 +41,12 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     setSelectedCell(scene, *mouseInfo, mapInfo, grid); // This function is important for the other functions to function properly.
     CheckResources(scene, mapInfo, *mouseInfo);
     CheckBases(scene, mapInfo, *mouseInfo, grid);
+    CheckResourceClick(scene, mapInfo);
+    CheckResourceReached(scene, unitStateMachineSubject, mapInfo);
+    CheckBaseReached(scene, unitStateMachineSubject, mapInfo);
     setPath(scene, mouseInfo, mapInfo, grid, camera);
-    GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
+    setGatheringPath(scene, mapInfo, grid);
+    //GatheringTask(scene, *mouseInfo, mapInfo); // Probably should be changed
     setTargetPosition(scene, mapInfo, camera);
     updatePosition(scene, deltaT);
 }
@@ -203,7 +208,7 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
                 isMoved = true;
 
                 // Temporary test
-                unitStateMachineSubject.notify(scene.registry, entity, Event::WALKING);
+                unitStateMachineSubject.notify(scene.registry, entity, Event::CLICKED_NEW_POSITION);
             }
         }
 
@@ -224,6 +229,34 @@ void setPath(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, vector<vector<
         }
     }
     mouseInfo->giveNewTarget = false;
+}
+
+void setGatheringPath(Scene& scene, MapInfo mapInfo, vector<vector<Tile>>& grid)
+{
+    auto view = scene.registry.view<EntityPosition, Path, TaskPositions, GatheringFlags>();
+    for(auto entity : view)
+    {
+        EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Path& path = view.get<Path>(entity);
+        TaskPositions& taskPositions = view.get<TaskPositions>(entity);
+        GatheringFlags& flags = view.get<GatheringFlags>(entity);
+
+        Pair startGridCell = GetGridPosition(GetPositionOnMap(entityPosition.currentPosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+
+        if((flags.GatheringActivated) && (!flags.GatheringDone) && (flags.SetGatheringPath))
+        {
+            flags.SetGatheringPath = false;
+            Pair resourceGridCell = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, resourceGridCell, grid);
+            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+        }
+        else if(flags.GatheringActivated && flags.GatheringDone)
+        {
+            Pair baseGridCell = GetGridPosition(GetPositionOnMap(taskPositions.basePosition, mapInfo.mapWidth, mapInfo.mapHeight), mapInfo.cellSize);
+            Pair targetGridCell = GetValidTargetGridCell(startGridCell, baseGridCell, grid);
+            path = GetPath(mapInfo, startGridCell, targetGridCell, grid);
+        }
+    }
 }
 
 Pair GetValidTargetGridCell(Pair startGridCell, Pair selectedTargetGridCell, vector<vector<Tile>>& grid){
@@ -292,7 +325,7 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
 
         if((path.empty()) && (state.Value == UnitState::WALKING))
         {
-            unitStateMachineSubject.notify(scene.registry, entity, Event::IDLE);
+            unitStateMachineSubject.notify(scene.registry, entity, Event::PATH_EMPTY);
         }
     }
     // End of Temporary test

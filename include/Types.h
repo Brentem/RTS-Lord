@@ -142,6 +142,21 @@ struct IsMoved
 
 enum Event
 {
-    IDLE,
-    WALKING
+    PATH_EMPTY,
+    CLICKED_NEW_POSITION,
+    REACHED_RESOURCE,
+    REACHED_BASE
+};
+
+struct GatheringFlags
+{
+    bool GatheringActivated;
+    bool GatheringDone;
+    bool SetGatheringPath;
+
+    GatheringFlags()
+    {
+        GatheringActivated = false;
+        GatheringDone = false;
+    }
 };
