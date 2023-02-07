@@ -37,7 +37,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     updatePosition(scene, deltaT);
 }
 
-void RenderSystem(Scene& scene, MapInfo mapInfo)
+void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
 {
     auto view = scene.registry.view<EntityPosition, Texture2D, EntityType>();
     for(auto entity : view)
@@ -55,18 +55,33 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
         }
     }
 
-    auto secondView = scene.registry.view<EntityPosition, Texture2D, EntitySize, IsSelected>();
+    auto secondView = scene.registry.view<EntityPosition, Animation, EntitySize, IsSelected>();
     for(auto entity : secondView)
     {
         EntityPosition& entityPosition = secondView.get<EntityPosition>(entity);
-        Texture2D& texture = secondView.get<Texture2D>(entity);
+        //Texture2D& texture = secondView.get<Texture2D>(entity);
         EntitySize& size = secondView.get<EntitySize>(entity);
         IsSelected& isSelected = secondView.get<IsSelected>(entity);
 
         Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
+
+        Animation& animation = secondView.get<Animation>(entity);
+
+        // TODO should be property of the entity
+        float speed = 50.0f * deltaT;
+
+        animation.framesCounter += speed;
+        if (animation.framesCounter >= 10){
+            animation.framesCounter = 0;
+            animation.currentFrame++;
+
+            if (animation.currentFrame > animation.frameCount) animation.currentFrame = 0;
+        }
+        
         Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
-        DrawTextureRec(texture, frameRec, characterPositionOnMap, WHITE);
+        frameRec.x = (float)animation.currentFrame*(float)size.width;
+        DrawTextureRec(animation.texture, frameRec, characterPositionOnMap, WHITE);
 
         if(isSelected.Value)
         {

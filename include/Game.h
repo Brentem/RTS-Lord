@@ -17,7 +17,7 @@ public:
     ~Game();
     void HandleInput();
     void Update(float deltaT);
-    void Render();
+    void Render(float deltaT);
 
 private:
     MonitorSettings monitorSettings;

@@ -94,6 +94,13 @@ struct TaskState
         TO_BASE
     } Value;
 };
+struct Animation
+{
+    Texture2D texture;
+    int frameCount = 0;
+    int currentFrame = 0;
+    float framesCounter = 0;
+};
 
 struct TaskStateChanged
 {

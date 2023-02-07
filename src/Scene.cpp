@@ -27,7 +27,8 @@ void Scene::CreatingWorkers()
     {
         entt::entity entity = registry.create();
         registry.emplace<EntityPosition>(entity);
-        registry.emplace<Texture2D>(entity);
+        // registry.emplace<Texture2D>(entity);
+        registry.emplace<Animation>(entity);
         registry.emplace<EntitySize>(entity);
         registry.emplace<IsSelected>(entity, false);
         registry.emplace<EntityType>(entity);
@@ -45,9 +46,9 @@ void Scene::CreatingWorkers()
     int counter = 0;
 
     AssetManager* manager = AssetManager::GetInstance();
-    Texture2D characterTexture = manager->GetTexture("Character_Down2.png");
+    Texture2D characterTexture = manager->GetTexture("spritesheet_peasant_idle_S.png");
 
-    auto view = registry.view<EntityPosition, Texture2D, EntitySize, EntityType, TaskState, TaskPositions, SelectedCell>();
+    auto view = registry.view<EntityPosition, Animation, EntitySize, EntityType, TaskState, TaskPositions, SelectedCell>();
     for(auto entity : view)
     {
         if(counter % 10 == 0)
@@ -57,16 +58,24 @@ void Scene::CreatingWorkers()
         }
 
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
-        Texture2D& texture = view.get<Texture2D>(entity);
+        Animation& animation = view.get<Animation>(entity);
+        //Texture2D& texture = view.get<Texture2D>(entity);
         EntitySize& size = view.get<EntitySize>(entity);
         EntityType& type = view.get<EntityType>(entity);
         TaskState& taskState = view.get<TaskState>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
 
-        entityPosition = {{posX, posY}, {posX, posY}};
-        texture = characterTexture;
         size = {32.0f, 32.0f};
+        entityPosition = {{posX, posY}, {posX, posY}};
+
+        animation.texture = characterTexture;
+        animation.frameCount = characterTexture.width/size.width;
+        srand(time(0));
+        int random_number = rand() % animation.frameCount + 1;
+        animation.currentFrame = random_number;
+        //texture = characterTexture;
+
         type.Value = EntityType::Worker;
         taskState.Value = TaskState::NOT_GATHERING;
         taskPositions = {BASE, {0.0f, 0.0f}};

@@ -70,7 +70,7 @@ void Game::Update(float deltaT)
     unitSelection->selectedUnits = mouseInfo.selectedUnits;
 }
 
-void Game::Render()
+void Game::Render(float deltaT)
 {
     BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -78,7 +78,7 @@ void Game::Render()
 		    // draw the entire background image for the entire world. The camera will clip it to the screen
 		    DrawTexture(background, mapInfo.position.x, mapInfo.position.y, WHITE);
 
-            RenderSystem(*scene, mapInfo);
+            RenderSystem(*scene, mapInfo, deltaT);
 
             // Render selection box
             if(mouseInfo.isdragging){

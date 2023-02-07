@@ -32,7 +32,7 @@ int main(void)
 
         // Draw
         //----------------------------------------------------------------------------------
-        game.Render();
+        game.Render(deltaT.count());
         //----------------------------------------------------------------------------------
 
         // Update the elapsed time variable for the next frame
