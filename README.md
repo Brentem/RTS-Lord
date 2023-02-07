@@ -23,3 +23,4 @@ We decided to go for The One Year Game Jam, because it gives us a lot of time to
 * [Convert iterator to pointer?](https://stackoverflow.com/a/2160319)
 * [Checking if an iterator is valid](https://stackoverflow.com/a/2062968)
 * [Singleton in C++](https://refactoring.guru/design-patterns/singleton/cpp/example#example-1)
+* [Observer](https://gameprogrammingpatterns.com/observer.html)

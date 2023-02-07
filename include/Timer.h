@@ -11,4 +11,6 @@ class Timer
         void Start(float lifeTime);
         void Update();
         bool Finished();
+        bool Started();
+        void Stop();
 };
