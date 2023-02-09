@@ -34,3 +34,14 @@ bool Timer::Finished()
 
     return finished;
 }
+
+bool Timer::Started()
+{
+    return timerStarted;
+}
+
+void Timer::Stop()
+{
+    lifeTime = 0;
+    timerStarted = false;
+}

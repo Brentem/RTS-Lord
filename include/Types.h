@@ -5,6 +5,7 @@ extern "C"
     #include "raylib.h"
 }
 
+#include <queue>
 #include <vector>
 #include <set>
 
@@ -84,7 +85,7 @@ struct TaskPositions
     Vector2 resourcePosition;
 };
 
-struct TaskState
+struct UnitState
 {
     enum Value
     {
@@ -94,22 +95,13 @@ struct TaskState
         TO_BASE
     } Value;
 };
+
 struct Animation
 {
     Texture2D texture;
     int frameCount = 0;
     int currentFrame = 0;
     float framesCounter = 0;
-};
-
-struct TaskStateChanged
-{
-    bool Value;
-
-    TaskStateChanged(bool value)
-    {
-        Value = value;
-    }
 };
 
 struct SelectedCell
@@ -127,12 +119,30 @@ struct IsSelected
     }
 };
 
-struct IsMoved
+enum Event
 {
-    bool Value;
+    NO_EVENT,
+    PATH_EMPTY,
+    CLICKED_NEW_POSITION,
+    CLICKED_ON_RESOURCE,
+    REACHED_RESOURCE,
+    REACHED_BASE
+};
 
-    IsMoved(bool value)
+typedef std::queue<Event> EventQueue;
+
+struct GatheringFlags
+{
+    bool GatheringActivated;
+    bool SetGatheringPath;
+    bool SetBasePath;
+    bool GatheringDone;
+
+    GatheringFlags()
     {
-        Value = value;
+        GatheringActivated = false;
+        SetGatheringPath = false;
+        SetBasePath = false;
+        GatheringDone = false;
     }
 };
