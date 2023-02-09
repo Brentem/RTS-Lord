@@ -1,26 +1,29 @@
 #include "../include/StateMachine.h"
 
 #include "../include/Types.h"
+#include "../include/AssetManager.h"
 
 #include <stdexcept>
 
 using namespace std;
 using namespace entt;
 
-static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event);
-static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event event);
-static void changeGatheringState(UnitState& state, Timer& timer, GatheringFlags& flags, Event event);
+static void handleEventIdle(Animation& animation, UnitState& state, GatheringFlags& flags, Event event);
+static void handleEventWalking(Animation& animation, UnitState& state, GatheringFlags& flags, Event event);
+static void changeGatheringState(Animation& animation, UnitState& state, Timer& timer, GatheringFlags& flags, Event event);
 static void emptyGatheringFlags(GatheringFlags& flags);
 static void checkTimer(UnitState& state, Timer& timer, GatheringFlags& flags);
 
-void UnitStateMachine(registry& registry, entity entity/*, Event event*/)
+void UnitStateMachine(registry& registry, entity entity)
 {
     UnitState& state = registry.get<UnitState>(entity);
     GatheringFlags& gatheringFlags = registry.get<GatheringFlags>(entity);
     Timer& timer = registry.get<Timer>(entity);
     EventQueue& fifo = registry.get<EventQueue>(entity);
+    Animation& animation = registry.get<Animation>(entity);
 
     Event event = Event::NO_EVENT;
+    AssetManager* assetManager = AssetManager::GetInstance();
 
     if(!fifo.empty())
     {
@@ -31,21 +34,23 @@ void UnitStateMachine(registry& registry, entity entity/*, Event event*/)
     switch (state.Value)
     {
     case UnitState::IDLE:
-        /* code */
-        // RunIdleAnimation
-        handleEventIdle(state, gatheringFlags, event);
+    {
+        handleEventIdle(animation, state, gatheringFlags, event);
         break;
+    }
 
     case UnitState::WALKING:
-        // RunWalkingAnimation
-        handleEventWalking(state, gatheringFlags, event);
+    {
+        handleEventWalking(animation, state, gatheringFlags, event);
         break;
+    }
 
     case UnitState::GATHERING:
-        // RunGatheringAnimation
+    {
         checkTimer(state, timer, gatheringFlags);
-        changeGatheringState(state, timer, gatheringFlags, event);
+        changeGatheringState(animation, state, timer, gatheringFlags, event);
         break;
+    }
     
     default:
         throw runtime_error("Unrecognized state");
@@ -53,17 +58,26 @@ void UnitStateMachine(registry& registry, entity entity/*, Event event*/)
     }
 }
 
-static void changeGatheringState(UnitState& state, Timer& timer, GatheringFlags& flags, Event event)
+static void ChangeAnimation(Animation& animation, string spritesheet){
+        AssetManager* assetManager = AssetManager::GetInstance();
+
+        Animation newAnimation;
+        newAnimation.texture = assetManager->GetTexture(spritesheet);
+        animation = newAnimation;
+};
+
+static void changeGatheringState(Animation& animation, UnitState& state, Timer& timer, GatheringFlags& flags, Event event)
 {
     if(event == Event::CLICKED_NEW_POSITION)
     {
+        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png");      
         state.Value = UnitState::WALKING;
         timer.Stop();
         emptyGatheringFlags(flags);
     }
 }
 
-static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event)
+static void handleEventIdle(Animation& animation, UnitState& state, GatheringFlags& flags, Event event)
 {
     switch (event)
     {
@@ -74,6 +88,7 @@ static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event
 
     case CLICKED_NEW_POSITION:
         state.Value = UnitState::WALKING;
+        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png"); 
         break;
     
     default:
@@ -81,7 +96,7 @@ static void handleEventIdle(UnitState& state, GatheringFlags& flags, Event event
     }
 }
 
-static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event event)
+static void handleEventWalking(Animation& animation, UnitState& state, GatheringFlags& flags, Event event)
 {
     switch (event)
     {
@@ -89,6 +104,7 @@ static void handleEventWalking(UnitState& state, GatheringFlags& flags, Event ev
         if(!flags.GatheringActivated)
         {
             state.Value = UnitState::IDLE;
+            ChangeAnimation(animation, "spritesheet_peasant_idle_S.png"); 
         }
         break;
 

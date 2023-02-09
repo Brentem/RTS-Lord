@@ -91,7 +91,18 @@ void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
 
         Animation& animation = secondView.get<Animation>(entity);
+        ProcessAnimation(animation, size, deltaT, characterPosition);
 
+        if(isSelected.Value)
+        {
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
+        }
+    }
+
+    DrawText(TextFormat("Gold: %d", scene.gold), -200, -200, 12, WHITE);
+}
+
+void ProcessAnimation(Animation& animation, EntitySize& size, float deltaT, Vector2 characterPositionOnMap){
         // TODO should be property of the entity
         float speed = 50.0f * deltaT;
 
@@ -106,14 +117,6 @@ void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
         Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
         frameRec.x = (float)animation.currentFrame*(float)size.width;
         DrawTextureRec(animation.texture, frameRec, characterPositionOnMap, WHITE);
-
-        if(isSelected.Value)
-        {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
-        }
-    }
-
-    DrawText(TextFormat("Gold: %d", scene.gold), -200, -200, 12, WHITE);
 }
 
 void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)

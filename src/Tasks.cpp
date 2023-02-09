@@ -111,20 +111,17 @@ void CheckBases(Scene& scene, MapInfo& mapInfo, MouseInfo& mouseInfo, vector<vec
 
 void CheckResourceClick(Scene& scene, Subject& subject, MapInfo mapInfo)
 {
-    auto view = scene.registry.view<TaskPositions, SelectedCell, GatheringFlags>();
+    auto view = scene.registry.view<TaskPositions, SelectedCell>();
     for(auto entity : view)
     {
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
         SelectedCell& cell = view.get<SelectedCell>(entity);
-        GatheringFlags& gatheringFlags = view.get<GatheringFlags>(entity);
 
         Pair resourceGrid = GetGridPosition(GetPositionOnMap(taskPositions.resourcePosition, mapInfo.mapWidth, mapInfo.mapHeight), 32);
         Pair selectedGrid = cell.pair;
 
         if (gridEqual(resourceGrid, selectedGrid))
         {
-            // gatheringFlags.GatheringActivated = true;
-            // gatheringFlags.SetGatheringPath = true;
             subject.notify(scene.registry, entity, Event::CLICKED_ON_RESOURCE);
         }
     }

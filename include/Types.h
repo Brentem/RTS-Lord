@@ -89,11 +89,10 @@ struct UnitState
 {
     enum Value
     {
-        NOT_GATHERING,
-        TO_RESOURCE,
-        GATHERING,
-        TO_BASE
-    } Value;
+        IDLE,
+        WALKING,
+        GATHERING
+    } Value = IDLE;
 };
 
 struct Animation
