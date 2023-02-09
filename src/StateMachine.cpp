@@ -58,11 +58,19 @@ void UnitStateMachine(registry& registry, entity entity)
     }
 }
 
-static void ChangeAnimation(Animation& animation, string spritesheet){
+static void ChangeAnimation(Animation& animation, string spritesheet, float speed){
+        if(animation.currentSpritesheet == spritesheet){
+            return;
+        }
+
         AssetManager* assetManager = AssetManager::GetInstance();
 
         Animation newAnimation;
         newAnimation.texture = assetManager->GetTexture(spritesheet);
+        newAnimation.speed = speed;
+        newAnimation.currentSpritesheet = spritesheet;
+        newAnimation.width = animation.width;
+        newAnimation.frameCount = newAnimation.texture.width/animation.width;
         animation = newAnimation;
 };
 
@@ -70,7 +78,7 @@ static void changeGatheringState(Animation& animation, UnitState& state, Timer& 
 {
     if(event == Event::CLICKED_NEW_POSITION)
     {
-        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png");      
+        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png", 125.0f);      
         state.Value = UnitState::WALKING;
         timer.Stop();
         emptyGatheringFlags(flags);
@@ -88,7 +96,7 @@ static void handleEventIdle(Animation& animation, UnitState& state, GatheringFla
 
     case CLICKED_NEW_POSITION:
         state.Value = UnitState::WALKING;
-        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png"); 
+        ChangeAnimation(animation, "spritesheet_peasant_walking_N.png", 125.0f); 
         break;
     
     default:
@@ -104,7 +112,7 @@ static void handleEventWalking(Animation& animation, UnitState& state, Gathering
         if(!flags.GatheringActivated)
         {
             state.Value = UnitState::IDLE;
-            ChangeAnimation(animation, "spritesheet_peasant_idle_S.png"); 
+            ChangeAnimation(animation, "spritesheet_peasant_idle_S.png", 50.0f); 
         }
         break;
 

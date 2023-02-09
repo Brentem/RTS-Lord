@@ -95,7 +95,7 @@ void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
 
         if(isSelected.Value)
         {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, DARKBROWN);
         }
     }
 
@@ -103,10 +103,7 @@ void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
 }
 
 void ProcessAnimation(Animation& animation, EntitySize& size, float deltaT, Vector2 characterPositionOnMap){
-        // TODO should be property of the entity
-        float speed = 50.0f * deltaT;
-
-        animation.framesCounter += speed;
+        animation.framesCounter += animation.speed * deltaT;
         if (animation.framesCounter >= 10){
             animation.framesCounter = 0;
             animation.currentFrame++;

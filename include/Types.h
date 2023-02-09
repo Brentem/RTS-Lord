@@ -8,6 +8,7 @@ extern "C"
 #include <queue>
 #include <vector>
 #include <set>
+#include <string>
 
 #define MAX_UNITS_SELECTED 30
 
@@ -98,6 +99,9 @@ struct UnitState
 struct Animation
 {
     Texture2D texture;
+    std::string currentSpritesheet = "";
+    float speed = 50.0f;
+    int width;
     int frameCount = 0;
     int currentFrame = 0;
     float framesCounter = 0;

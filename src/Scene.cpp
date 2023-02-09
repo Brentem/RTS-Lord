@@ -71,6 +71,7 @@ void Scene::CreatingWorkers()
         entityPosition = {{posX, posY}, {posX, posY}};
 
         animation.texture = characterTexture;
+        animation.width = size.width;
         animation.frameCount = characterTexture.width/size.width;
         srand(time(0));
         int random_number = rand() % animation.frameCount + 1;
