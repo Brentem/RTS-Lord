@@ -61,7 +61,6 @@ void Scene::CreatingWorkers()
 
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
         Animation& animation = view.get<Animation>(entity);
-        //Texture2D& texture = view.get<Texture2D>(entity);
         EntitySize& size = view.get<EntitySize>(entity);
         EntityType& type = view.get<EntityType>(entity);
         TaskPositions& taskPositions = view.get<TaskPositions>(entity);
@@ -76,7 +75,6 @@ void Scene::CreatingWorkers()
         srand(time(0));
         int random_number = rand() % animation.frameCount + 1;
         animation.currentFrame = random_number;
-        //texture = characterTexture;
 
         type.Value = EntityType::Worker;
         taskPositions = {BASE, {0.0f, 0.0f}};

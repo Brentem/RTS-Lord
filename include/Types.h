@@ -58,10 +58,53 @@ struct MouseInfo
     bool giveNewTarget;
 };
 
+struct Direction
+{
+    enum DirectionValue
+    {
+        N,
+        NE,
+        E,
+        SE,
+        S,
+        SW,
+        W,
+        NW,
+        None
+    } Value = None;
+
+    static std::string toString(DirectionValue value) {
+        switch (value)
+        {
+        case DirectionValue::N:
+            return "N";
+        case DirectionValue::NE:
+            return "NE";
+        case DirectionValue::E:
+            return "E";
+        case DirectionValue::SE:
+            return "SE";
+        case DirectionValue::S:
+            return "S";
+        case DirectionValue::SW:
+            return "SW";
+        case DirectionValue::W:
+            return "W";
+        case DirectionValue::NW:
+            return "NW";
+        default:
+            return "S";
+        }
+    }
+
+};
+
+
 struct EntityPosition
 {
     Vector2 currentPosition;
     Vector2 targetPosition;
+    Direction direction;
 };
 
 struct EntitySize

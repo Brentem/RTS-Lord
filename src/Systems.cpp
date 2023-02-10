@@ -6,6 +6,7 @@
 #include "../include/Tasks.h"
 #include "../include/Subjects.h"
 #include "../include/StateMachine.h"
+#include "../include/AnimationManager.h"
 
 #include <stdio.h>
 
@@ -341,10 +342,11 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
 
 void updatePosition(Scene& scene, float deltaT)
 {
-    auto view = scene.registry.view<EntityPosition>();
+    auto view = scene.registry.view<EntityPosition, Animation>();
     for(auto entity : view)
     {
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Animation& animation = view.get<Animation>(entity);
         Vector2* currentPosition = &entityPosition.currentPosition;
         Vector2* targetPosition = &entityPosition.targetPosition;
 
@@ -353,9 +355,13 @@ void updatePosition(Scene& scene, float deltaT)
         // TODO should be property of the entity
         float speed = 50.0f * deltaT;   
         // TODO should be property of the entity AND calculated correctly          
-        float diagonalSpeed = speed / (sqrt(2));    
+        float diagonalSpeed = speed / (sqrt(2));  
+
+        Direction horizontalDirection; 
+        Direction verticalDirection; 
 
         if(targetPosition->x > currentPosition->x){
+            horizontalDirection.Value = Direction::E;
             if(isMovingDiagonally){
                 currentPosition->x += diagonalSpeed;
             } else{
@@ -365,6 +371,7 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->x < currentPosition->x){
+            horizontalDirection.Value = Direction::W;
             if(isMovingDiagonally){
                 currentPosition->x -= diagonalSpeed;
             } else{
@@ -374,6 +381,7 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->y > currentPosition->y){
+            verticalDirection.Value = Direction::S;
             if(isMovingDiagonally){
                 currentPosition->y += diagonalSpeed;
             } else{
@@ -383,12 +391,42 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->y < currentPosition->y){
+            verticalDirection.Value = Direction::N;
             if(isMovingDiagonally){
                 currentPosition->y -= diagonalSpeed;
             } else{
                 currentPosition->y -= speed;
             }
             if(targetPosition->y > currentPosition->y) currentPosition->y = targetPosition->y;
+        }
+
+        Direction newDirection;
+        if(isMovingDiagonally){
+            if(horizontalDirection.Value == Direction::E){
+                if(verticalDirection.Value == Direction::N){
+                    newDirection.Value = Direction::NE;
+                } else{
+                    newDirection.Value = Direction::SE;
+                }
+            } else{
+                if(verticalDirection.Value == Direction::N){
+                    newDirection.Value = Direction::NW;
+                } else{
+                    newDirection.Value = Direction::SW;
+                 }
+            }
+        } else{
+            if(horizontalDirection.Value != Direction::None){
+                newDirection.Value = horizontalDirection.Value;
+            } else{
+                newDirection.Value = verticalDirection.Value;
+            }
+        }
+
+        if(newDirection.Value != Direction::None && newDirection.Value != entityPosition.direction.Value){
+            entityPosition.direction = newDirection;
+            AnimationManager* animationManager = AnimationManager::GetInstance();
+            animationManager->ChangeDirection(animation, newDirection, "peasant_walking");
         }
     }
 }
