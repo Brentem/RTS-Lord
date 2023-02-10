@@ -15,8 +15,6 @@ void UnitStateMachineObserver::OnNotify(registry& registry, entity entity, Event
         return;
     }
 
-    // UnitStateMachine(registry, entity, event);
-    // fifo.push(event);
     checkEventQueue(fifo, event);
 }
 

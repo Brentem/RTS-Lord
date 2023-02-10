@@ -8,6 +8,7 @@ extern "C"
 #include <queue>
 #include <vector>
 #include <set>
+#include <string>
 
 #define MAX_UNITS_SELECTED 30
 
@@ -57,10 +58,53 @@ struct MouseInfo
     bool giveNewTarget;
 };
 
+struct Direction
+{
+    enum DirectionValue
+    {
+        N,
+        NE,
+        E,
+        SE,
+        S,
+        SW,
+        W,
+        NW,
+        None
+    } Value = None;
+
+    static std::string toString(DirectionValue value) {
+        switch (value)
+        {
+        case DirectionValue::N:
+            return "N";
+        case DirectionValue::NE:
+            return "NE";
+        case DirectionValue::E:
+            return "E";
+        case DirectionValue::SE:
+            return "SE";
+        case DirectionValue::S:
+            return "S";
+        case DirectionValue::SW:
+            return "SW";
+        case DirectionValue::W:
+            return "W";
+        case DirectionValue::NW:
+            return "NW";
+        default:
+            return "S";
+        }
+    }
+
+};
+
+
 struct EntityPosition
 {
     Vector2 currentPosition;
     Vector2 targetPosition;
+    Direction direction;
 };
 
 struct EntitySize
@@ -93,6 +137,17 @@ struct UnitState
         WALKING,
         GATHERING
     } Value = IDLE;
+};
+
+struct Animation
+{
+    Texture2D texture;
+    std::string currentSpritesheet = "";
+    float speed = 50.0f;
+    int width;
+    int frameCount = 0;
+    int currentFrame = 0;
+    float framesCounter = 0;
 };
 
 struct SelectedCell

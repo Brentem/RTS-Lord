@@ -75,6 +75,7 @@
 		"chrono": "cpp",
 		"codecvt": "cpp",
 		"iomanip": "cpp",
-		"filesystem": "cpp"
+		"filesystem": "cpp",
+		"iostream": "cpp"
 	}
 }

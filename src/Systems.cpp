@@ -6,6 +6,7 @@
 #include "../include/Tasks.h"
 #include "../include/Subjects.h"
 #include "../include/StateMachine.h"
+#include "../include/AnimationManager.h"
 
 #include <stdio.h>
 
@@ -61,7 +62,7 @@ void MovementSystem(Scene& scene, MouseInfo* mouseInfo, MapInfo mapInfo, Rectang
     updatePosition(scene, deltaT);
 }
 
-void RenderSystem(Scene& scene, MapInfo mapInfo)
+void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
 {
     auto view = scene.registry.view<EntityPosition, Texture2D, EntityType>();
     for(auto entity : view)
@@ -79,26 +80,41 @@ void RenderSystem(Scene& scene, MapInfo mapInfo)
         }
     }
 
-    auto secondView = scene.registry.view<EntityPosition, Texture2D, EntitySize, IsSelected>();
+    auto secondView = scene.registry.view<EntityPosition, Animation, EntitySize, IsSelected>();
     for(auto entity : secondView)
     {
         EntityPosition& entityPosition = secondView.get<EntityPosition>(entity);
-        Texture2D& texture = secondView.get<Texture2D>(entity);
+        //Texture2D& texture = secondView.get<Texture2D>(entity);
         EntitySize& size = secondView.get<EntitySize>(entity);
         IsSelected& isSelected = secondView.get<IsSelected>(entity);
 
         Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
-        Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
-        DrawTextureRec(texture, frameRec, characterPositionOnMap, WHITE);
+
+        Animation& animation = secondView.get<Animation>(entity);
+        ProcessAnimation(animation, size, deltaT, characterPosition);
 
         if(isSelected.Value)
         {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, RED);
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, DARKBROWN);
         }
     }
 
     DrawText(TextFormat("Gold: %d", scene.gold), -200, -200, 12, WHITE);
+}
+
+void ProcessAnimation(Animation& animation, EntitySize& size, float deltaT, Vector2 characterPositionOnMap){
+        animation.framesCounter += animation.speed * deltaT;
+        if (animation.framesCounter >= 10){
+            animation.framesCounter = 0;
+            animation.currentFrame++;
+
+            if (animation.currentFrame > animation.frameCount) animation.currentFrame = 0;
+        }
+        
+        Rectangle frameRec = { 0.0f, 0.0f, size.width, size.height };
+        frameRec.x = (float)animation.currentFrame*(float)size.width;
+        DrawTextureRec(animation.texture, frameRec, characterPositionOnMap, WHITE);
 }
 
 void MiniMapCharactersSystem(Scene& scene, MiniMap* miniMap)
@@ -326,10 +342,11 @@ void setTargetPosition(Scene& scene, MapInfo mapInfo, Camera2D camera)
 
 void updatePosition(Scene& scene, float deltaT)
 {
-    auto view = scene.registry.view<EntityPosition>();
+    auto view = scene.registry.view<EntityPosition, Animation>();
     for(auto entity : view)
     {
         EntityPosition& entityPosition = view.get<EntityPosition>(entity);
+        Animation& animation = view.get<Animation>(entity);
         Vector2* currentPosition = &entityPosition.currentPosition;
         Vector2* targetPosition = &entityPosition.targetPosition;
 
@@ -338,9 +355,13 @@ void updatePosition(Scene& scene, float deltaT)
         // TODO should be property of the entity
         float speed = 50.0f * deltaT;   
         // TODO should be property of the entity AND calculated correctly          
-        float diagonalSpeed = speed / (sqrt(2));    
+        float diagonalSpeed = speed / (sqrt(2));  
+
+        Direction horizontalDirection; 
+        Direction verticalDirection; 
 
         if(targetPosition->x > currentPosition->x){
+            horizontalDirection.Value = Direction::E;
             if(isMovingDiagonally){
                 currentPosition->x += diagonalSpeed;
             } else{
@@ -350,6 +371,7 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->x < currentPosition->x){
+            horizontalDirection.Value = Direction::W;
             if(isMovingDiagonally){
                 currentPosition->x -= diagonalSpeed;
             } else{
@@ -359,6 +381,7 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->y > currentPosition->y){
+            verticalDirection.Value = Direction::S;
             if(isMovingDiagonally){
                 currentPosition->y += diagonalSpeed;
             } else{
@@ -368,12 +391,42 @@ void updatePosition(Scene& scene, float deltaT)
         }
 
         if(targetPosition->y < currentPosition->y){
+            verticalDirection.Value = Direction::N;
             if(isMovingDiagonally){
                 currentPosition->y -= diagonalSpeed;
             } else{
                 currentPosition->y -= speed;
             }
             if(targetPosition->y > currentPosition->y) currentPosition->y = targetPosition->y;
+        }
+
+        Direction newDirection;
+        if(isMovingDiagonally){
+            if(horizontalDirection.Value == Direction::E){
+                if(verticalDirection.Value == Direction::N){
+                    newDirection.Value = Direction::NE;
+                } else{
+                    newDirection.Value = Direction::SE;
+                }
+            } else{
+                if(verticalDirection.Value == Direction::N){
+                    newDirection.Value = Direction::NW;
+                } else{
+                    newDirection.Value = Direction::SW;
+                 }
+            }
+        } else{
+            if(horizontalDirection.Value != Direction::None){
+                newDirection.Value = horizontalDirection.Value;
+            } else{
+                newDirection.Value = verticalDirection.Value;
+            }
+        }
+
+        if(newDirection.Value != Direction::None && newDirection.Value != entityPosition.direction.Value){
+            entityPosition.direction = newDirection;
+            AnimationManager* animationManager = AnimationManager::GetInstance();
+            animationManager->ChangeDirection(animation, newDirection, "peasant_walking");
         }
     }
 }
