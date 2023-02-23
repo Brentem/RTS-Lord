@@ -91,13 +91,13 @@ void RenderSystem(Scene& scene, MapInfo mapInfo, float deltaT)
         Vector2 characterPosition = entityPosition.currentPosition;
         Vector2 characterPositionOnMap = {(characterPosition.x + mapInfo.offSet.x), (characterPosition.y + mapInfo.offSet.y)};
 
-        Animation& animation = secondView.get<Animation>(entity);
-        ProcessAnimation(animation, size, deltaT, characterPosition);
-
         if(isSelected.Value)
         {
-            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, DARKBROWN);
+            DrawRectangleLines(characterPositionOnMap.x, characterPositionOnMap.y, size.width, size.height, GREEN);
         }
+
+        Animation& animation = secondView.get<Animation>(entity);
+        ProcessAnimation(animation, size, deltaT, characterPosition);
     }
 
     DrawText(TextFormat("Gold: %d", scene.gold), -200, -200, 12, WHITE);
